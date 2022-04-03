@@ -3,7 +3,7 @@ import Phaser from 'phaser'
 let gameOptions = {
  
     // water level, in % of screen height
-    waterLevel: 50,
+    waterLevel: 60,
  
     // ball gravity
     ballGravity: 1600,
@@ -14,9 +14,19 @@ let gameOptions = {
 
 export default class UnderwaterScene extends Phaser.Scene{
     constructor(){
-        super("PlayGame");
+        super("MainScene");
     }
+    static onGameOver;
+    static setGameOver(onGameOver) {
+        UnderwaterScene.onGameOver = onGameOver;
+    }
+    requestRestart() {
+        console.log('restart requested');
+        UnderwaterScene.instance.locked = true;
+    }
+    static instance;
     preload(){
+        UnderwaterScene.instance = this;
         this.load.setBaseURL('https://casper-game-1.storage.googleapis.com/')
         this.load.image("ball", "ball.png");
         this.load.image("water", "water.png");
@@ -24,6 +34,7 @@ export default class UnderwaterScene extends Phaser.Scene{
     create(){
         let game = this.game;
         this.deed = false;
+        this.locked = false;
         this.setScore(0);
 
         // add water sprite
@@ -40,7 +51,7 @@ export default class UnderwaterScene extends Phaser.Scene{
         this.water.displayHeight = game.config.height - this.water.y;
 
         // add ball sprite
-        this.ball = this.physics.add.sprite(game.config.width / 2, game.config.height / 4, "ball");
+        this.ball = this.physics.add.sprite(game.config.width / 2, game.config.height / 10, "ball");
         this.ball.setCollideWorldBounds();
         this.ball.body.onWorldBounds = true;
         this.physics.add.overlap(this.ball, this.water, this.coll, null, this);
@@ -52,6 +63,12 @@ export default class UnderwaterScene extends Phaser.Scene{
         this.input.on("pointerdown", this.jump, this);
 
         this.physics.world.on('worldbounds', this.onWorldBounds, this);
+
+        this.events.on('resume', this.onResume, this);
+    }
+
+    onResume() {
+        console.log(JSON.stringify(['resuming']));
     }
 
     onWorldBounds() {
@@ -68,7 +85,14 @@ export default class UnderwaterScene extends Phaser.Scene{
         if(!this.deed) {
             document.getElementById('deed-msg').style.display = 'block';
             this.deed = true;
+            let score = this.score;
             this.setScore(0);
+            this.scene.launch('PauseScene')
+            this.scene.pause();
+
+            if(UnderwaterScene.onGameOver) {
+                UnderwaterScene.onGameOver({score});
+            }
         }
     }
 

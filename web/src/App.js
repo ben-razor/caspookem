@@ -15,6 +15,8 @@ import Modal from 'react-modal';
 import gameConfig from './data/world/config';
 import Phaser from 'phaser';
 import Scene1 from './js/components/scenes/UnderwaterScene';
+import PauseScene from './js/components/scenes/PauseScene';
+import { requestCounterInc } from './js/helpers/casper';
 
 const baseImageURL = 'https://storage.googleapis.com/birdfeed-01000101.appspot.com/strange-juice-1/';
 const TOAST_TIMEOUT = 4000;
@@ -70,6 +72,7 @@ function App() {
   const [activeKart, setActiveKart] = useState('');
   const [processingActions, setProcessingActions] = useState({});
   const [screen, setScreen] = useState(screens.GARAGE);
+  const [highScore, setHighScore] = useState(0);
 
   function toast(message, type='info') {
     toasty[type](message, { 
@@ -107,7 +110,20 @@ function App() {
     })();
   }, [contract]);
 
+  function onGameOver(data) {
+    console.log(JSON.stringify(['game over', data, highScore]));
+    if(data.score > highScore) {
+      setHighScore(data.score);
+    }
+  }
+
+  async function saveHighScore() {
+    requestCounterInc();
+  }
+
   useEffect(() => {
+    Scene1.setGameOver(onGameOver);
+
     var config = {
       type: Phaser.AUTO,
       backgroundColor:0x888888,
@@ -121,11 +137,10 @@ function App() {
           gravity: { y: 200 },
         },
       },
-      scene: [Scene1],
+      scene: [Scene1, PauseScene],
     };
 
     var game = new Phaser.Game(config);
-
 
   }, []);
 
@@ -589,7 +604,8 @@ function App() {
           <div className="br-score-bar">
             <div className="br-deed" id="deed-msg" style={ { display: 'none'}}>You Deed</div>
             <div className="br-score" id="score">0</div>
-            <div className="br-high-score">High Score: <span id="high-score"></span></div>
+            <div className="br-high-score">High Score: <span id="high-score">{highScore}</span></div>
+            <button className="br-score-control" onClick={saveHighScore}>Save Score</button>
           </div>
           <div id="phaser-parent" className="phaser-parent">
           </div>
