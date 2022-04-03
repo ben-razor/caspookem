@@ -14,7 +14,7 @@ import bigInt from 'big-integer';
 import Modal from 'react-modal';
 import gameConfig from './data/world/config';
 import Phaser from 'phaser';
-import HelloWorldScene from './js/components/scenes/HelloWorldScene.ts';
+import Scene1 from './js/components/scenes/UnderwaterScene';
 
 const baseImageURL = 'https://storage.googleapis.com/birdfeed-01000101.appspot.com/strange-juice-1/';
 const TOAST_TIMEOUT = 4000;
@@ -110,6 +110,7 @@ function App() {
   useEffect(() => {
     var config = {
       type: Phaser.AUTO,
+      backgroundColor:0x888888,
       parent: 'phaser-parent',
       pixelArt: true,
       width: 800,
@@ -120,7 +121,7 @@ function App() {
           gravity: { y: 200 },
         },
       },
-      scene: [HelloWorldScene],
+      scene: [Scene1],
     };
 
     var game = new Phaser.Game(config);
@@ -584,7 +585,15 @@ function App() {
         </div>
       </div>
       <div className="br-content">
-        <div id="phaser-parent" className="phaser-parent"></div>
+        <div className="br-game-container">
+          <div className="br-score-bar">
+            <div className="br-deed" id="deed-msg" style={ { display: 'none'}}>You Deed</div>
+            <div className="br-score" id="score">0</div>
+            <div className="br-high-score">High Score: <span id="high-score"></span></div>
+          </div>
+          <div id="phaser-parent" className="phaser-parent">
+          </div>
+        </div>
       </div>
     </div>
   );

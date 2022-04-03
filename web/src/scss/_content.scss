@@ -962,3 +962,27 @@
     width: 800px;
     height: 600px;
 }
+
+.br-score-bar {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.br-score {
+    margin: 10px;
+}
+
+.br-deed {
+    margin: 10px;
+}
+
+.br-high-score {
+    margin: 10px;
+}
+
+.br-game-container {
+    width: 800px;
+    height: 600px;
+    margin: auto;
+}
