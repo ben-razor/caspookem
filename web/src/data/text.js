@@ -1,0 +1,100 @@
+const text_consts = {
+  "app_name": "NEAR Karts",
+  "nft_name": "NEAR Kart",
+  "nft_short_name": "Kart",
+  "blockchain_name": "NEAR",
+  "mint_price": "0.1 NEAR",
+  "upgrade_price": "0.1 NEAR"
+}
+
+const text = {
+  "en": {
+    "text_header_info": `Header Info`,
+    "text_intro_line_1": `Intro line 1`,
+    "text_intro_line_2": `Intro line 2`,
+    "text_intro_line_3": `Intro line 3`,
+    "text_intro_line_4": `Intro line 4`,
+    "text_intro_summary": `Intro summary text`,
+    "text_modal_1_tab_1": `Tab 1`,
+    "text_modal_2_tab_2": `Tab 2`,
+    "text_header_button_2": `Modal 2`,
+    "text_sign_in": `Sign In`,
+    "text_kart_name_label": `Enter ${text_consts.nft_name} name...`,
+    "text_battle_started": `Battle has commenced!!`,
+    "text_no_battle": `No battle to watch`,
+    "text_battle_loading": `Arena is being prepared for battle...`,
+    "text_battle_arena": `Battle Arena`,
+    "text_battle": `Battle`,
+    "text_your_kart": `Your ${text_consts.nft_short_name}`,
+    "text_opponent_kart": `Opponent ${text_consts.nft_short_name}`,
+    "text_vs": `Vs`,
+    "text_get_new_decals": `Get new decals by winning battles!`,
+    "text_unlock_items": `Unlock items as you rise through the levels!`,
+    "text_creating_image": `Photographing ${text_consts.nft_name} for NFT`,
+    "text_mint_request": `Minting on ${text_consts.blockchain_name} blockchain`,
+    "text_upgrade_request": `Upgrading on ${text_consts.blockchain_name} blockchain`,
+    "text_finding_opponent": `Finding opponent on ${text_consts.blockchain_name} blockchain`,
+    "text_locked": `${text_consts.nft_name} is locked for upgrades`,
+    "text_next_upgrade": `Next upgrade at level {next_upgrade_level}`,
+    "text_upgrade_save": `Upgrade and save your ${text_consts.nft_short_name} on ${text_consts.blockchain_name}`,
+    "text_level": `Level`,
+    "text_leaderboard_waiting": `Leaderboard is waiting for data`,
+    "text_leaderboard_processing": `New battle results are added after a short processing time`,
+
+
+    "text_help_welcome": `Welcome to ${text_consts.app_name}`,
+    "text_help_near_karts": `${text_consts.app_name} is a system for creating Battle Kart NFTs`,
+    "text_help_garage": `In your garage you equip and pimp your ${text_consts.nft_name}.`,
+    "text_help_equip_pimp": `Equip and pimp your ${text_consts.nft_name}`,
+    "text_help_mint": `Mint it on the ${text_consts.blockchain_name} blockchain for ${text_consts.mint_price}`,
+    "text_help_garage_title": `Garage`,
+    "text_help_battle_title": `Battles`,
+    "text_help_battle": `Each battle won increases your ${text_consts.nft_name} level by 1`,
+    "text_help_level_up": `Unlock items as your level increases`,
+    "text_help_upgrade": `You can upgrade and save your ${text_consts.nft_name} once every 5 levels`,
+    "text_help_kart_name": `The name of your ${text_consts.nft_name} cannot be changed so choose wisely!`,
+    "text_help_no_equip_benefit": `Your equipment does not effect on the battle outcome`,
+    "text_help_look_cool": `It just makes your ${text_consts.nft_name} look cool!`,
+    "text_try_later": `Please try again later`,
+
+    "text_alpha_warning": `${text_consts.app_name} is an alpha demo running on ${text_consts.blockchain_name} testnet`,
+    "text_data_loss_warning": `${text_consts.nft_name} and data may be removed as the app is developed`,
+
+    "success_save_kart": `${text_consts.nft_name} saved!!`,
+    "success_image_upload": `${text_consts.nft_short_name} image uploaded`,
+
+    "error_chain_unavailable": `${text_consts.blockchain_name} is currently unavailable`,
+    "error_save_kart": `Error saving ${text_consts.nft_name}`,
+    "error_no_active_kart": `No ${text_consts.nft_name} is active`,
+    "error_check_console": "Check console for details",
+    "error_mint_kart": `Error minting ${text_consts.nft_name}`,
+    "error_upgrade_kart": `Error upgrading ${text_consts.nft_name}`,
+    "error_starting_battle": `Error starting battle`,
+    "error_no_opponent_selected": `Error no opponent selected`,
+    "error_no_battle_self": `Error ${text_consts.nft_name} cannot battle self`,
+    "error_no_kart_name": `No name supplied for ${text_consts.nft_name}`,
+    "error_image_upload_failed": `Image upload failed`,
+    "error_upgrade_kart_locked": `${text_consts.nft_name} is locked for upgrades`,
+    "error_signature_verification_failed": `Signature verification of cid failed`,
+    "error_pubkey_is_not_signer": `Pub Key is not a registered signer`,
+    "error_mint_payment_too_low": `Minting requires an attached deposit of at least ${text_consts.mint_price}`,
+    "error_upgrade_payment_too_low": `Upgrade requires an attached deposit of at least ${text_consts.upgrade_price}`
+  }
+};
+
+const langs = ["en"];
+let lang = langs[0];
+
+export default function getText(id, replacements) {
+  let t = text[lang][id] || id;
+  if(replacements) {
+    for(let k of Object.keys(replacements)) {
+      t = t.replaceAll(`{${k}}`, `${replacements[k]}`);
+    }
+  }
+  return t;
+}
+
+export function exclamation(text) {
+  return text + '!!';
+}
