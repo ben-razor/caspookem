@@ -45,23 +45,14 @@ const helpModes = {
   BATTLE: 2
 }
 
-let activePublicKey;
-
 function App() {
   const [ modalIsOpen, setModalIsOpen ] = useState(false);
   const [ modal2IsOpen, setModal2IsOpen ] = useState(false);
   const [ helpMode, setHelpMode] = useState(helpModes.INTRO);
   const [ headerInfoText, setHeaderInfoText ] = useState(getText('text_header_info'));
-  const [contract, setContract] = useState();
   const [wallet, setWallet] = useState();
   const [walletSignedIn, setWalletSignedIn] = useState(true);
-  const [nftContract, setNFTContract] = useState();
-  const [tokensLoaded, setTokensLoaded] = useState(true);
   const [nftList, setNFTList] = useState([]);
-  const [nftData, setNFTData] = useState({});
-  const [nftMetadata, setNFTMetadata] = useState({});
-  const [activeTokenId, setActiveTokenId] = useState();
-  const [activeKart, setActiveKart] = useState('');
   const [processingActions, setProcessingActions] = useState({});
   const [screen, setScreen] = useState(screens.GARAGE);
   const [highScore, setHighScore] = useState(0);
@@ -69,6 +60,7 @@ function App() {
   const [timerId, setTimerId] = useState(0);
   const [submittedTx, setSubmittedTx] = useState([]);
   const [txTimerId, setTxTimerId] = useState(0);
+  const [activePublicKey, setActivePublicKey] = useState();
 
   function toast(message, type='info') {
     toasty[type](message, { 
@@ -103,33 +95,43 @@ function App() {
     }
     setPendingTx([]);
   }, [pendingTx]);
+
+  useEffect(() => {
+    console.log(JSON.stringify(['apk changed', activePublicKey]));
+    
+    if(activePublicKey) {
+      requestHighScore();
+    }
+  }, [activePublicKey]);
   
   useEffect(() => {
-    if(stateCheck.changed('doPendingTx', pendingTx)) {
+    if(stateCheck.changed('doPendingTx', pendingTx) || stateCheck.changed('apk1', activePublicKey)) {
       console.log(JSON.stringify(['cl int']));
       
       clearInterval(timerId);
 
       let _timerId = setInterval(async () => {
+        console.log(JSON.stringify(['inter']));
+        
         try {
           let _activePublicKey = await window.casperlabsHelper.getActivePublicKey();
           console.log(JSON.stringify(['SI - apk', _activePublicKey]));
           if(_activePublicKey !== activePublicKey) {
             console.log(JSON.stringify(['Connected!']));
             doPendingTx();
+            setActivePublicKey(_activePublicKey);
           }
-          activePublicKey = _activePublicKey;
         }
         catch(e) { 
           console.log(JSON.stringify(['SI - No pub key']));
-          activePublicKey = null;
+          setActivePublicKey();
         }
       }, 500);
 
       setTimerId(_timerId);
     }
     return () => clearInterval(timerId);
-  }, [pendingTx, doPendingTx, timerId]);
+  }, [pendingTx, doPendingTx, timerId, activePublicKey]);
 
   useEffect(() => {
     console.log(JSON.stringify(['cstx 1']));
@@ -208,9 +210,16 @@ function App() {
           }
         }
         else if(type === 'getHighScore') {
-          let savedHighScore = await getHighScore(res.data.activePublicKey);
-          if(savedHighScore > highScore) {
+          let hsRes = await getHighScore(res.data.activePublicKey);
+          console.log(JSON.stringify(['ghs', hsRes]));
+
+          if(hsRes.success) {
+            let savedHighScore = hsRes.data.highScore;
             setHighScore(savedHighScore);
+          }
+          else {
+            console.log('High score read error: ', hsRes.reason, res.data.activePublicKey);
+            setHighScore(0);
           }
         }
       }

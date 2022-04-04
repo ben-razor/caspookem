@@ -58,11 +58,19 @@ async function counter_inc(publicKeyHex, networkName, paymentAmount) {
 }
 
 export async function getHighScore(publicKeyHex) {
+  let res = createSuccessInfo();
   let publicKey = CLPublicKey.fromHex(publicKeyHex);
   let accountHash = publicKey.toAccountHashStr().substring(13); // Remove account-hash- from the account hash str
-  let response = await contractHighScore.queryContractDictionary("highscore_dictionary", accountHash);
-  console.log(JSON.stringify(['getHighScore', response]));
-  return response?.data?.toString();
+  try {
+    let response = await contractHighScore.queryContractDictionary("highscore_dictionary", accountHash); 
+    res.data.highScore = response?.data?.toString();
+    console.log(JSON.stringify(['casper getHighScore', response]));
+  }
+  catch(e) {
+    res = createErrorInfo('error_reading_highscore', { error: e });
+  }
+
+  return res;
 }
 
 export async function addHighScore(score, publicKeyHex, networkName, paymentAmount) {
