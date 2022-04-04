@@ -180,7 +180,7 @@ export async function requestAccountInfo() {
 
 export async function casperAttemptConnect() {
   let success = false;
-  let reason = 'error-no-casper-signer';
+  let reason = 'error_no_casper_signer';
   let activePublicKey;
   
   if(window.casperlabsHelper) {
@@ -193,7 +193,7 @@ export async function casperAttemptConnect() {
       }
     }
     catch(e) { 
-      reason = 'error-casper-signer-no-account';
+      reason = 'error_casper_signer_no_account';
     }
     
     if(!activePublicKey) {
@@ -202,7 +202,7 @@ export async function casperAttemptConnect() {
     }
 
     if(!activePublicKey) {
-      reason = 'error-casper-signer-no-account';
+      reason = 'error_casper_signer_no_account';
     }
   }
 

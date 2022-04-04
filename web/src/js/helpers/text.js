@@ -78,7 +78,12 @@ const text = {
     "error_signature_verification_failed": `Signature verification of cid failed`,
     "error_pubkey_is_not_signer": `Pub Key is not a registered signer`,
     "error_mint_payment_too_low": `Minting requires an attached deposit of at least ${text_consts.mint_price}`,
-    "error_upgrade_payment_too_low": `Upgrade requires an attached deposit of at least ${text_consts.upgrade_price}`
+    "error_upgrade_payment_too_low": `Upgrade requires an attached deposit of at least ${text_consts.upgrade_price}`,
+
+    "error_casper_error": `Error connecting to Casper network`,
+    "error_no_casper_signer": `Casper Wallet not found`,
+    "error_casper_signer_no_account": `Please sign in to Casper network`,
+    "error_tx_pending": `A transaction of this type is waiting for Casper network`
   }
 };
 

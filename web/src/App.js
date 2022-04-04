@@ -8,8 +8,8 @@ import 'react-toastify/dist/ReactToastify.css';
 import * as nearAPI from 'near-api-js';
 import BrButton from './js/components/lib/BrButton';
 import { initNear } from './js/helpers/near';
-import { localLog } from './js/helpers/helpers';
-import getText from './data/text';
+import { localLog, StateCheck } from './js/helpers/helpers';
+import getText from './js/helpers/text';
 import bigInt from 'big-integer';
 import Modal from 'react-modal';
 import gameConfig from './data/world/config';
@@ -17,6 +17,8 @@ import Phaser from 'phaser';
 import Scene1 from './js/components/scenes/UnderwaterScene';
 import PauseScene from './js/components/scenes/PauseScene';
 import { csprToMote, casperAttemptConnect, addHighScore, getHighScore } from './js/helpers/casper';
+
+let stateCheck = new StateCheck();
 
 const PAYMENT_ADD_HIGH_SCORE = csprToMote(0.1);
 const NETWORK_NAME = 'casper-test';
@@ -43,6 +45,8 @@ const helpModes = {
   BATTLE: 2
 }
 
+let activePublicKey;
+
 function App() {
   const [ modalIsOpen, setModalIsOpen ] = useState(false);
   const [ modal2IsOpen, setModal2IsOpen ] = useState(false);
@@ -61,10 +65,12 @@ function App() {
   const [processingActions, setProcessingActions] = useState({});
   const [screen, setScreen] = useState(screens.GARAGE);
   const [highScore, setHighScore] = useState(0);
+  const [pendingTx, setPendingTx] = useState([]);
+  const [timerId, setTimerId] = useState(0);
 
   function toast(message, type='info') {
     toasty[type](message, { 
-      position: "top-right",
+      position: "top-left",
       autoClose: TOAST_TIMEOUT,
       hideProgressBar: false,
       closeOnClick: true,
@@ -86,20 +92,43 @@ function App() {
     }
   }
 
-  async function requestHighScore(score) {
-    try {
-      let res = await casperAttemptConnect();
+  const doPendingTx = useCallback(() => {
+    console.log(JSON.stringify(['doing', pendingTx]));
+    for(let txInfo of pendingTx) {
+      console.log(JSON.stringify(['doing pending tx', txInfo]));
       
-      if(res.success) {
-        await getHighScore(res.data.activePublicKey);
-      }
-      else {
-        console.log(res.reason);
-      }
+      requestCasperTx(txInfo.type, txInfo.data);
     }
-    catch(e) {
-      console.log('Error', e);
+    setPendingTx([]);
+  }, [pendingTx]);
+  
+  useEffect(() => {
+    if(stateCheck.changed('doPendingTx', pendingTx)) {
+      clearInterval(timerId);
+
+      let _timerId = setInterval(async () => {
+        try {
+          let _activePublicKey = await window.casperlabsHelper.getActivePublicKey();
+          console.log(JSON.stringify(['SI - apk', _activePublicKey]));
+          if(_activePublicKey !== activePublicKey) {
+            console.log(JSON.stringify(['Connected!']));
+            doPendingTx();
+          }
+          activePublicKey = _activePublicKey;
+        }
+        catch(e) { 
+          console.log(JSON.stringify(['SI - No pub key']));
+          activePublicKey = null;
+        }
+      }, 500);
+
+      setTimerId(_timerId);
     }
+    return () => clearInterval(timerId);
+  }, [pendingTx, doPendingTx, timerId]);
+
+  async function requestHighScore() {
+    requestCasperTx('getHighScore');
   }
 
   async function saveHighScore(score) {
@@ -110,11 +139,68 @@ function App() {
         await addHighScore(score, res.data.activePublicKey, NETWORK_NAME, PAYMENT_ADD_HIGH_SCORE);
       }
       else {
+        addPendingTx('addHighScore', { score });
         console.log(res.reason);
+        toast(getText(res.reason), 'info');
       }
     }
     catch(e) {
       console.log('Error', e);
+      toast(getText('error_casper_error'), 'warning');
+    }
+  }
+
+  async function requestCasperTx(type, data) {
+    try {
+      let res = await casperAttemptConnect();
+
+      if(res.success) {
+        if(type === 'addHighScore') {
+          await addHighScore(data.score, res.data.activePublicKey, NETWORK_NAME, PAYMENT_ADD_HIGH_SCORE);
+        }
+        else if(type === 'getHighScore') {
+          let savedHighScore = await getHighScore(res.data.activePublicKey);
+          if(savedHighScore > highScore) {
+            setHighScore(savedHighScore);
+          }
+        }
+      }
+      else {
+        addPendingTx(type, data);
+        console.log(res.reason);
+        toast(getText(res.reason), 'info');
+      }
+    }
+    catch(e) {
+      console.log('Error', e);
+      toast(getText('error_casper_error'), 'warning');
+    }
+  }
+
+  function txExists(type, data, exclusive=true) {
+    let existingTx = pendingTx.find(x => x.type === type && exclusive);
+    return existingTx;
+  }
+
+  function txDelete(type, data, exclusive=true) {
+    let existingTxIndex = pendingTx.findIndex(x => x.type === type && exclusive);
+    if(existingTxIndex !== -1) {
+      pendingTx.splice(existingTxIndex, 1);
+    }
+  }
+
+  useEffect(() => {
+    console.log(JSON.stringify(['ptx', pendingTx]));
+    
+  }, [pendingTx]);
+
+  function addPendingTx(type, data, exclusive=true) {
+    console.log(JSON.stringify(['adding', type]));
+    
+    if(!txExists(type, data)) {
+      let _pendingTx = [...pendingTx, { type, data }];
+      setPendingTx(_pendingTx);
+      console.log(JSON.stringify(['added', _pendingTx]));
     }
   }
 
