@@ -1,0 +1,1 @@
+/home/chrisb/dev/crypto1/casper/casper-sp-game-1/contract/single-player/target/wasm32-unknown-unknown/release/highscore.wasm: /home/chrisb/dev/crypto1/casper/casper-sp-game-1/contract/single-player/contract/src/highscore.rs

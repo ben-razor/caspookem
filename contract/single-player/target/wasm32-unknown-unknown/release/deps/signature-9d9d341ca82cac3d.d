@@ -1,0 +1,11 @@
+/home/chrisb/dev/crypto1/casper/casper-sp-game-1/contract/single-player/target/wasm32-unknown-unknown/release/deps/signature-9d9d341ca82cac3d.rmeta: /home/chrisb/.cargo/registry/src/github.com-1ecc6299db9ec823/signature-1.2.2/src/lib.rs /home/chrisb/.cargo/registry/src/github.com-1ecc6299db9ec823/signature-1.2.2/src/error.rs /home/chrisb/.cargo/registry/src/github.com-1ecc6299db9ec823/signature-1.2.2/src/signature.rs /home/chrisb/.cargo/registry/src/github.com-1ecc6299db9ec823/signature-1.2.2/src/signer.rs /home/chrisb/.cargo/registry/src/github.com-1ecc6299db9ec823/signature-1.2.2/src/verifier.rs
+
+/home/chrisb/dev/crypto1/casper/casper-sp-game-1/contract/single-player/target/wasm32-unknown-unknown/release/deps/libsignature-9d9d341ca82cac3d.rlib: /home/chrisb/.cargo/registry/src/github.com-1ecc6299db9ec823/signature-1.2.2/src/lib.rs /home/chrisb/.cargo/registry/src/github.com-1ecc6299db9ec823/signature-1.2.2/src/error.rs /home/chrisb/.cargo/registry/src/github.com-1ecc6299db9ec823/signature-1.2.2/src/signature.rs /home/chrisb/.cargo/registry/src/github.com-1ecc6299db9ec823/signature-1.2.2/src/signer.rs /home/chrisb/.cargo/registry/src/github.com-1ecc6299db9ec823/signature-1.2.2/src/verifier.rs
+
+/home/chrisb/dev/crypto1/casper/casper-sp-game-1/contract/single-player/target/wasm32-unknown-unknown/release/deps/signature-9d9d341ca82cac3d.d: /home/chrisb/.cargo/registry/src/github.com-1ecc6299db9ec823/signature-1.2.2/src/lib.rs /home/chrisb/.cargo/registry/src/github.com-1ecc6299db9ec823/signature-1.2.2/src/error.rs /home/chrisb/.cargo/registry/src/github.com-1ecc6299db9ec823/signature-1.2.2/src/signature.rs /home/chrisb/.cargo/registry/src/github.com-1ecc6299db9ec823/signature-1.2.2/src/signer.rs /home/chrisb/.cargo/registry/src/github.com-1ecc6299db9ec823/signature-1.2.2/src/verifier.rs
+
+/home/chrisb/.cargo/registry/src/github.com-1ecc6299db9ec823/signature-1.2.2/src/lib.rs:
+/home/chrisb/.cargo/registry/src/github.com-1ecc6299db9ec823/signature-1.2.2/src/error.rs:
+/home/chrisb/.cargo/registry/src/github.com-1ecc6299db9ec823/signature-1.2.2/src/signature.rs:
+/home/chrisb/.cargo/registry/src/github.com-1ecc6299db9ec823/signature-1.2.2/src/signer.rs:
+/home/chrisb/.cargo/registry/src/github.com-1ecc6299db9ec823/signature-1.2.2/src/verifier.rs:

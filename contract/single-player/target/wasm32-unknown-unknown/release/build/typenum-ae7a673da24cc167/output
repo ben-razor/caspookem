@@ -1,0 +1,2 @@
+cargo:rustc-env=TYPENUM_BUILD_CONSTS=/home/chrisb/dev/crypto1/casper/casper-sp-game-1/contract/single-player/target/wasm32-unknown-unknown/release/build/typenum-ae7a673da24cc167/out/consts.rs
+cargo:rustc-env=TYPENUM_BUILD_OP=/home/chrisb/dev/crypto1/casper/casper-sp-game-1/contract/single-player/target/wasm32-unknown-unknown/release/build/typenum-ae7a673da24cc167/out/op.rs

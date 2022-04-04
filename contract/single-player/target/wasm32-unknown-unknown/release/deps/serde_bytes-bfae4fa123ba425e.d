@@ -1,0 +1,11 @@
+/home/chrisb/dev/crypto1/casper/casper-sp-game-1/contract/single-player/target/wasm32-unknown-unknown/release/deps/serde_bytes-bfae4fa123ba425e.rmeta: /home/chrisb/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_bytes-0.11.5/src/lib.rs /home/chrisb/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_bytes-0.11.5/src/bytes.rs /home/chrisb/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_bytes-0.11.5/src/de.rs /home/chrisb/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_bytes-0.11.5/src/ser.rs /home/chrisb/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_bytes-0.11.5/src/bytebuf.rs
+
+/home/chrisb/dev/crypto1/casper/casper-sp-game-1/contract/single-player/target/wasm32-unknown-unknown/release/deps/libserde_bytes-bfae4fa123ba425e.rlib: /home/chrisb/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_bytes-0.11.5/src/lib.rs /home/chrisb/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_bytes-0.11.5/src/bytes.rs /home/chrisb/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_bytes-0.11.5/src/de.rs /home/chrisb/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_bytes-0.11.5/src/ser.rs /home/chrisb/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_bytes-0.11.5/src/bytebuf.rs
+
+/home/chrisb/dev/crypto1/casper/casper-sp-game-1/contract/single-player/target/wasm32-unknown-unknown/release/deps/serde_bytes-bfae4fa123ba425e.d: /home/chrisb/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_bytes-0.11.5/src/lib.rs /home/chrisb/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_bytes-0.11.5/src/bytes.rs /home/chrisb/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_bytes-0.11.5/src/de.rs /home/chrisb/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_bytes-0.11.5/src/ser.rs /home/chrisb/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_bytes-0.11.5/src/bytebuf.rs
+
+/home/chrisb/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_bytes-0.11.5/src/lib.rs:
+/home/chrisb/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_bytes-0.11.5/src/bytes.rs:
+/home/chrisb/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_bytes-0.11.5/src/de.rs:
+/home/chrisb/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_bytes-0.11.5/src/ser.rs:
+/home/chrisb/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_bytes-0.11.5/src/bytebuf.rs:
