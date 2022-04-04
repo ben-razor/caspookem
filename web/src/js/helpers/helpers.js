@@ -34,16 +34,16 @@ export function clip(text, toaster) {
   });
 }
 
-export function createSuccessInfo() {
-  return { success: true, reason: 'ok', code: 0, message: ''};
+export function createSuccessInfo(reason='ok', data={}) {
+  return { success: true, reason, data };
 }
 
-export function createErrorInfo(reason='error', code=0, message='') {
-  return { success: false, reason, code, message };
+export function createErrorInfo(reason='error', data={}) {
+  return { success: false, reason, data };
 }
 
-export function result(success, reason, code, message, data) {
-  return { success, reason, code, message, data};
+export function result(success, reason, data) {
+  return { success, reason, data };
 }
 
 export class StateCheck {

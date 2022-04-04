@@ -60,6 +60,9 @@ const text = {
     "text_alpha_warning": `${text_consts.app_name} is an alpha demo running on ${text_consts.blockchain_name} testnet`,
     "text_data_loss_warning": `${text_consts.nft_name} and data may be removed as the app is developed`,
 
+    "text_high_score_saved": `High score saved on Casper!`,
+    "text_tx_complete": `Transaction complete: {type}`,
+
     "success_save_kart": `${text_consts.nft_name} saved!!`,
     "success_image_upload": `${text_consts.nft_short_name} image uploaded`,
 

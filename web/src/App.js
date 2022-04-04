@@ -16,7 +16,7 @@ import gameConfig from './data/world/config';
 import Phaser from 'phaser';
 import Scene1 from './js/components/scenes/UnderwaterScene';
 import PauseScene from './js/components/scenes/PauseScene';
-import { csprToMote, casperAttemptConnect, addHighScore, getHighScore } from './js/helpers/casper';
+import { csprToMote, casperAttemptConnect, addHighScore, getHighScore, getDeploy } from './js/helpers/casper';
 
 let stateCheck = new StateCheck();
 
@@ -67,6 +67,8 @@ function App() {
   const [highScore, setHighScore] = useState(0);
   const [pendingTx, setPendingTx] = useState([]);
   const [timerId, setTimerId] = useState(0);
+  const [submittedTx, setSubmittedTx] = useState([]);
+  const [txTimerId, setTxTimerId] = useState(0);
 
   function toast(message, type='info') {
     toasty[type](message, { 
@@ -104,6 +106,8 @@ function App() {
   
   useEffect(() => {
     if(stateCheck.changed('doPendingTx', pendingTx)) {
+      console.log(JSON.stringify(['cl int']));
+      
       clearInterval(timerId);
 
       let _timerId = setInterval(async () => {
@@ -127,27 +131,65 @@ function App() {
     return () => clearInterval(timerId);
   }, [pendingTx, doPendingTx, timerId]);
 
+  useEffect(() => {
+    console.log(JSON.stringify(['cstx 1']));
+    
+    if(stateCheck.changed('checkSubmittedTx', submittedTx)) {
+      
+      console.log(JSON.stringify(['cstx 2']));
+      clearInterval(txTimerId);
+
+      let _txTimerId = setInterval(async () => {
+        try {
+          console.log(JSON.stringify(['cstx 3', submittedTx]));
+
+          if(submittedTx.length) {
+            let successful = [];
+            let i = 0;
+            for(let txInfo of submittedTx) {
+              let res = await getDeploy(txInfo.data.deploy);
+              console.log(JSON.stringify([res]));
+
+              if(res.success) {
+                if(txInfo.type === 'addHighScore') {
+                  toast(getText('text_high_score_saved'));
+                }
+                else {
+                  toast(getText('text_tx_complete', txInfo));
+                }
+                console.log(JSON.stringify(['deployed!']));
+                successful.push(i++);
+              }
+            }
+
+            for(let index of successful) {
+              console.log(JSON.stringify(['Removing submitted...', submittedTx[index]]));
+              submittedTx.splice(index, 1);
+            }
+
+            setSubmittedTx(submittedTx);
+          }
+        }
+        catch(e) { 
+          console.log(JSON.stringify(['getDeploy monitor error', e]));
+        }
+      }, 2000);
+
+      setTxTimerId(_txTimerId);
+    }
+    return () => clearInterval(txTimerId);
+  }, [submittedTx, txTimerId]);
+
+  useEffect(() => {
+    console.log(JSON.stringify(['stx', submittedTx]));
+  }, [submittedTx]);
+
   async function requestHighScore() {
     requestCasperTx('getHighScore');
   }
 
   async function saveHighScore(score) {
-    try {
-      let res = await casperAttemptConnect();
-      
-      if(res.success) {
-        await addHighScore(score, res.data.activePublicKey, NETWORK_NAME, PAYMENT_ADD_HIGH_SCORE);
-      }
-      else {
-        addPendingTx('addHighScore', { score });
-        console.log(res.reason);
-        toast(getText(res.reason), 'info');
-      }
-    }
-    catch(e) {
-      console.log('Error', e);
-      toast(getText('error_casper_error'), 'warning');
-    }
+    requestCasperTx('addHighScore', { score })
   }
 
   async function requestCasperTx(type, data) {
@@ -156,7 +198,14 @@ function App() {
 
       if(res.success) {
         if(type === 'addHighScore') {
-          await addHighScore(data.score, res.data.activePublicKey, NETWORK_NAME, PAYMENT_ADD_HIGH_SCORE);
+          let txRes = await addHighScore(data.score, res.data.activePublicKey, NETWORK_NAME, PAYMENT_ADD_HIGH_SCORE);
+          if(txRes.success) {
+            console.log(JSON.stringify(['deploy', txRes.data.deploy]));
+            
+            data.deploy = txRes.data.deploy;
+            let _submittedTx = [...submittedTx, { type, data }]
+            setSubmittedTx(_submittedTx);
+          }
         }
         else if(type === 'getHighScore') {
           let savedHighScore = await getHighScore(res.data.activePublicKey);

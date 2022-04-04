@@ -2,6 +2,7 @@ import { CasperClient, CasperServiceByJsonRPC, CLPublicKey, DeployUtil } from "c
 import {
   Contracts, Keys, RuntimeArgs, CLValueBuilder
 } from 'casper-js-sdk';
+import { createSuccessInfo, createErrorInfo } from "./helpers";
 
 const { Contract, toCLMap, fromCLMap } = Contracts;
 
@@ -65,29 +66,33 @@ export async function getHighScore(publicKeyHex) {
 }
 
 export async function addHighScore(score, publicKeyHex, networkName, paymentAmount) {
-  const runtimeArgs = RuntimeArgs.fromMap({ 'score': CLValueBuilder.u512(score) });
+  let res = createSuccessInfo();
 
-  const publicKey = CLPublicKey.fromHex(publicKeyHex);
-
-  let result = contractHighScore.callEntrypoint(
-    'add_highscore',
-    runtimeArgs,
-    publicKey,
-    networkName,
-    paymentAmount,
-  );
-
-  console.log(JSON.stringify(['res', result]));
-  
-  const deployJSON = DeployUtil.deployToJson(result);
-
-  let sig = await window.casperlabsHelper.sign(deployJSON, publicKeyHex);
   try {
-    await sendDeploy(sig);
+    const runtimeArgs = RuntimeArgs.fromMap({ 'score': CLValueBuilder.u512(score) });
+
+    const publicKey = CLPublicKey.fromHex(publicKeyHex);
+
+    let result = contractHighScore.callEntrypoint(
+      'add_highscore',
+      runtimeArgs,
+      publicKey,
+      networkName,
+      paymentAmount,
+    );
+
+    console.log(JSON.stringify(['res', result]));
+    
+    const deployJSON = DeployUtil.deployToJson(result);
+    let sig = await window.casperlabsHelper.sign(deployJSON, publicKeyHex);
+    res = await sendDeploy(sig);
   }
   catch(e) {
     console.log(JSON.stringify(['send deploy failed', e]));
+    res = createErrorInfo('error_sending_tx', { error: e })
   }
+
+  return res;
 }
 
 export async function requestAddHighScore(score) {
@@ -107,19 +112,27 @@ export async function requestAddHighScore(score) {
 }
 
 async function sendDeploy(sig) {
+  let success = true;
+  let reason = 'ok';
+  let data = {};
+
+  try {
     // Sign transcation using casper-signer.
     const deployObject = DeployUtil.deployFromJson(sig);
 
     // Here we are sending the signed deploy.
     const deploy = await casperClient.putDeploy(deployObject.val);
-  
-    try {
-      console.log(JSON.stringify(['tx deployed', deploy]));
-      initiateGetDeployProcedure(deploy); 
-    }
-    catch(e) {
-      console.log(JSON.stringify(['igdp', e]));
-    }
+
+    console.log(JSON.stringify(['tx deployed', deploy]));
+    data.deploy = deploy;
+  }
+  catch(e) {
+    success = false;
+    reason = 'error_deploy'
+    data.error = e;
+  }
+
+  return { success, reason, data }
 }
 
 export async function requestCounterGet() {
@@ -127,50 +140,52 @@ export async function requestCounterGet() {
   return res.toString();
 }
 
-function initiateGetDeployProcedure(hash) {
+export function initiateGetDeployProcedure(hash) {
   getDeploy(hash);
   getDeployInterval = setInterval(() => { //We call this every 5 seconds to check on the status of the deploy
     getDeploy(hash);
   }, 5000);
 }
 
-async function getDeploy(deployHash) {
+export async function getDeploy(deployHash) {
+  let res = createErrorInfo();
+
   console.log(JSON.stringify(['gd', deployHash]));
   
-  casperClient.getDeploy(deployHash).then((response) => {
-    console.log(JSON.stringify(['gd 2', deployHash, response]));
-    if (response.length === 0) { //See if there's return data yet
-      console.log("No return data yet");
-      return;
+  try {
+    let response = await casperClient.getDeploy(deployHash);
+
+    if (response.length === 0) { 
+      res.reason = 'error_deploy_no_return_data'
     }
+    else {
+      const resultInfo = response[1];
 
-    const resultInfo = response[1];
+      if (!resultInfo?.execution_results?.length) { //If executionResults doesn't contain the result key the deployment hasn't been executed by the node
+        console.log("Doesnt have result yet");
+        res.reason = 'error_deploy_no_result_yet';
+      }
+      else {
+        const result = resultInfo.execution_results[0].result;
+        res.data = result;
 
-    if (!resultInfo?.execution_results?.length) { //If executionResults doesn't contain the result key the deployment hasn't been executed by the node
-      console.log("Doesnt have result yet");
-      return;
+        if (result && result.hasOwnProperty("Success")) { //Deployment succeeded!
+          res.success = true;
+          res.reason = 'ok';
+          console.log("Execution Successful");
+        } else if (result.hasOwnProperty("Failure")) {
+          res.reason = 'error_deploy_failure';
+        } else {
+          res.reason = 'error_deploy_failure';
+        }
+      }
     }
+  } catch(e) {
+    res.reason = 'error_deploy_failure';
+    res.data.error = e;
+  };
 
-    const result = resultInfo.execution_results[0].result; //Get the result
-    console.log(response);
-
-    if (result && result.hasOwnProperty("Success")) { //Deployment succeeded!
-      (async () => {
-        let res = await requestCounterGet();
-        console.log(JSON.stringify(['counter', res]));
-      })();
-      console.log("Execution Successful");
-    } else if (result.hasOwnProperty("Failure")) {
-      console.log("Execution Failure");
-    } else {
-      console.log("Unknown Error");
-    }
-    clearInterval(getDeployInterval); //Stop polling getDeploy
-
-  }).catch((error) => {
-    console.log(JSON.stringify(['getDeployError', error]));
-    clearInterval(getDeployInterval); //Stop polling getDeploy
-  });
+  return res;
 }
 
 export async function requestAccountInfo() {
