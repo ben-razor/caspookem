@@ -28,7 +28,7 @@ export default class UnderwaterScene extends Phaser.Scene{
     preload(){
         UnderwaterScene.instance = this;
         this.load.setBaseURL('https://casper-game-1.storage.googleapis.com/')
-        this.load.image("ball", "ball.png");
+        this.load.image("ball", "ball-white-1.png");
         this.load.image("water", "water.png");
     }
     create(){
@@ -52,6 +52,7 @@ export default class UnderwaterScene extends Phaser.Scene{
 
         // add ball sprite
         this.ball = this.physics.add.sprite(game.config.width / 2, game.config.height / 10, "ball");
+        this.ball.tint = 0xff0000;
         this.ball.setCollideWorldBounds();
         this.ball.body.onWorldBounds = true;
         this.physics.add.overlap(this.ball, this.water, this.coll, null, this);

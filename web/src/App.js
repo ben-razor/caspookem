@@ -1,13 +1,10 @@
 /* global BigInt */
 import { useState, useEffect, useCallback, Fragment } from 'react';
-import Logo from './images/near-karts-1.png';
-import * as Tone from 'tone';
+import Logo from './images/caspervania-1.png';
 import './scss/styles.scss';
 import { toast as toasty } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import * as nearAPI from 'near-api-js';
 import BrButton from './js/components/lib/BrButton';
-import { initNear } from './js/helpers/near';
 import { localLog, StateCheck } from './js/helpers/helpers';
 import getText from './js/helpers/text';
 import bigInt from 'big-integer';
@@ -16,12 +13,15 @@ import gameConfig from './data/world/config';
 import Phaser from 'phaser';
 import Scene1 from './js/components/scenes/UnderwaterScene';
 import PauseScene from './js/components/scenes/PauseScene';
-import { csprToMote, casperAttemptConnect, addHighScore, getHighScore, getDeploy } from './js/helpers/casper';
+import { csprToMote, casperAttemptConnect, addHighScore, getHighScore, getDeploy,
+         getAccountInfo, getAccountNamedKeyValue, getNFTsForAccount, mintNFT } from './js/helpers/casper';
+import { getNFTName } from './js/helpers/casper';
 
 let stateCheck = new StateCheck();
 
 const PAYMENT_ADD_HIGH_SCORE = csprToMote(0.1);
 const NETWORK_NAME = 'casper-test';
+const CONTRACT_ACCOUNT = '01483e93cb89a114afb30a7bb08b1cb463ca73329bfd1ae4595c1cde5b0f08bd3a';
 
 const baseImageURL = 'https://storage.googleapis.com/birdfeed-01000101.appspot.com/strange-juice-1/';
 const TOAST_TIMEOUT = 4000;
@@ -101,6 +101,10 @@ function App() {
     
     if(activePublicKey) {
       requestHighScore();
+      (async () => {
+        let nftsForAccount = await getNFTsForAccount(activePublicKey);
+        console.log(JSON.stringify([nftsForAccount]));
+      })();
     }
   }, [activePublicKey]);
   
@@ -111,11 +115,9 @@ function App() {
       clearInterval(timerId);
 
       let _timerId = setInterval(async () => {
-        console.log(JSON.stringify(['inter']));
-        
         try {
           let _activePublicKey = await window.casperlabsHelper.getActivePublicKey();
-          console.log(JSON.stringify(['SI - apk', _activePublicKey]));
+
           if(_activePublicKey !== activePublicKey) {
             console.log(JSON.stringify(['Connected!']));
             doPendingTx();
@@ -123,7 +125,6 @@ function App() {
           }
         }
         catch(e) { 
-          console.log(JSON.stringify(['SI - No pub key']));
           setActivePublicKey();
         }
       }, 500);
@@ -192,6 +193,13 @@ function App() {
 
   async function saveHighScore(score) {
     requestCasperTx('addHighScore', { score })
+  }
+
+  async function requestMint() {
+    (async () => {
+      let deploy = await mintNFT(activePublicKey);
+      console.log(JSON.stringify(['reqmint', deploy]));
+    })();
   }
 
   async function requestCasperTx(type, data) {
@@ -278,11 +286,28 @@ function App() {
           gravity: { y: 200 },
         },
       },
+      fps: {
+        target: 20,
+        forceSetTimeOut: true
+      },
       scene: [Scene1, PauseScene],
     };
 
     var game = new Phaser.Game(config);
 
+  }, []);
+
+  useEffect(() => {
+    (async () => {
+      let accountInfo = await getAccountInfo(CONTRACT_ACCOUNT);
+      console.log(JSON.stringify(['cont', accountInfo]));
+      let hash = await getAccountNamedKeyValue(accountInfo, 'pra1_contract_contract_hash')
+      console.log(JSON.stringify(['cont hash', hash]));
+      let nftName = await getNFTName();
+      console.log(JSON.stringify(['nft name', nftName]));
+
+
+    })();
   }, []);
 
   function getTextureURL(element, style) {
@@ -531,6 +556,7 @@ function App() {
             <div className="br-high-score">High Score: <span id="high-score">{highScore}</span></div>
             <button className="br-score-control" onClick={() => saveHighScore(highScore)}>Save Score</button>
             <button className="br-score-control" onClick={requestHighScore}>Get Score</button>
+            <button className="br-score-control" onClick={requestMint}>Mint</button>
           </div>
           <div id="phaser-parent" className="phaser-parent">
           </div>
