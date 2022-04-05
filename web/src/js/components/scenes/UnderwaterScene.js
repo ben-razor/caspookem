@@ -38,6 +38,7 @@ export default class UnderwaterScene extends Phaser.Scene{
         this.load.image("ball", "ball-white-1.png");
         this.load.image("water", "water.png");
         this.load.spritesheet("explosion", "herochar_spritesheet(new).png", {frameWidth: 16, frameHeight: 16});
+        this.load.spritesheet("tiles", "tileset.png", {frameWidth: 48, frameHeight: 12});
     }
     create(){
         let game = this.game;
@@ -91,13 +92,23 @@ export default class UnderwaterScene extends Phaser.Scene{
         this.hero.body.height = 16 * HERO_SIZE;
         this.hero.setScale(HERO_SIZE, HERO_SIZE);
         this.hero.setOrigin(0.5, 1);
-        this.hitUp = false;
+        this.hero.body.setMaxVelocityX(500);
+        this.hero.setDragX(800);
         this.physics.add.collider(this.hero, this.water);
 
+        this.platform = this.physics.add.sprite(game.config.width / 2, game.config.height / 2.5, 'tiles', 18);
+        this.platform.setScale(HERO_SIZE, HERO_SIZE);
+        this.platform.body.allowGravity = false;
+        this.platform.body.immovable = true;
+        this.platform.body.checkCollision.down = false;
+        this.physics.add.collider(this.hero, this.platform);
+
         this.cursors = this.input.keyboard.createCursorKeys();
+        this.spaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
 
         // listener for input, calls "jump" method
         this.input.on("pointerdown", this.jump, this);
+        this.hitUp = false;
 
         this.physics.world.on('worldbounds', this.onWorldBounds, this);
 
@@ -174,21 +185,20 @@ export default class UnderwaterScene extends Phaser.Scene{
             this.ball.body.velocity.y = gameOptions.ballPower * (this.isUnderwater() ? 1 : -1);
         }
 
-        this.hero.body.setVelocityX(0);
+        this.hero.body.setAccelerationX(0);
 
         if (this.cursors.left.isDown)
         {
-            this.hero.body.setVelocityX(-500);
+            this.hero.body.setAccelerationX(-800);
             this.hero.flipX = true;
         }
         else if (this.cursors.right.isDown)
         {
-            this.hero.body.setVelocityX(500);
-            this.hero.setScale(HERO_SIZE, HERO_SIZE);
+            this.hero.body.setAccelerationX(800);
             this.hero.flipX = false;
         }
     
-        if (this.cursors.up.isDown)
+        if (this.spaceKey.isDown)
         {
             if(!this.hitUp) {
                 if(this.hero.body.touching.down) {
