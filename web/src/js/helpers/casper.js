@@ -114,7 +114,7 @@ export async function getNFTsForAccount(publicKeyHex) {
         }
       });
       
-      tokens.push([token, color]);
+      tokens.push({token, color});
     }
   }
   catch(e) {

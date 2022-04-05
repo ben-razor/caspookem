@@ -7,6 +7,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import BrButton from './js/components/lib/BrButton';
 import { localLog, StateCheck } from './js/helpers/helpers';
 import getText from './js/helpers/text';
+import { hexColorToInt } from './js/helpers/3d';
 import bigInt from 'big-integer';
 import Modal from 'react-modal';
 import gameConfig from './data/world/config';
@@ -17,6 +18,7 @@ import { csprToMote, casperAttemptConnect, addHighScore, getHighScore, getDeploy
          getAccountInfo, getAccountNamedKeyValue, getNFTsForAccount, mintNFT } from './js/helpers/casper';
 import { getNFTName } from './js/helpers/casper';
 
+let game;
 let stateCheck = new StateCheck();
 
 const PAYMENT_ADD_HIGH_SCORE = csprToMote(0.1);
@@ -104,6 +106,14 @@ function App() {
       (async () => {
         let nftsForAccount = await getNFTsForAccount(activePublicKey);
         console.log(JSON.stringify([nftsForAccount]));
+
+        for(let nft of nftsForAccount) {
+          var mainScene = game.scene.keys['MainScene'];
+          if(nft.color && nft.color !== '0x000000') {
+            mainScene?.setBallColor(hexColorToInt(nft.color));
+            break;
+          }
+        }
       })();
     }
   }, [activePublicKey]);
@@ -293,7 +303,7 @@ function App() {
       scene: [Scene1, PauseScene],
     };
 
-    var game = new Phaser.Game(config);
+    game = new Phaser.Game(config);
 
   }, []);
 
@@ -305,8 +315,6 @@ function App() {
       console.log(JSON.stringify(['cont hash', hash]));
       let nftName = await getNFTName();
       console.log(JSON.stringify(['nft name', nftName]));
-
-
     })();
   }, []);
 

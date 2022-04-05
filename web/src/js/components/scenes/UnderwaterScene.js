@@ -24,6 +24,11 @@ export default class UnderwaterScene extends Phaser.Scene{
         console.log('restart requested');
         UnderwaterScene.instance.locked = true;
     }
+    setBallColor(color) {
+        console.log(JSON.stringify(['sbc', color]));
+        this.ball.tint = color;
+        this.game.registry.tint = color;
+    }
     static instance;
     preload(){
         UnderwaterScene.instance = this;
@@ -52,7 +57,11 @@ export default class UnderwaterScene extends Phaser.Scene{
 
         // add ball sprite
         this.ball = this.physics.add.sprite(game.config.width / 2, game.config.height / 10, "ball");
-        this.ball.tint = 0xff0000;
+        console.log(JSON.stringify(['reg tint', this.game.registry.tint]));
+        
+        if(this.game.registry.tint) {
+            this.ball.tint = this.game.registry.tint;
+        }
         this.ball.setCollideWorldBounds();
         this.ball.body.onWorldBounds = true;
         this.physics.add.overlap(this.ball, this.water, this.coll, null, this);
