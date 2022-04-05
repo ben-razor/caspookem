@@ -82,7 +82,16 @@ export default class UnderwaterScene extends Phaser.Scene{
         };
     
         this.anims.create(config);
+  
+        config = {
+            key: 'standStill',
+            frames: this.anims.generateFrameNumbers('explosion', { start: 40, end: 43, first: 40 }),
+            frameRate: 20,
+            repeat: -1 
+        };
     
+        this.anims.create(config);
+
         this.hero = this.physics.add.sprite(game.config.width / 2 - 128, game.config.height / 3, 'explosion').play('explodeAnimation');
         this.hero.body.setCollideWorldBounds(true);
         this.hero.debugShowBody = true;
@@ -109,6 +118,9 @@ export default class UnderwaterScene extends Phaser.Scene{
         // listener for input, calls "jump" method
         this.input.on("pointerdown", this.jump, this);
         this.hitUp = false;
+        this.hitLeft = false;
+        this.hitRight = false;
+        this.hitNoX = false;
 
         this.physics.world.on('worldbounds', this.onWorldBounds, this);
 
@@ -191,11 +203,29 @@ export default class UnderwaterScene extends Phaser.Scene{
         {
             this.hero.body.setAccelerationX(-800);
             this.hero.flipX = true;
+            if(!this.hitLeft) {
+                this.hero.play('explodeAnimation');
+                this.hitLeft = true;
+            }
+            this.hitNoX = false;
         }
         else if (this.cursors.right.isDown)
         {
             this.hero.body.setAccelerationX(800);
             this.hero.flipX = false;
+            if(!this.hitRight) {
+                this.hero.play('explodeAnimation');
+                this.hitRight = true;
+            }
+            this.hitNoX = false;
+        }
+        else {
+            if(!this.hitNoX) {
+                this.hero.play('standStill');
+                this.hitNoX = true;
+                this.hitLeft = false;
+                this.hitRight = false;
+            }
         }
     
         if (this.spaceKey.isDown)
