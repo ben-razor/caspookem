@@ -9,8 +9,10 @@ let gameOptions = {
     ballGravity: 1600,
  
     // jump power
-    ballPower: 800
+    ballPower: 800,
 }
+
+const HERO_SIZE = 4;
 
 export default class UnderwaterScene extends Phaser.Scene{
     constructor(){
@@ -46,6 +48,7 @@ export default class UnderwaterScene extends Phaser.Scene{
         // add water sprite
         this.water = this.physics.add.sprite(0, game.config.height / 100 * gameOptions.waterLevel, "water");
         this.water.body.allowGravity = false;
+        this.water.body.immovable = true;
  
         // set registration point to top left pixel
         this.water.setOrigin(0, 0);
@@ -64,11 +67,11 @@ export default class UnderwaterScene extends Phaser.Scene{
             this.ball.tint = this.game.registry.tint;
         }
         this.ball.setCollideWorldBounds();
-        this.ball.body.onWorldBounds = true;
         this.physics.add.overlap(this.ball, this.water, this.coll, null, this);
 
         // set ball ballGravity
         this.ball.body.gravity.y = gameOptions.ballGravity * (this.isUnderwater() ? -1 : 1)
+        this.ball.body.allowGravity = false;
  
         var config = {
             key: 'explodeAnimation',
@@ -79,8 +82,19 @@ export default class UnderwaterScene extends Phaser.Scene{
     
         this.anims.create(config);
     
-        this.hero = this.add.sprite(game.config.width / 2 - 128, game.config.height / 2, 'explosion').play('explodeAnimation');
-        this.hero.setScale(8, 8);
+        this.hero = this.physics.add.sprite(game.config.width / 2 - 128, game.config.height / 3, 'explosion').play('explodeAnimation');
+        this.hero.body.setCollideWorldBounds(true);
+        this.hero.debugShowBody = true;
+        this.hero.onWorldBounds = true;
+        this.hero.body.gravity.y = gameOptions.ballGravity * (this.isUnderwater() ? -1 : 1)
+        this.hero.body.width = 16 * HERO_SIZE;
+        this.hero.body.height = 16 * HERO_SIZE;
+        this.hero.setScale(HERO_SIZE, HERO_SIZE);
+        this.hero.setOrigin(0.5, 1);
+        this.hitUp = false;
+        this.physics.add.collider(this.hero, this.water);
+
+        this.cursors = this.input.keyboard.createCursorKeys();
 
         // listener for input, calls "jump" method
         this.input.on("pointerdown", this.jump, this);
@@ -144,6 +158,8 @@ export default class UnderwaterScene extends Phaser.Scene{
         return this.ball.y > game.config.height / 100 * gameOptions.waterLevel
     }
     update(){
+        //this.physics.collide(this.hero, this.water);
+
         // determine next ball gravity
         let nextGravity = gameOptions.ballGravity * (this.isUnderwater() ? -1 : 1);
  
@@ -157,5 +173,33 @@ export default class UnderwaterScene extends Phaser.Scene{
             // set ball velocity as if we just jumped
             this.ball.body.velocity.y = gameOptions.ballPower * (this.isUnderwater() ? 1 : -1);
         }
+
+        this.hero.body.setVelocityX(0);
+
+        if (this.cursors.left.isDown)
+        {
+            this.hero.body.setVelocityX(-500);
+            this.hero.flipX = true;
+        }
+        else if (this.cursors.right.isDown)
+        {
+            this.hero.body.setVelocityX(500);
+            this.hero.setScale(HERO_SIZE, HERO_SIZE);
+            this.hero.flipX = false;
+        }
+    
+        if (this.cursors.up.isDown)
+        {
+            if(!this.hitUp) {
+                if(this.hero.body.touching.down) {
+                    this.hero.setVelocityY(-800);
+                    this.hitUp = true;
+                }
+            }
+        }
+        else {
+            this.hitUp = false;
+        }
+
     }
 }
