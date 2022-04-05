@@ -35,6 +35,7 @@ export default class UnderwaterScene extends Phaser.Scene{
         this.load.setBaseURL('https://casper-game-1.storage.googleapis.com/')
         this.load.image("ball", "ball-white-1.png");
         this.load.image("water", "water.png");
+        this.load.spritesheet("explosion", "herochar_spritesheet(new).png", {frameWidth: 16, frameHeight: 16});
     }
     create(){
         let game = this.game;
@@ -69,6 +70,18 @@ export default class UnderwaterScene extends Phaser.Scene{
         // set ball ballGravity
         this.ball.body.gravity.y = gameOptions.ballGravity * (this.isUnderwater() ? -1 : 1)
  
+        var config = {
+            key: 'explodeAnimation',
+            frames: this.anims.generateFrameNumbers('explosion', { start: 8, end: 13, first: 8 }),
+            frameRate: 20,
+            repeat: -1 
+        };
+    
+        this.anims.create(config);
+    
+        this.hero = this.add.sprite(game.config.width / 2 - 128, game.config.height / 2, 'explosion').play('explodeAnimation');
+        this.hero.setScale(8, 8);
+
         // listener for input, calls "jump" method
         this.input.on("pointerdown", this.jump, this);
 
