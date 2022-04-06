@@ -12,8 +12,9 @@ import bigInt from 'big-integer';
 import Modal from 'react-modal';
 import gameConfig from './data/world/config';
 import Phaser from 'phaser';
-import Scene1 from './js/components/scenes/UnderwaterScene';
+import Scene1 from './js/components/scenes/MainScene';
 import PauseScene from './js/components/scenes/PauseScene';
+import Game3D from './js/components/Game3D';
 import { csprToMote, casperAttemptConnect, addHighScore, getHighScore, getDeploy,
          getAccountInfo, getAccountNamedKeyValue, getNFTsForAccount, mintNFT } from './js/helpers/casper';
 import { getNFTName } from './js/helpers/casper';
@@ -56,7 +57,8 @@ function App() {
   const [walletSignedIn, setWalletSignedIn] = useState(true);
   const [nftList, setNFTList] = useState([]);
   const [processingActions, setProcessingActions] = useState({});
-  const [screen, setScreen] = useState(screens.GARAGE);
+  const [screen, setScreen] = useState(screens.Garage);
+  const [selectedGame, setSelectedGame] = useState('game3D');
   const [highScore, setHighScore] = useState(0);
   const [pendingTx, setPendingTx] = useState([]);
   const [timerId, setTimerId] = useState(0);
@@ -331,6 +333,10 @@ function App() {
   }
 
   function getImageURL(cid) {
+    if(!cid) {
+      return '';
+    }
+    
     let imageURL = cid;
     if(!cid.startsWith('http')) {
       imageURL = `https://storage.googleapis.com/near-karts/${cid}.png`; 
@@ -567,8 +573,17 @@ function App() {
             <button className="br-score-control" onClick={requestHighScore}>Get Score</button>
             <button className="br-score-control" onClick={requestMint}>Mint</button>
           </div>
-          <div id="phaser-parent" className="phaser-parent">
-          </div>
+          { selectedGame === 'platformer2D' ?
+            <div id="phaser-parent" className="phaser-parent">
+            </div>
+            :
+            <Game3D processingActions={processingActions} toast={toast} 
+            screens={screens} screen={screen} setScreen={setScreen} 
+            showModal={showModal}
+            getTextureURL={getTextureURL} getIconURL={getIconURL} 
+            getImageURL={getImageURL} 
+            nftList={nftList} />
+          }
         </div>
       </div>
     </div>

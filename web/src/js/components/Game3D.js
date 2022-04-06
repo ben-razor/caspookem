@@ -1,18 +1,18 @@
 import React, {useEffect, useState, useCallback, Fragment} from 'react';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
-import lifeform from '../../data/models/bot-3.glb';
+import lifeform from '../../data/models/casper-1.gltf';
 import imageFrame from '../../images/frame-dark-1.png';
 import BrButton from './lib/BrButton';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { setAlphaToEmissive, loadImageToMaterial, hueToColor, hexColorToInt, intToHexColor, HitTester } from '../helpers/3d';
 import { cloneObj, StateCheck, isLocal, localLog } from '../helpers/helpers';
 import gameConfig, { partIdToName } from '../../data/world/config';
-import getText, { exclamation } from '../../data/text';
+import getText, { exclamation } from '../helpers/text';
 import { CompactPicker } from 'react-color';
 import domtoimage from 'dom-to-image';
 
-function getNearKartsServerURL(forceRemote=false) {
+function getServerURL(forceRemote=false) {
   let url = 'https://localhost:8926';
 
   if(!isLocal() || forceRemote) {
@@ -22,19 +22,17 @@ function getNearKartsServerURL(forceRemote=false) {
   return url;
 }
 
-const nearKartsURL = getNearKartsServerURL();
+const serverURL = getServerURL();
 
 const DEBUG_FORCE_BATTLE = false;
 const DEBUG_FORCE_POST_BATTLE = false;
-const DEBUG_IMAGES = false;
 const DEBUG_NO_MINT = false;
-const DEBUG_KART = false;
 const DEBUG_FAST_BATTLE = false;
 
 const loader = new GLTFLoader();
 
 const w = 1000;
-const h = 800;
+const h = 600;
 const wPhoto = 400;
 const hPhoto = 400;
 
@@ -68,7 +66,7 @@ const postBattleScreens = {
   END: 7
 };
 
-function NearKarts(props) {
+function Game3D(props) {
   const showModal = props.showModal;
   const nftList = props.nftList;
   const nftData = props.nftData;
@@ -77,7 +75,6 @@ function NearKarts(props) {
   const execute = props.execute;
   const processingActions = props.processingActions;
   const toast = props.toast;
-  const battleKarts = props.battleKarts;
   const battleResult = props.battleResult;
   const battleConfig = props.battleConfig;
   const setBattleConfig = props.setBattleConfig;
@@ -114,6 +111,7 @@ function NearKarts(props) {
   const [renderRequested, setRenderRequested] = useState();
   const [prevScreen, setPrevScreen] = useState(screens.GARAGE);
   const [battle, setBattle] = useState({});
+  const [battlers, setBattlers] = useState([{},{}]);
   const [battleText, setBattleText] = useState([]);
   const [battlePower, setBattlePower] = useState([100, 100])
   const [battleHit, setBattleHit] = useState([0, 0])
@@ -123,8 +121,14 @@ function NearKarts(props) {
   const [orbitControls, setOrbitControls] = useState();
   const [garagePanel, setGaragePanel] = useState('equip');
   const [postBattleScreen, setPostBattleScreen] = useState(postBattleScreens.NONE);
+  const [showEquipControls, setShowEquipControls] = useState(false);
+  const [showNFTList, setShowNFTList ] = useState(false);
 
-  function kartChanged(nftData, prevNFTData) {
+  function characterChanged(nftData, prevNFTData) {
+    if(!nftData || !prevNFTData) {
+      return false;
+    }
+
     let keys = Object.keys(gameConfig.baseNFTData);
 
     let changedKeys = [];
@@ -202,7 +206,7 @@ function NearKarts(props) {
   }
 
   useEffect(() => {
-    let changedKeys = kartChanged(nftData, prevNFTData);
+    let changedKeys = characterChanged(nftData, prevNFTData);
 
     if(changedKeys.length && nftData !== {}) {
       let kartConfig = nftDataToKartConfig(nftData);
@@ -434,7 +438,7 @@ function NearKarts(props) {
   }
 
   function getControlSet(setId, gameConfig) {
-    if(screen !== screens.GARAGE || !nftData.version) {
+    if(screen !== screens.GARAGE || !nftData?.version) {
       return;
     }
     let controlSetUI = [];
@@ -765,7 +769,7 @@ function NearKarts(props) {
     try {
       let fd = new FormData();
       fd.append('file', f);
-      let r = await fetch(`${nearKartsURL}/upload`, {method: 'POST', headers: {
+      let r = await fetch(`${serverURL}/upload`, {method: 'POST', headers: {
       }, body: fd})
 
       let j = await r.json();
@@ -891,10 +895,10 @@ function NearKarts(props) {
   }
 
   useEffect(() => {
-    if(battleKarts.length) {
+    if(battlers.length) {
       changeScreen(screens.BATTLE_SETUP)
     }
-  }, [battleKarts]);
+  }, [battlers]);
 
   useEffect(() => {
     if(battleResult && battleResult.metadata) {
@@ -1015,27 +1019,29 @@ function NearKarts(props) {
   function getScreenGarage() {
     let nftListUI;
 
-    nftListUI = <div className="br-nft-gallery">
-      { tokensLoaded ? displayNFTs(nftList, activeTokenId) : ''}
-      { !nftList.length ? 
-        <div className="br-info-message-start">
-          <i className="fa fa-info br-info-icon"></i>
-          <div className="br-space-right">
-            { getText('text_help_welcome') }
+    if(showNFTList) {
+      nftListUI = <div className="br-nft-gallery">
+        { tokensLoaded ? displayNFTs(nftList, activeTokenId) : ''}
+        { !nftList.length ? 
+          <div className="br-info-message-start">
+            <i className="fa fa-info br-info-icon"></i>
+            <div className="br-space-right">
+              { getText('text_help_welcome') }
+            </div>
+            <BrButton label="The System" id="helpMore" className="br-button" onClick={ e => showModal() } />
           </div>
-          <BrButton label="The System" id="helpMore" className="br-button" onClick={ e => showModal() } />
-        </div>
-        :
-        ''
-      }
-      { nftList.length && nftData.level > 0 ?
-        <BrButton label="Battle" id="gameSimpleBattle" className="br-button" 
-                  onClick={ e => startBattle() }
-                  isSubmitting={processingActions['gameSimpleBattle']} />
-        :
-        ''
-      } 
-    </div>
+          :
+          ''
+        }
+        { nftList.length && nftData.level > 0 ?
+          <BrButton label="Battle" id="gameSimpleBattle" className="br-button" 
+                    onClick={ e => startBattle() }
+                    isSubmitting={processingActions['gameSimpleBattle']} />
+          :
+          ''
+        } 
+      </div>
+    }
 
     return <Fragment>
       <div className={ "br-screen br-screen-garage " + getScreenClass(screens.GARAGE)}>
@@ -1047,17 +1053,21 @@ function NearKarts(props) {
             <div className='br-level'>
               {getText('text_level')}
               <div className="br-level-number">
-                {nftData.level}
+                {nftData?.level || 0}
               </div>
             </div>
             <button className="br-autorotate-button br-button br-icon-button"
                     onMouseDown={toggleAutoRotate}><i className="fa fa-sync-alt"></i></button>
           </div>
-          <div className="br-strange-juice-overlay">
-            { getGaragePanelTabs() }
-            { getControlUI(gameConfig, nftData) } 
-            { getContractControls() }
-          </div>
+          { showEquipControls ?
+            <div className="br-strange-juice-overlay">
+              { getGaragePanelTabs() }
+              { getControlUI(gameConfig, nftData) } 
+              { getContractControls() }
+            </div>
+            :
+            ''
+          }
         </div>
 
         <div className="br-offscreen">
@@ -1079,14 +1089,14 @@ function NearKarts(props) {
                   onClick={e => changeScreen(screens.GARAGE)} />
       </div>
       <h1>{getText('text_battle_arena')}</h1>
-      { battleKarts.length ?
+      { battlers.length ?
         <div className="br-battle-setup">
           <div className="br-battle-setup-home">
             <h3>{getText('text_your_kart')}</h3>
             <div className="br-battle-setup-home-kart">
-              <img className={"br-battle-viewer-image"} alt="Home Kart" src={getImageURL(battleKarts[0].media)} />
+              <img className={"br-battle-viewer-image"} alt="Home Kart" src={getImageURL(battlers[0].media)} />
               <div className="br-battle-setup-home-kart-name">
-                {kartName(battleKarts[0].title)}
+                {kartName(battlers[0].title)}
               </div>
             </div>
           </div>
@@ -1097,9 +1107,9 @@ function NearKarts(props) {
           <div className="br-battle-setup-away">
             <h3>{getText('text_opponent_kart')}</h3>
             <div className="br-battle-setup-home-kart">
-              <img className={"br-battle-viewer-image"} alt="Home Kart" src={getImageURL(battleKarts[1].media)} />
+              <img className={"br-battle-viewer-image"} alt="Home Kart" src={getImageURL(battlers[1].media)} />
               <div className="br-battle-setup-away-kart-name">
-                {kartName(battleKarts[1].title)}
+                {kartName(battlers[1].title)}
               </div>
             </div>
           </div>
@@ -1215,4 +1225,4 @@ function NearKarts(props) {
   </div>
 }
 
-export default NearKarts;
+export default Game3D;

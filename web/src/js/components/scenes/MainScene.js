@@ -14,17 +14,17 @@ let gameOptions = {
 
 const HERO_SIZE = 4;
 
-export default class UnderwaterScene extends Phaser.Scene{
+export default class MainScene extends Phaser.Scene{
     constructor(){
         super("MainScene");
     }
     static onGameOver;
     static setGameOver(onGameOver) {
-        UnderwaterScene.onGameOver = onGameOver;
+        MainScene.onGameOver = onGameOver;
     }
     requestRestart() {
         console.log('restart requested');
-        UnderwaterScene.instance.locked = true;
+        MainScene.instance.locked = true;
     }
     setBallColor(color) {
         console.log(JSON.stringify(['sbc', color]));
@@ -33,7 +33,7 @@ export default class UnderwaterScene extends Phaser.Scene{
     }
     static instance;
     preload(){
-        UnderwaterScene.instance = this;
+        MainScene.instance = this;
         this.load.setBaseURL('https://casper-game-1.storage.googleapis.com/')
         this.load.image("ball", "ball-white-1.png");
         this.load.image("water", "water.png");
@@ -150,8 +150,8 @@ export default class UnderwaterScene extends Phaser.Scene{
             this.scene.launch('PauseScene')
             this.scene.pause();
 
-            if(UnderwaterScene.onGameOver) {
-                UnderwaterScene.onGameOver({score});
+            if(MainScene.onGameOver) {
+                MainScene.onGameOver({score});
             }
         }
     }
