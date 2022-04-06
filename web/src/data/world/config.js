@@ -30,7 +30,7 @@ const config = {
     { id: "TransportTracks", name: "Tracks" },
     { id: "TransportDoubleTracks", name: "Double Tracks" },
   ],
-  start_hidden: [ 'Transport', 'BotTurret', 'Weapon', 'Shield'],
+  start_hidden: [ 'Transport', 'BotTurret', 'Weapon', 'Shield', 'Background'],
   decal_panels: [ 'DecalFront', 'DecalLeft', 'DecalRight'],
   decals: [
     { id: '0', name: 'Empty'},

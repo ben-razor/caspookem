@@ -283,6 +283,9 @@ function App() {
   }
 
   useEffect(() => {
+    if(selectedGame !== 'phaser2D') {
+      return;
+    }
     Scene1.setGameOver(onGameOver);
 
     var config = {
@@ -336,7 +339,7 @@ function App() {
     if(!cid) {
       return '';
     }
-    
+
     let imageURL = cid;
     if(!cid.startsWith('http')) {
       imageURL = `https://storage.googleapis.com/near-karts/${cid}.png`; 

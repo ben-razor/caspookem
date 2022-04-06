@@ -1,7 +1,7 @@
 import React, {useEffect, useState, useCallback, Fragment} from 'react';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
-import lifeform from '../../data/models/casper-1.gltf';
+import lifeform from '../../data/models/ghost-3-plus-floor-1.gltf';
 import imageFrame from '../../images/frame-dark-1.png';
 import BrButton from './lib/BrButton';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
@@ -11,6 +11,7 @@ import gameConfig, { partIdToName } from '../../data/world/config';
 import getText, { exclamation } from '../helpers/text';
 import { CompactPicker } from 'react-color';
 import domtoimage from 'dom-to-image';
+import { BasicCharacterController } from './3d/CharacterController';
 
 function getServerURL(forceRemote=false) {
   let url = 'https://localhost:8926';
@@ -112,7 +113,7 @@ function Game3D(props) {
   const [renderRequested, setRenderRequested] = useState();
   const [prevScreen, setPrevScreen] = useState(screens.GARAGE);
   const [battle, setBattle] = useState({});
-  const [battlers, setBattlers] = useState([{},{}]);
+  const [battlers, setBattlers] = useState([]);
   const [battleText, setBattleText] = useState([]);
   const [battlePower, setBattlePower] = useState([100, 100])
   const [battleHit, setBattleHit] = useState([0, 0])
@@ -124,6 +125,7 @@ function Game3D(props) {
   const [postBattleScreen, setPostBattleScreen] = useState(postBattleScreens.NONE);
   const [showEquipControls, setShowEquipControls] = useState(false);
   const [showNFTList, setShowNFTList ] = useState(false);
+  const [threeElem, setThreeElem ] = useState();
 
   function characterChanged(nftData, prevNFTData) {
     if(!nftData || !prevNFTData) {
@@ -331,7 +333,7 @@ function Game3D(props) {
   }, [photoSubScene, controlEntry, styleScene]);
 
   useEffect(() => {
-    if(scene) {
+    if(scene && threeElem) {
       loader.load(lifeform, function ( gltf ) {
           scene.add(gltf.scene);
           setSJScene(gltf.scene);
@@ -344,10 +346,14 @@ function Game3D(props) {
           const walkAction = mixer.clipAction( clipWalk );
           walkAction.play();
 
+          let controller = new BasicCharacterController(lifeformModel);
+
           var animateLifeform = function () {
             let delta = clock.getDelta();
 
             requestAnimationFrame( animateLifeform );
+
+            controller.Update(delta);
             mixer.update(delta);
           }
 
@@ -356,13 +362,13 @@ function Game3D(props) {
 
         }, undefined, function ( error ) { console.error( error ); } );  
     }
-  }, [scene]);
+  }, [scene, threeElem]);
 
   const createScene = useCallback((threeElem, w, h, camPos, orbitControls=false, refreshEvery=1, camLookAt=[0,0,0]) => {
     var clock = new THREE.Clock();
     setClock(clock);
     var scene = new THREE.Scene();
-    var camera = new THREE.PerspectiveCamera( 50, w/h, 1, 10 );
+    var camera = new THREE.PerspectiveCamera( 50, w/h, 1, 100 );
     camera.position.copy(camPos);
     camera.lookAt(camLookAt[0], camLookAt[1], camLookAt[2]);
 
@@ -411,9 +417,10 @@ function Game3D(props) {
 
   useEffect(() => {
     let { scene, camera } = createScene(threeRef.current, w, h, 
-      new THREE.Vector3(0, 1.5, 4), false, 4, [0, 1.5, 0]);
+      new THREE.Vector3(0, 4, 8), false, 4, [0, 1.5, 0]);
     setScene(scene);
     setCamera(camera);
+    setThreeElem(threeRef.current);
 
     let { scene: photoScene, camera: photoCamera} = createScene(threePhotoRef.current, wPhoto, hPhoto, 
       new THREE.Vector3(0, 1.6, 3.6), false, 20, [0, -0.5, 0]);
@@ -910,6 +917,9 @@ function Game3D(props) {
   useEffect(() => {
     if(battlers.length) {
       changeScreen(screens.BATTLE_SETUP)
+    }
+    else {
+      changeScreen(screens.GARAGE);
     }
   }, [battlers]);
 
