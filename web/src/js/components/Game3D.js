@@ -94,6 +94,7 @@ function Game3D(props) {
 
   const [scene, setScene] = useState();
   const [camera, setCamera] = useState();
+  const [clock, setClock] = useState();
   const [sjScene, setSJScene] = useState();
   const [photoScene, setPhotoScene] = useState();
   const [photoSubScene, setPhotoSubScene] = useState();
@@ -334,20 +335,32 @@ function Game3D(props) {
       loader.load(lifeform, function ( gltf ) {
           scene.add(gltf.scene);
           setSJScene(gltf.scene);
+
+          const mixer = new THREE.AnimationMixer(gltf.scene);
+          const clips = gltf.animations;
+
+          let lifeformModel = gltf.scene.getObjectByName('EmptyLifeform');
+          const clipWalk = THREE.AnimationClip.findByName( clips, 'Walk1' );
+          const walkAction = mixer.clipAction( clipWalk );
+          walkAction.play();
+
+          var animateLifeform = function () {
+            let delta = clock.getDelta();
+
+            requestAnimationFrame( animateLifeform );
+            mixer.update(delta);
+          }
+
+          animateLifeform();
+
+
         }, undefined, function ( error ) { console.error( error ); } );  
     }
   }, [scene]);
 
-  useEffect(() => {
-    if(photoScene) {
-      loader.load(lifeform, function ( gltf ) {
-          photoScene.add(gltf.scene);
-          setPhotoSubScene(gltf.scene);
-        }, undefined, function ( error ) { console.error( error ); } );  
-    }
-  }, [photoScene]);
-
   const createScene = useCallback((threeElem, w, h, camPos, orbitControls=false, refreshEvery=1, camLookAt=[0,0,0]) => {
+    var clock = new THREE.Clock();
+    setClock(clock);
     var scene = new THREE.Scene();
     var camera = new THREE.PerspectiveCamera( 50, w/h, 1, 10 );
     camera.position.copy(camPos);
@@ -398,7 +411,7 @@ function Game3D(props) {
 
   useEffect(() => {
     let { scene, camera } = createScene(threeRef.current, w, h, 
-      new THREE.Vector3(0, 0.5, 4), true, 4, [0, -1.5, 0]);
+      new THREE.Vector3(0, 1.5, 4), false, 4, [0, 1.5, 0]);
     setScene(scene);
     setCamera(camera);
 
