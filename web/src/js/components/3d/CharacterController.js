@@ -40,10 +40,7 @@ class BasicCharacterController {
       acc.multiplyScalar(2.0);
     }
 
-    console.log(JSON.stringify(['k1']));
-    
     if (this._input._keys.forward) {
-    console.log(JSON.stringify(['k2']));
       velocity.z += acc.z * timeInSeconds;
     }
     if (this._input._keys.backward) {
@@ -99,12 +96,10 @@ class BasicCharacterControllerInput {
     };
     document.addEventListener('keydown', (e) => this._onKeyDown(e), false);
     document.addEventListener('keyup', (e) => this._onKeyUp(e), false);
-    console.log(JSON.stringify(['ik1']));
     
   }
 
   _onKeyDown(event) {
-    console.log(JSON.stringify(['ik2', event.key]));
     
     switch (event.keyCode) {
       case 87: // w

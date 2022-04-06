@@ -341,24 +341,38 @@ function Game3D(props) {
           const mixer = new THREE.AnimationMixer(gltf.scene);
           const clips = gltf.animations;
 
-          let lifeformModel = gltf.scene.getObjectByName('EmptyLifeform');
+          let lifeformPositioner = gltf.scene.getObjectByName('EmptyLifeform');
           const clipWalk = THREE.AnimationClip.findByName( clips, 'Walk1' );
           const walkAction = mixer.clipAction( clipWalk );
           walkAction.play();
 
-          let controller = new BasicCharacterController(lifeformModel);
+          const box = new THREE.Box3();
+          let casperBody = gltf.scene.getObjectByName('CasperBody');
+          casperBody.geometry.computeBoundingBox();
+          
+          const computerBox = new THREE.Box3();
+          let computer = gltf.scene.getObjectByName('Props_Computer');
+          console.log(JSON.stringify(['comp', computer]));
+          computer.children[0].geometry.computeBoundingBox();
+
+          let controller = new BasicCharacterController(lifeformPositioner);
 
           var animateLifeform = function () {
             let delta = clock.getDelta();
-
             requestAnimationFrame( animateLifeform );
+
+            box.copy( casperBody.geometry.boundingBox ).applyMatrix4( casperBody.matrixWorld );
+            computerBox.copy( computer.children[2].geometry.boundingBox ).applyMatrix4( computer.matrixWorld );
+
+            if(box.containsBox(computerBox)) {
+              console.log(JSON.stringify(['Collision!!']));
+            }
 
             controller.Update(delta);
             mixer.update(delta);
           }
 
           animateLifeform();
-
 
         }, undefined, function ( error ) { console.error( error ); } );  
     }
