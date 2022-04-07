@@ -442,11 +442,54 @@ function Game3D(props) {
         let balls = [];
         let ballMeshes = [];
         let material = new THREE.MeshLambertMaterial({ color: 0xdddddd })
+        let ballIndex = 0;
+        let toRemove = [];
+
         window.addEventListener('click', (event) => {
 
           const ballBody = new CANNON.Body({ mass: 1 })
           ballBody.addShape(ballShape)
           const ballMesh = new THREE.Mesh(ballGeometry, material)
+
+          ballBody.addEventListener('collide', (a) => {
+            let b1 = a.body;
+            let b2 = a.target;
+
+            if(b1.ballId) {
+              console.log(JSON.stringify(['b1 coll']));
+              let b1i = 0;
+              for(let ballBody of balls) {
+                if(ballBody.ballId === b1.ballId) {
+                  break;
+                }
+                b1i++;
+              }
+              world.removeBody(balls[b1i]);
+              let mesh2 = ballMeshes[b1i];
+              scene.remove(mesh2);
+              mesh2.geometry.dispose();
+              mesh2.material.dispose();
+              balls.splice(b1i, 1);
+              ballMeshes.splice(b1i, 1);
+              toRemove.push(b1i);
+            }
+
+            if(b2.ballId) {
+              console.log(JSON.stringify(['b2 coll']));
+              let b2i = 0;
+              for(let ballBody of balls) {
+                if(ballBody.ballId === b2.ballId) {
+                  break;
+                }
+                b2i++;
+              }
+              
+              toRemove.push(b2i);
+            }
+          })
+
+          ballBody.ballId = ballIndex++;
+          ballMesh.ballId = ballBody.ballId;
 
           ballMesh.castShadow = true
           ballMesh.receiveShadow = true
@@ -483,6 +526,22 @@ function Game3D(props) {
             lastCallTime = time;
             totalTime += dt;
 
+            if(toRemove.length) {
+              for(let b2i of toRemove) {
+                if(!balls[b2i]) {
+                  continue;
+                }
+                world.removeBody(balls[b2i]);
+                let mesh2 = ballMeshes[b2i];
+                scene.remove(mesh2);
+                mesh2.geometry.dispose();
+                mesh2.material.dispose();
+                balls.splice(b2i, 1);
+                ballMeshes.splice(b2i, 1);
+              }
+              toRemove = [];
+            }
+
             if(cannonPhysics) {
               if(totalTime > 5) {
                 world.step(1/60, dt, 0.001);
@@ -515,7 +574,6 @@ function Game3D(props) {
                     if(controller._input._keys.backward) {
                       lifeformBody.velocity.z = 6;
                     }
-                    console.log(JSON.stringify(['spc down', lifeformBody.velocity]));
                     jumping = true;
                   }
                 }
@@ -524,7 +582,6 @@ function Game3D(props) {
                   if(!jumping) {
                     lifeformBody.velocity.x = -6;
                     lifeformPositioner.rotation.set(0, -Math.PI/2, 0);
-                    console.log(JSON.stringify(['lt down', lifeformBody.velocity]));
                   }
                 }
 
@@ -532,7 +589,6 @@ function Game3D(props) {
                   if(!jumping) {
                     lifeformBody.velocity.x = 6;
                     lifeformPositioner.rotation.set(0, Math.PI/2, 0);
-                    console.log(JSON.stringify(['rt down', lifeformBody.velocity]));
                   }
                 }
 
@@ -540,7 +596,6 @@ function Game3D(props) {
                   if(!jumping) {
                     lifeformBody.velocity.z = 6;
                     lifeformPositioner.rotation.set(0, 0, 0);
-                    console.log(JSON.stringify(['d down', lifeformBody.velocity]));
                   }
                 }
 
@@ -548,7 +603,6 @@ function Game3D(props) {
                   if(height < 0.1) {
                     lifeformBody.velocity.z = -6;
                     lifeformPositioner.rotation.set(0, Math.PI, 0);
-                    console.log(JSON.stringify(['u down', lifeformBody.velocity]));
                   }
                 }
               }
