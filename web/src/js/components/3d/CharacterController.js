@@ -11,6 +11,7 @@ class BasicCharacterController {
     this._acceleration = new THREE.Vector3(1, 0.25, 50.0);
     this._velocity = new THREE.Vector3(0, 0, 0);
     this._input = new BasicCharacterControllerInput();
+    this.prevPosition = new THREE.Vector3(0, 0, 0);
   }
 
   Update(timeInSeconds) {
@@ -61,6 +62,7 @@ class BasicCharacterController {
 
     const oldPosition = new THREE.Vector3();
     oldPosition.copy(controlObject.position);
+    this.prevPosition = oldPosition;
 
     const forward = new THREE.Vector3(0, 0, 1);
     forward.applyQuaternion(controlObject.quaternion);

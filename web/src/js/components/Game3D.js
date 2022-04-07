@@ -361,14 +361,31 @@ function Game3D(props) {
             let delta = clock.getDelta();
             requestAnimationFrame( animateLifeform );
 
-            box.copy( casperBody.geometry.boundingBox ).applyMatrix4( casperBody.matrixWorld );
-            computerBox.copy( computer.children[2].geometry.boundingBox ).applyMatrix4( computer.matrixWorld );
-
-            if(box.containsBox(computerBox)) {
-              console.log(JSON.stringify(['Collision!!']));
+            let vTo = lifeformPositioner.position.clone();
+            vTo.setY(0);
+            let computerPosFlat = computer.position.clone();
+            computerPosFlat.setY(0);
+            vTo.sub(computerPosFlat);
+            
+            let hit = false;
+            if(vTo !== null && vTo.length() < 1) {
+              hit = true;
             }
 
-            controller.Update(delta);
+            if(hit) {
+              let newPos = lifeformPositioner.position.clone();
+              vTo.multiplyScalar(0.1);
+              newPos.add(vTo);
+              console.log(JSON.stringify(['new pos', newPos]));
+              
+              lifeformPositioner.position.copy(newPos);
+
+              controller._velocity = new THREE.Vector3(0,0,0);
+            }
+            else {
+              controller.Update(delta);
+            }
+
             mixer.update(delta);
           }
 
