@@ -75,8 +75,8 @@ class BasicCharacterController {
     sideways.multiplyScalar(velocity.x * timeInSeconds);
     forward.multiplyScalar(velocity.z * timeInSeconds);
 
-    controlObject.position.add(forward);
-    controlObject.position.add(sideways);
+    // controlObject.position.add(forward);
+    // controlObject.position.add(sideways);
 
     oldPosition.copy(controlObject.position);
   }

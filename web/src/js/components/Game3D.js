@@ -346,12 +346,12 @@ function Game3D(props) {
           world.gravity.set(0, -9.81, 0)
           world.broadphase = new CANNON.NaiveBroadphase()
           world.solver.iterations = 10
-          world.allowSleep = true
+          //world.allowSleep = true
 
-          let physicsMaterial = new CANNON.Material('physics')
+          let physicsMaterial = new CANNON.Material('physics');
           const physics_physics = new CANNON.ContactMaterial(physicsMaterial, physicsMaterial, {
-            friction: 0.1,
-            restitution: 0.3,
+            friction: 0,
+            restitution: 1,
           })
 
           world.addContactMaterial(physics_physics);
@@ -361,9 +361,9 @@ function Game3D(props) {
           const walkAction = mixer.clipAction( clipWalk );
           walkAction.play();
 
-          //const lifeformShape = new CANNON.Box(new CANNON.Vec3(0.25, 1, 0.25))
-          const lifeformShape = new CANNON.Sphere(1)
-          const lifeformBody = new CANNON.Body({ mass: 1 })
+          const lifeformShape = new CANNON.Box(new CANNON.Vec3(0.25, 1, 0.25))
+          //const lifeformShape = new CANNON.Sphere(1)
+          const lifeformBody = new CANNON.Body({ mass: 1, fixedRotation: true })
           lifeformBody.addShape(lifeformShape)
           let startPos = lifeformPositioner.position.clone();
           startPos.set(0, 5, 0);
@@ -400,6 +400,14 @@ function Game3D(props) {
 
           let lastCallTime = 0;
           let totalTime = 0;
+          let jumping = false;
+
+          lifeformBody.addEventListener('collide', (a, b) => {
+            let a1 = a;
+            let b1 = b;
+            console.log(JSON.stringify(['i collided']));
+            jumping = false;
+          })
 
           var animateLifeform = function () {
             requestAnimationFrame( animateLifeform );
@@ -415,41 +423,54 @@ function Game3D(props) {
                 world.step(1/60, dt, 0.001);
                 // console.log(JSON.stringify([totalTime, dt, lifeformBody.position]));
                 let lPos = lifeformBody.position.clone();
-                lPos.y = lPos.y - 1;
+                let height = lifeformBody.position.y - 1;
+                lPos.y = height;
                 lifeformPositioner.position.copy(lPos);
+                //lifeformPositioner.setRotationFromQuaternion(lifeformBody.quaternion);
                 
+                if(controller._input._keys.space) {
+                  if(!jumping) {
+                    lifeformBody.velocity.y = 6;
+                    console.log(JSON.stringify(['spc down', lifeformBody.velocity]));
+                    jumping = true;
+                  }
+                }
+
+                if(controller._input._keys.left) {
+                  if(!jumping) {
+                    lifeformBody.velocity.x = -5;
+                    lifeformPositioner.rotation.set(0, -Math.PI/2, 0);
+                    console.log(JSON.stringify(['lt down', lifeformBody.velocity]));
+                  }
+                }
+
                 if(controller._input._keys.right) {
-                  console.log(JSON.stringify(['rt down']));
-                  lifeformBody.velocity.set(0, 100, 0);
+                  if(!jumping) {
+                    lifeformBody.velocity.x = 5;
+                    lifeformPositioner.rotation.set(0, Math.PI/2, 0);
+                    console.log(JSON.stringify(['rt down', lifeformBody.velocity]));
+                  }
+                }
+
+                if(controller._input._keys.backward) {
+                  if(!jumping) {
+                    lifeformBody.velocity.z = 5;
+                    lifeformPositioner.rotation.set(0, 0, 0);
+                    console.log(JSON.stringify(['d down', lifeformBody.velocity]));
+                  }
+                }
+
+                if(controller._input._keys.forward) {
+                  if(height < 0.1) {
+                    lifeformBody.velocity.z = -5;
+                    lifeformPositioner.rotation.set(0, Math.PI, 0);
+                    console.log(JSON.stringify(['u down', lifeformBody.velocity]));
+                  }
                 }
               }
             }
-            else {
-              let vTo = lifeformPositioner.position.clone();
-              vTo.setY(0);
-              let computerPosFlat = computer.position.clone();
-              computerPosFlat.setY(0);
-              vTo.sub(computerPosFlat);
-              
-              let hit = false;
-              if(vTo !== null && vTo.length() < 1) {
-                hit = true;
-              }
 
-              if(hit) {
-                let newPos = lifeformPositioner.position.clone();
-                vTo.multiplyScalar(0.1);
-                newPos.add(vTo);
-                console.log(JSON.stringify(['new pos', newPos]));
-                
-                lifeformPositioner.position.copy(newPos);
-
-                controller._velocity = new THREE.Vector3(0,0,0);
-              }
-              else {
-                controller.Update(delta);
-              }
-            }
+            // controller.Update(delta);
             mixer.update(delta);
           }
 
@@ -512,7 +533,7 @@ function Game3D(props) {
 
   useEffect(() => {
     let { scene, camera } = createScene(threeRef.current, w, h, 
-      new THREE.Vector3(0, 10, 30), true, 20, [0, 1.5, 0]);
+      new THREE.Vector3(0, 10, 30), true, 2, [0, 1.5, 0]);
     setScene(scene);
     setCamera(camera);
     setThreeElem(threeRef.current);
