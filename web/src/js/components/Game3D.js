@@ -1,5 +1,6 @@
 import React, {useEffect, useState, useCallback, Fragment} from 'react';
 import * as THREE from 'three';
+import * as CANNON from 'cannon-es';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import lifeform from '../../data/models/ghost-3-plus-floor-1.gltf';
 import imageFrame from '../../images/frame-dark-1.png';
@@ -341,10 +342,35 @@ function Game3D(props) {
           const mixer = new THREE.AnimationMixer(gltf.scene);
           const clips = gltf.animations;
 
+          const world = new CANNON.World()
+          world.gravity.set(0, -9.81, 0)
+          world.broadphase = new CANNON.NaiveBroadphase()
+          world.solver.iterations = 10
+          world.allowSleep = true
+
+          let physicsMaterial = new CANNON.Material('physics')
+          const physics_physics = new CANNON.ContactMaterial(physicsMaterial, physicsMaterial, {
+            friction: 0.1,
+            restitution: 0.3,
+          })
+
+          world.addContactMaterial(physics_physics);
+
           let lifeformPositioner = gltf.scene.getObjectByName('EmptyLifeform');
           const clipWalk = THREE.AnimationClip.findByName( clips, 'Walk1' );
           const walkAction = mixer.clipAction( clipWalk );
           walkAction.play();
+
+          //const lifeformShape = new CANNON.Box(new CANNON.Vec3(0.25, 1, 0.25))
+          const lifeformShape = new CANNON.Sphere(1)
+          const lifeformBody = new CANNON.Body({ mass: 1 })
+          lifeformBody.addShape(lifeformShape)
+          let startPos = lifeformPositioner.position.clone();
+          startPos.set(0, 5, 0);
+          console.log(JSON.stringify(['lifeform pos: ', lifeformPositioner.position]));
+          
+          lifeformBody.position.copy(startPos);
+          world.addBody(lifeformBody)
 
           const box = new THREE.Box3();
           let casperBody = gltf.scene.getObjectByName('CasperBody');
@@ -355,37 +381,75 @@ function Game3D(props) {
           console.log(JSON.stringify(['comp', computer]));
           computer.children[0].geometry.computeBoundingBox();
 
+          const computerShape = new CANNON.Box(new CANNON.Vec3(0.5, 2, 0.5))
+          const computerBody = new CANNON.Body({ mass: 0 })
+          computerBody.addShape(computerShape)
+          computerBody.position.copy(computer.position);
+          world.addBody(computerBody)
+
+          const groundShape = new CANNON.Plane()
+          const groundBody = new CANNON.Body({ mass: 0, material: physicsMaterial })
+          groundBody.position.copy(new THREE.Vector3(0, 0, 0));
+          groundBody.addShape(groundShape)
+          groundBody.quaternion.setFromEuler(-Math.PI / 2, 0, 0)
+          world.addBody(groundBody)
+
           let controller = new BasicCharacterController(lifeformPositioner);
 
+          let cannonPhysics = true;
+
+          let lastCallTime = 0;
+          let totalTime = 0;
+
           var animateLifeform = function () {
-            let delta = clock.getDelta();
             requestAnimationFrame( animateLifeform );
 
-            let vTo = lifeformPositioner.position.clone();
-            vTo.setY(0);
-            let computerPosFlat = computer.position.clone();
-            computerPosFlat.setY(0);
-            vTo.sub(computerPosFlat);
-            
-            let hit = false;
-            if(vTo !== null && vTo.length() < 1) {
-              hit = true;
-            }
+            let delta = clock.getDelta();
+            const time = performance.now() / 1000
+            const dt = Math.max(time - lastCallTime, 0.05);
+            lastCallTime = time;
+            totalTime += dt;
 
-            if(hit) {
-              let newPos = lifeformPositioner.position.clone();
-              vTo.multiplyScalar(0.1);
-              newPos.add(vTo);
-              console.log(JSON.stringify(['new pos', newPos]));
-              
-              lifeformPositioner.position.copy(newPos);
-
-              controller._velocity = new THREE.Vector3(0,0,0);
+            if(cannonPhysics) {
+              if(totalTime > 5) {
+                world.step(1/60, dt, 0.001);
+                // console.log(JSON.stringify([totalTime, dt, lifeformBody.position]));
+                let lPos = lifeformBody.position.clone();
+                lPos.y = lPos.y - 1;
+                lifeformPositioner.position.copy(lPos);
+                
+                if(controller._input._keys.right) {
+                  console.log(JSON.stringify(['rt down']));
+                  lifeformBody.velocity.set(0, 100, 0);
+                }
+              }
             }
             else {
-              controller.Update(delta);
-            }
+              let vTo = lifeformPositioner.position.clone();
+              vTo.setY(0);
+              let computerPosFlat = computer.position.clone();
+              computerPosFlat.setY(0);
+              vTo.sub(computerPosFlat);
+              
+              let hit = false;
+              if(vTo !== null && vTo.length() < 1) {
+                hit = true;
+              }
 
+              if(hit) {
+                let newPos = lifeformPositioner.position.clone();
+                vTo.multiplyScalar(0.1);
+                newPos.add(vTo);
+                console.log(JSON.stringify(['new pos', newPos]));
+                
+                lifeformPositioner.position.copy(newPos);
+
+                controller._velocity = new THREE.Vector3(0,0,0);
+              }
+              else {
+                controller.Update(delta);
+              }
+            }
             mixer.update(delta);
           }
 
@@ -408,8 +472,8 @@ function Game3D(props) {
     if(orbitControls) {
       controls = new OrbitControls( camera, threeElem );
       controls.target.set(0, 0.4, 0);
-      controls.minDistance = 3;
-      controls.maxDistance = 4.5;
+      //controls.minDistance = 3;
+      //controls.maxDistance = 4.5;
       controls.minPolarAngle = 0;
       controls.maxPolarAngle = Math.PI / 2.1;
       controls.autoRotate = false;
@@ -448,7 +512,7 @@ function Game3D(props) {
 
   useEffect(() => {
     let { scene, camera } = createScene(threeRef.current, w, h, 
-      new THREE.Vector3(0, 4, 8), false, 4, [0, 1.5, 0]);
+      new THREE.Vector3(0, 10, 30), true, 20, [0, 1.5, 0]);
     setScene(scene);
     setCamera(camera);
     setThreeElem(threeRef.current);
