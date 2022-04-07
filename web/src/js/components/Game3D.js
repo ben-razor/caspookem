@@ -426,6 +426,54 @@ function Game3D(props) {
 
           let hitRight = false;
 
+                  // The shooting balls
+        const shootVelocity = 15
+        const ballShape = new CANNON.Sphere(0.5)
+        const ballGeometry = new THREE.SphereBufferGeometry(ballShape.radius, 32, 32)
+        
+        function getShootDirection() {
+          const forward = new THREE.Vector3(0, 0, 1);
+          forward.applyQuaternion(lifeformPositioner.quaternion);
+          forward.normalize();
+          console.log(JSON.stringify(['vd', forward]));
+          return forward;
+        }
+
+        let balls = [];
+        let ballMeshes = [];
+        let material = new THREE.MeshLambertMaterial({ color: 0xdddddd })
+        window.addEventListener('click', (event) => {
+
+          const ballBody = new CANNON.Body({ mass: 1 })
+          ballBody.addShape(ballShape)
+          const ballMesh = new THREE.Mesh(ballGeometry, material)
+
+          ballMesh.castShadow = true
+          ballMesh.receiveShadow = true
+
+          world.addBody(ballBody)
+          scene.add(ballMesh)
+          balls.push(ballBody)
+          ballMeshes.push(ballMesh)
+
+          const shootDirection = getShootDirection()
+          ballBody.velocity.set(
+            shootDirection.x * shootVelocity,
+            shootDirection.y * shootVelocity,
+            shootDirection.z * shootVelocity
+          )
+
+          // Move the ball outside the player sphere
+          const x = lifeformBody.position.x + shootDirection.x * (.5 + ballShape.radius)
+          let y = lifeformBody.position.y + shootDirection.y * (.5 + ballShape.radius)
+          const z = lifeformBody.position.z + shootDirection.z * (.5 + ballShape.radius)
+          console.log(JSON.stringify(['lbp', lifeformBody.position]));
+          
+          y = y + 2;
+          ballBody.position.set(x, y, z)
+          ballMesh.position.copy(ballBody.position)
+        })
+
           var animateLifeform = function () {
             requestAnimationFrame( animateLifeform );
 
@@ -438,6 +486,13 @@ function Game3D(props) {
             if(cannonPhysics) {
               if(totalTime > 5) {
                 world.step(1/60, dt, 0.001);
+
+                // Update ball positions
+                for (let i = 0; i < balls.length; i++) {
+                  ballMeshes[i].position.copy(balls[i].position)
+                  ballMeshes[i].quaternion.copy(balls[i].quaternion)
+                }
+
                 // console.log(JSON.stringify([totalTime, dt, lifeformBody.position]));
                 let lPos = lifeformBody.position.clone();
                 let height = lifeformBody.position.y - 1;

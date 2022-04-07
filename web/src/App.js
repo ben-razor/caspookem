@@ -156,8 +156,6 @@ function App() {
 
       let _txTimerId = setInterval(async () => {
         try {
-          console.log(JSON.stringify(['cstx 3', submittedTx]));
-
           if(submittedTx.length) {
             let successful = [];
             let i = 0;
