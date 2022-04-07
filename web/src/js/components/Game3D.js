@@ -416,8 +416,6 @@ function Game3D(props) {
         let jumping = false;
 
         lifeformBody.addEventListener('collide', (a, b) => {
-          let a1 = a;
-          let b1 = b;
           console.log(JSON.stringify(['i collided']));
           jumping = false;
         })
@@ -441,6 +439,7 @@ function Game3D(props) {
         let material = new THREE.MeshLambertMaterial({ color: 0xdddddd })
         let ballIndex = 0;
         let toRemove = [];
+        let removeIds = [];
 
         window.addEventListener('click', (event) => {
 
@@ -452,6 +451,13 @@ function Game3D(props) {
             let b1 = a.body;
             let b2 = a.target;
 
+            if(b1.objId) {
+              removeIds.push(b1.objId);
+            }
+            if(b2.objId) {
+              removeIds.push(b2.objId);
+            }
+            
             if(b1.ballId) {
               console.log(JSON.stringify(['b1 coll']));
               let b1i = 0;
@@ -527,6 +533,8 @@ function Game3D(props) {
         
         const lineMaterial = new THREE.LineBasicMaterial( { color: 0xff0000 } );
         
+        let objs = { }
+
         // Create the final object to add to the scene
         const baddySpline = new THREE.Line( geometry, lineMaterial );
         scene.add(baddySpline);
@@ -537,8 +545,13 @@ function Game3D(props) {
 
         const baddyShape = new CANNON.Sphere(0.5)
         const baddyBody = new CANNON.Body({ mass: 0, material: physicsMaterial })
+        baddyBody.objId = 'baddy';
         baddyBody.addShape(baddyShape);
         world.addBody(baddyBody);
+
+        objs['baddy'] = {
+          mesh: baddyMesh, body: baddyBody, spline: baddySpline
+        }
 
         function rotateAroundWorldAxis(obj, axis, radians) {
           let rotWorldMatrix = new THREE.Matrix4();
@@ -546,7 +559,18 @@ function Game3D(props) {
           rotWorldMatrix.multiply(obj.matrix);
           obj.matrix = rotWorldMatrix;
           obj.setRotationFromMatrix(obj.matrix);
-       }
+        }
+
+        let removeObj = function(world, scene, mesh, body, spline) {
+          world.removeBody(body);
+          scene.remove(mesh);
+          mesh.geometry.dispose();
+          mesh.material.dispose();
+
+          if(spline) {
+            scene.remove(spline);
+          }
+        }
 
         var animateLifeform = function () {
           requestAnimationFrame( animateLifeform );
@@ -557,26 +581,29 @@ function Game3D(props) {
           lastCallTime = time;
           totalTime += dt;
 
-          let point = baddyCurve.getPointAt((totalTime / 20) % 1.0);
-          console.log(JSON.stringify(['cp', point]));
-          let baddyPos = new THREE.Vector3(point.x, point.y, 0);
-          baddyMesh.position.copy(baddyPos);
-          var euler = new THREE.Euler( -Math.PI/2, 0, 0, 'XYZ' );
-          baddyMesh.position.applyEuler(euler);
-          baddyBody.position.copy(baddyMesh.position);
+          if(objs['baddy']) {
+            let point = baddyCurve.getPointAt((totalTime / 20) % 1.0);
+            let baddyPos = new THREE.Vector3(point.x, point.y, 0);
+            baddyMesh.position.copy(baddyPos);
+            var euler = new THREE.Euler( -Math.PI/2, 0, 0, 'XYZ' );
+            baddyMesh.position.applyEuler(euler);
+            baddyBody.position.copy(baddyMesh.position);
+          }
+
+          if(removeIds.length) {
+            for(let objId of removeIds) {
+              removeObj(world, scene, objs[objId].mesh, objs[objId].body, objs[objId].spline);
+              delete objs['baddy'];
+            }
+            removeIds = [];
+          }
 
           if(toRemove.length) {
-            for(let b2i of toRemove) {
-              if(!balls[b2i]) {
-                continue;
-              }
-              world.removeBody(balls[b2i]);
-              let mesh2 = ballMeshes[b2i];
-              scene.remove(mesh2);
-              mesh2.geometry.dispose();
-              mesh2.material.dispose();
-              balls.splice(b2i, 1);
-              ballMeshes.splice(b2i, 1);
+            for(let objId of toRemove) {
+              if(!balls[objId]) continue;
+              removeObj(world, scene, ballMeshes[objId], balls[objId]);
+              balls.splice(objId, 1);
+              ballMeshes.splice(objId, 1);
             }
             toRemove = [];
           }
