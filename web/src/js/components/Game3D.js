@@ -535,6 +535,11 @@ function Game3D(props) {
         baddyMesh.position.copy(baddyCurve.getPoint(0.5));
         scene.add(baddyMesh);
 
+        const baddyShape = new CANNON.Sphere(0.5)
+        const baddyBody = new CANNON.Body({ mass: 0, material: physicsMaterial })
+        baddyBody.addShape(baddyShape);
+        world.addBody(baddyBody);
+
         function rotateAroundWorldAxis(obj, axis, radians) {
           let rotWorldMatrix = new THREE.Matrix4();
           rotWorldMatrix.makeRotationAxis(axis.normalize(), radians);
@@ -558,6 +563,7 @@ function Game3D(props) {
           baddyMesh.position.copy(baddyPos);
           var euler = new THREE.Euler( -Math.PI/2, 0, 0, 'XYZ' );
           baddyMesh.position.applyEuler(euler);
+          baddyBody.position.copy(baddyMesh.position);
 
           if(toRemove.length) {
             for(let b2i of toRemove) {
