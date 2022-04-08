@@ -1,12 +1,10 @@
 const config = {
   shield_index_start: 200,
-  weapons_range: [
-    { id: "WeaponRangeEmpty", name: "Empty" },
-    { id: "WeaponLaser", name: "Laser" },
-    { id: "WeaponRocket", name: "Rocket" },
-    { id: "WeaponFist", name: "Fist Full Of Nuts" },
-    { id: "WeaponFlamethrower", name: "Flamethrower" },
-    { id: "WeaponAceed", name: "Acieed" },
+  eyewear: [
+    { id: "EyewearEmpty", name: "Empty" },
+    { id: "Eyewear3D", name: "3D Glasses" },
+    { id: "EyewearAviator", name: "Aviator" },
+    { id: "EyewearGenius", name: "Genius" },
   ],
   weapons_melee: [
     { id: "WeaponMeleeEmpty", name: "Empty" },
@@ -30,7 +28,7 @@ const config = {
     { id: "TransportTracks", name: "Tracks" },
     { id: "TransportDoubleTracks", name: "Double Tracks" },
   ],
-  start_hidden: [ 'Transport', 'BotTurret', 'Weapon', 'Shield', 'Background'],
+  start_hidden: [ 'Eyewear', 'Headwear', 'Jewellery', 'Outfit', 'NFT'],
   decal_panels: [ 'DecalFront', 'DecalLeft', 'DecalRight'],
   decals: [
     { id: '0', name: 'Empty'},
@@ -42,14 +40,14 @@ const config = {
     { id: '6', name: 'Yin-Yang'},
     { id: '7', name: 'NEAR'},
   ],
-  defaultKartEntry: {
+  defaultEntry: {
     front: '',
     left: '',
     right: '',
     top: '',
-    transport: 'TransportWheels',
-    skin: 'SkinSteel',
-    color: '#444444',
+    eyewear: 'Eyewear3D',
+    skin: 'SkinPlastic',
+    color: '#11aaff',
     decal1: '7',
     decal2: '0',
     decal3: '0',

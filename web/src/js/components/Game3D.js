@@ -2,7 +2,7 @@ import React, {useEffect, useState, useCallback, Fragment} from 'react';
 import * as THREE from 'three';
 import * as CANNON from 'cannon-es';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
-import lifeform from '../../data/models/ghost-5.gltf';
+import lifeform from '../../data/models/ghost-6.gltf';
 import imageFrame from '../../images/frame-dark-1.png';
 import BrButton from './lib/BrButton';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
@@ -107,11 +107,11 @@ function Game3D(props) {
   const [prevNFTData, setPrevNFTData] = useState({});
   const [kartNameEntry, setKartNameEntry] = useState('');
   const [replayReq, setReplayReq] = useState(0);
-  const [controlEntry, setControlEntry] = useState({ ...gameConfig.defaultKartEntry });
-  const [kartStyleInitialized, setKartStyleInitialized] = useState();
+  const [controlEntry, setControlEntry] = useState({ ...gameConfig.defaultEntry });
+  const [styleInitialized, setStyleInitialized] = useState();
 
   const [imageDataURL, setImageDataURL] = useState('');
-  const [kartImageRendered, setKartImageRendered] = useState(false);
+  const [imageRendered, setImageRendered] = useState(false);
   const [renderRequested, setRenderRequested] = useState();
   const [prevScreen, setPrevScreen] = useState(screens.GARAGE);
   const [battle, setBattle] = useState({});
@@ -125,7 +125,7 @@ function Game3D(props) {
   const [orbitControls, setOrbitControls] = useState();
   const [garagePanel, setGaragePanel] = useState('equip');
   const [postBattleScreen, setPostBattleScreen] = useState(postBattleScreens.NONE);
-  const [showEquipControls, setShowEquipControls] = useState(false);
+  const [showEquipControls, setShowEquipControls] = useState(true);
   const [showNFTList, setShowNFTList ] = useState(false);
   const [threeElem, setThreeElem ] = useState();
 
@@ -240,14 +240,10 @@ function Game3D(props) {
         o.visible = false;
       }
 
-      if(controlEntry.left) {
-        let name = controlEntry.left;
+      if(controlEntry.eyewear) {
+        let name = controlEntry.eyewear;
 
-        if(o.name === 'BotTurretL' && name.startsWith('Weapon') && !name.endsWith('Empty')) {
-          o.visible = true;
-        }
-
-        if(o.name.startsWith(name + 'L')) {
+        if(o.name.startsWith(name)) {
           o.visible = true;
         }
       }
@@ -282,8 +278,12 @@ function Game3D(props) {
         }
       }
 
-      if(o.name === 'BotBody1') {
-        for(let child of o.children) {
+      if(o.name === 'Body') {
+        console.log(JSON.stringify(['st b']));
+        
+        let meshes = o.children.length ? o.children : [o];
+
+        for(let child of meshes) {
 
           if(child.material.name === 'MatBodyDecal1') {
             loadImageToMaterial(child.material, getTextureURL('badge', controlEntry.decal1));
@@ -318,7 +318,7 @@ function Game3D(props) {
         }
       }
 
-      setKartStyleInitialized(true);
+      setStyleInitialized(true);
     });
   }, []);
 
@@ -388,7 +388,7 @@ function Game3D(props) {
         lifeformBody.position.copy(startPos);
         world.addBody(lifeformBody)
 
-        let computer = gltf.scene.getObjectByName('Props_Computer');
+        let computer = gltf.scene.getObjectByName('WorldL1Computer');
         computer.children[0].geometry.computeBoundingBox();
 
         const computerShape = new CANNON.Box(new CANNON.Vec3(0.25, 2, 0.25))
@@ -717,7 +717,7 @@ function Game3D(props) {
       new THREE.Vector3(5, 5, 5), new THREE.Vector3(-5, 5, 5), new THREE.Vector3(0, 5, -2)
     ])
 
-    const light = new THREE.AmbientLight( 0x404040 ); // soft white light
+    const light = new THREE.AmbientLight( 0xb0b0b0 ); // soft white light
     scene.add( light );
 
     let i = 0;
@@ -778,20 +778,17 @@ function Game3D(props) {
   }
 
   function getControlSet(setId, gameConfig) {
-    if(screen !== screens.GARAGE || !nftData?.version) {
-      return;
-    }
     let controlSetUI = [];
     let elems = [];
     let index = 0;
     let disabled;
-    let validIndex = getMaxWeaponIndexForLevel(nftData.level);
+    let validIndex = getMaxWeaponIndexForLevel(nftData?.level);
 
     if(setId === 'left' || setId === 'right') {
       let optionsWeapon = [];
       let optionsShield = []
 
-      elems = gameConfig.weapons_range;
+      elems = gameConfig.eyewear;
 
       index = 0;
       for(let elem of elems) {
@@ -1077,7 +1074,7 @@ function Game3D(props) {
      */
     let dataURL = threePhotoRef.current.getElementsByTagName('canvas')[0].toDataURL();
     setImageDataURL(dataURL);
-    setKartImageRendered(true);
+    setImageRendered(true);
   }
 
   const mintOrUpgrade = useCallback((verifiedImageData) => {
@@ -1130,21 +1127,21 @@ function Game3D(props) {
       toast(getText('error_image_upload_failed'), 'error');
     }
 
-    setKartImageRendered(false);
+    setImageRendered(false);
     setRenderRequested(false);
   }, [toast, mintOrUpgrade]);
 
   useEffect(() => {
-    if(stateCheck.changed('kartImageRendered', kartImageRendered, false) && kartImageRendered) { 
+    if(stateCheck.changed('ImageRendered', imageRendered, false) && imageRendered) { 
       domtoimage.toPng(photoComposerRef.current, { style: { display: 'block'}})
       .then(function (dataUrl) {
          saveImageData(dataUrl);
       })
       .catch(function (error) {
-          console.error('Unable to render composed Kart image', error);
+          console.error('Unable to render composed  image', error);
       });
     }
-  }, [kartImageRendered, saveImageData, photoComposerRef]);
+  }, [imageRendered, saveImageData, photoComposerRef]);
 
   function displayBattleText(battleText) {
     let lines = [];
