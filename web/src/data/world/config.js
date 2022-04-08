@@ -4,14 +4,11 @@ const config = {
     { id: "EyewearEmpty", name: "Empty" },
     { id: "Eyewear3D", name: "3D Glasses" },
     { id: "EyewearAviator", name: "Aviator" },
-    { id: "EyewearGenius", name: "Genius" },
+    { id: "EyewearHacker", name: "Hacker" },
   ],
-  weapons_melee: [
-    { id: "WeaponMeleeEmpty", name: "Empty" },
-    { id: "WeaponFlipper", name: "Flipper" },
-    { id: "WeaponSword", name: "Sword" },
-    { id: "WeaponAxe", name: "Axe" },
-    { id: "WeaponHammer", name: "Hammer" },
+  headwear: [
+    { id: "HeadwearEmpty", name: "Empty" },
+    { id: "HeadwearHeadphones", name: "Headphones" },
   ],
   shields_side: [
     { id: "ShieldKitten", name: "Fluffy Kitten"},

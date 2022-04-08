@@ -248,6 +248,14 @@ function Game3D(props) {
         }
       }
 
+      if(controlEntry.headwear) {
+        let name = controlEntry.headwear;
+
+        if(o.name.startsWith(name)) {
+          o.visible = true;
+        }
+      }
+
       if(controlEntry.right) {
         let name = controlEntry.right;
 
@@ -784,34 +792,19 @@ function Game3D(props) {
     let disabled;
     let validIndex = getMaxWeaponIndexForLevel(nftData?.level);
 
-    if(setId === 'left' || setId === 'right') {
-      let optionsWeapon = [];
-      let optionsShield = []
+    if(setId === 'eyewear' || setId === 'headwear') {
 
-      elems = gameConfig.eyewear;
-
-      index = 0;
-      for(let elem of elems) {
-        disabled = index > validIndex;
-        optionsWeapon.push(
-          <option key={setId + elem.id} disabled={disabled} value={elem.id}>{elem.name}</option>
-        )
-        index++;
-      }
-
-      elems = gameConfig.shields_side;
+      elems = gameConfig[setId];
+      console.log(JSON.stringify(['ELEMS', elems]));
 
       index = 0;
       for(let elem of elems) {
         disabled = index > validIndex;
-        optionsShield.push(
+        controlSetUI.push(
           <option key={setId + elem.id} disabled={disabled} value={elem.id}>{elem.name}</option>
         )
         index++;
       }
-
-      controlSetUI.push(<optgroup key={setId + "Weapons"} label="Weapons">{optionsWeapon}</optgroup>)
-      controlSetUI.push(<optgroup key={setId + "Shields"} label="Shields">{optionsShield}</optgroup>)
     }
     else if(setId.startsWith('decal')) {
       elems = gameConfig.decals;
@@ -895,9 +888,8 @@ function Game3D(props) {
         </div>);
       }
 
-      controlUI.push(getControlRow('Left', getControlSet('left', gameConfig)));
-      controlUI.push(getControlRow('Right', getControlSet('right', gameConfig)))
-      controlUI.push(getControlRow('Front', getControlSet('front', gameConfig)))
+      controlUI.push(getControlRow('Eyewear', getControlSet('eyewear', gameConfig)));
+      controlUI.push(getControlRow('Headwear', getControlSet('headwear', gameConfig)))
       controlUI.push(getControlRow('Wheels', getControlSet('transport', gameConfig)))
       controlUI.push(getControlRow('Skin', getControlSet('skin', gameConfig)))
     }
