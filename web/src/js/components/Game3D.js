@@ -2,7 +2,7 @@ import React, {useEffect, useState, useCallback, Fragment} from 'react';
 import * as THREE from 'three';
 import * as CANNON from 'cannon-es';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
-import lifeform from '../../data/models/ghost-3-plus-floor-1.gltf';
+import lifeform from '../../data/models/ghost-5.gltf';
 import imageFrame from '../../images/frame-dark-1.png';
 import BrButton from './lib/BrButton';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
@@ -388,9 +388,6 @@ function Game3D(props) {
         lifeformBody.position.copy(startPos);
         world.addBody(lifeformBody)
 
-        let casperBody = gltf.scene.getObjectByName('CasperBody');
-        casperBody.geometry.computeBoundingBox();
-        
         let computer = gltf.scene.getObjectByName('Props_Computer');
         computer.children[0].geometry.computeBoundingBox();
 
@@ -719,6 +716,9 @@ function Game3D(props) {
     let lights = addPointLights(scene, 0xffffff, LIGHT_INTENSITY, 10, [
       new THREE.Vector3(5, 5, 5), new THREE.Vector3(-5, 5, 5), new THREE.Vector3(0, 5, -2)
     ])
+
+    const light = new THREE.AmbientLight( 0x404040 ); // soft white light
+    scene.add( light );
 
     let i = 0;
     var animate = function () {
