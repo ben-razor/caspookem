@@ -18,6 +18,7 @@ const NETWORK_NAME = 'casper-test';
 const CONTRACT_WASM_HASH = 'hash-6db37be05d9f42c7fdb4cdf146aec26562ba88bbfc918cbd5d4798fa76464eed';
 const CONTRACT_HIGH_SCORE = 'hash-6b37fbcbf02a66d5a2f893f479044df33c28abc0c1895f763f258dfe8b78f45b';
 const CONTRACT_NFT_PRA = 'hash-09766a2ccc20f5a4a24442bf5ef83a58f7a145593e78c84437f91e906873a2a7';
+const CONTRACT_CASPOOKIES001 = 'hash-b0fecb42a40e963f40b53a7081d0865624b5a052ab91f4d97271a23303af66f4';
 
 //Create Casper client and service to interact with Casper node.
 const apiUrl = "http://localhost:7777/rpc/";
