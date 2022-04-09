@@ -506,72 +506,146 @@ def disable_collection(name, hide=True, exact=True):
                                 if text_compare(name, c3.name, exact):
                                     c3.exclude = hide 
 
+def enable_collections(names, exact=True):
+    for name in names:
+        disable_collection(name, False, exact)
+
+def disable_collections(names, exact=True):
+    for name in names:
+        disable_collection(name, True, exact)
+
+def set_color(mat_name, color, colors):
+    m = findMaterials(mat_name, exact=True)
+
+    if len(m):
+        if color.startswith('glow'):
+            set_mat_color(m[0], [0, 0, 0])
+            set_mat_color(m[0], get_color(color, colors), emission=True)
+        else:
+            set_mat_color(m[0], get_color(color, colors))
+            set_mat_color(m[0], [0, 0, 0], emission=True)
+    else:
+        print(f'Material not found: {mat_name}')
+
+def set_material(obj_name, mat_name):
+    m = findMaterials(mat_name)
+    print('mmmat', mat_name, m, name)
+    if len(m):
+        set_materials(find_name(name, starts_with=True), m[0])
+    else:
+        print(f'Material not found: {config["material"]}')
+
 def config_elem(config, position, colors):
     name = f'{config["name"]}{position}'
 
     if 'color' in config:
-        m = findMaterials(name, exact=True)
-        print('ce', name, config, len(m))
-        if len(m):
-            emission = False
-            if config['color'].startswith('glow'):
-                emission = True
-
-            print('ce2', config, m[0].name, get_color(config['color'], colors), emission)
-            set_mat_color(m[0], get_color(config['color'], colors), emission=emission)
-        else:
-            print(f'Material not found: {name}')
-
+        set_color(name, config['color'], colors)
     if 'material' in config:
-        m = findMaterials(config['material'])
-        print('mmmat', config['material'], m, name)
-        if len(m):
-            set_materials(find_name(name, starts_with=True), m[0])
-        else:
-            print(f'Material not found: {config["material"]}')
+        set_material(name, config['material'])
 
 def config_extra(config, position, colors):
     if 'extra' in config:
         for extra in config['extra']:
             config_elem(extra, position, colors)
 
-def get_casper_defines():
-    return {
+def render_image(token_id, w, h):
+    bpy.context.scene.render.filepath = f'/home/chrisb/dev/crypto1/casper/casper-sp-game-1/artwork/render/nft/v1/{token_id}.png'
+    bpy.context.scene.render.resolution_x = w
+    bpy.context.scene.render.resolution_y = h 
+    bpy.ops.render.render(write_still=True)
+
+def get_casper_defines(key):
+    defines = {
         "colors": {
             "lightblue": [.1, .4, 1],
-            "et": [.4, .4, .4]
+            "et": [.3, .3, .3],
+            "ghost": [.9, .9, .9],
+            "violet": [.6, .2, 1],
+            "blue": [0, .3, 1],
+            "green": [.15, 1, 0],
+            "yellow": [.8, 1, 0],
+            "red": [1, 0.02, 0.1],
+            "white": [1, 1, 1],
+            "glowlightblue": [0, 0.7, 1],
+            "glowgreen": [0, 1, 0],
+            "glowviolet": [.7, 0, 1],
+            "glowpink": [1, 0, 0.1],
         }
     }
 
-def style_casper():
-    defines = get_casper_defines()
-    colors = defines["colors"]
+    if key:
+        return defines[key]
+    else:
+        return defines
 
+def make_random_caspers():
+    all_colors = get_casper_defines('colors')
+
+    eyewear = ['Empty', '3D']
+    headwear = ['Empty', 'Headphones']
+    skin_colors = [x for x in all_colors if 'glow' not in x]
+    eye_colors = ['white']
+    pupil_colors = [x for x in all_colors if 'glow' in x]
+    
+    token_id = 0
+
+    for ew in eyewear:
+        for hw in headwear:
+            for sc in skin_colors:
+                if ew == 'Empty':
+                    for ec in eye_colors:
+                        for pc in pupil_colors:
+                            metadata = get_casper_metadata(token_id, ew, hw, sc, ec, pc)
+                            style_casper(metadata)
+                            token_id = token_id + 1
+                else:
+                    metadata = get_casper_metadata(token_id, ew, hw, sc, 'white', 'glowgreen')
+                    style_casper(metadata)
+                    token_id = token_id + 1
+
+def style_default_casper():
+    metadata = get_casper_metadata(4, 'Empty', 'Headphones', 'violet', 'white', 'glowgreen')
+    style_casper(metadata)
+
+def get_casper_metadata(token_id, eyewear, headwear, skin_color, eye_color, pupil_color):
     nft_metadata = {
-        "name": "Casperform V1",
-        "eyewear": "Eyewear3D",
-        "headwear": "HeadwearHeadphones",
-        "skin_type": "Plastic",
-        "skin_color": "et",
+        'token_id': token_id,
+        'name': 'Casperform V1',
+        'eyewear': eyewear,
+        'headwear': headwear,
+        'skin_type': 'Plastic',
+        'skin_color': skin_color,
+        'eye_color': eye_color,
+        'pupil_color': pupil_color
     }
+    return nft_metadata
+
+def style_casper(nft_metadata):
+    print(nft_metadata)
+    colors = get_casper_defines('colors')
 
     config = {
-        "start_collection_hidden": ["World", "Headwear", "Eyewear"],
-        "name": nft_metadata["name"],
-        "eyewear": nft_metadata["eyewear"],
-        "headwear": nft_metadata["headwear"],
-        "skin_type": nft_metadata["skin_type"],
-        "skin_color": nft_metadata["skin_color"]
+        'token_id': nft_metadata['token_id'],
+        'width': 400,
+        'height': 400,
+        'start_collection_hidden': ['World', 'Headwear', 'Eyewear'],
+        'name': nft_metadata['name'],
+        'eyewear': 'Eyewear' + nft_metadata['eyewear'],
+        'headwear': 'Headwear' + nft_metadata['headwear'],
+        'skin_type': nft_metadata['skin_type'],
+        'skin_color': nft_metadata['skin_color'],
+        'eye_color': nft_metadata['eye_color'],
+        'pupil_color': nft_metadata['pupil_color'],
     }
 
-    for n in config["start_collection_hidden"]:
-        disable_collection(n, exact=False)
+    disable_collections(config['start_collection_hidden'])
+    enable_collections([config['eyewear'], config['headwear']])
 
-    disable_collection(config["eyewear"], False)
-    disable_collection(config["headwear"], False)
+    set_color('MatBody', config['skin_color'], colors)
+    set_color('MatEye', config['eye_color'], colors)
+    set_color('MatPupil', config['pupil_color'], colors)
 
-    m = findMaterials('MatBody', exact=True)
-    set_mat_color(m[0], get_color(config['skin_color'], colors))
+    render_image(config['token_id'], config['width'], config['height'])
 
 def style_fluence_scene(config, defines):
     topology = config['topology']
