@@ -1,4 +1,5 @@
 import os
+from os.path import join
 import bpy, bgl, blf, mathutils
 import subprocess
 import json
@@ -552,10 +553,10 @@ def config_extra(config, position, colors):
 casper_folder = '/home/chrisb/dev/crypto1/casper/casper-sp-game-1/artwork/render/nft/v1'
 
 def shuffle_files(folder):
-    img_folder = os.path.join(folder, 'img')
-    metadata_folder = os.path.join(folder, 'metadata')
-    out_folder = os.path.join(folder, 'img_shuffled')
-    out_metadata_folder = os.path.join(folder, 'metadata_shuffled')
+    img_folder = join(folder, 'img')
+    metadata_folder = join(folder, 'metadata')
+    out_folder = join(folder, 'img_shuffled')
+    out_metadata_folder = join(folder, 'metadata_shuffled')
 
     files = os.listdir(img_folder)
     Random(2).seed(197537)
@@ -569,14 +570,14 @@ def shuffle_files(folder):
 
     i = 0
     for fname in files:
-        from_file = os.path.join(img_folder, fname)
+        from_file = join(img_folder, fname)
         metadata_name = fname.replace('png', 'json')
-        from_metadata = os.path.join(metadata_folder, metadata_name)
+        from_metadata = join(metadata_folder, metadata_name)
         if not os.path.isdir(from_file):
-            to_file = os.path.join(out_folder, shuffled_files[i])
+            to_file = join(out_folder, shuffled_files[i])
             shutil.copyfile(from_file, to_file)
 
-            to_metadata = os.path.join(out_metadata_folder, shuffled_files[i].replace('png', 'json'))
+            to_metadata = join(out_metadata_folder, shuffled_files[i].replace('png', 'json'))
             shutil.copyfile(from_metadata, to_metadata)
             i = i + 1
 
@@ -587,7 +588,9 @@ def render_image(token_id, w, h):
     bpy.ops.render.render(write_still=True)
 
 def save_metadata(token_id, metadata):
-    metadata_folder = os.path.join(casper_folder, 'metadata')
+    metadata_folder = join(casper_folder, 'metadata')
+
+    del metadata['token_id']
 
     try:
         os.mkdir(metadata_folder)
@@ -596,6 +599,19 @@ def save_metadata(token_id, metadata):
     fname = f'{metadata_folder}/{token_id}.json'
     f = open(fname, 'w')
     f.write(json.dumps(metadata))
+
+def add_metadata_image_links(folder, base_uri):
+    metadata_folder = join(casper_folder, 'metadata_shuffled')
+    fnames = os.listdir(metadata_folder)
+
+    for fname in fnames:
+        token_id = fname.replace('.json', '')
+        fpath = join(metadata_folder, fname)
+        with open(fpath, 'r+') as f:
+            metadata = json.load(f)
+            f.seek(0)
+            metadata['image'] = join(base_uri, token_id)
+            json.dump(metadata, f)
 
 def get_casper_defines(key):
     defines = {
