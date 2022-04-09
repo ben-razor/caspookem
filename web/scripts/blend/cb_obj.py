@@ -3,7 +3,8 @@ import bpy, bgl, blf, mathutils
 import subprocess
 import json
 import string
-from random import choice, random
+from random import choice, random, Random, shuffle
+import shutil
 
 def changeMaterial():
     print('Change material...')
@@ -548,11 +549,53 @@ def config_extra(config, position, colors):
         for extra in config['extra']:
             config_elem(extra, position, colors)
 
+casper_folder = '/home/chrisb/dev/crypto1/casper/casper-sp-game-1/artwork/render/nft/v1'
+
+def shuffle_files(folder):
+    img_folder = os.path.join(folder, 'img')
+    metadata_folder = os.path.join(folder, 'metadata')
+    out_folder = os.path.join(folder, 'img_shuffled')
+    out_metadata_folder = os.path.join(folder, 'metadata_shuffled')
+
+    files = os.listdir(img_folder)
+    Random(2).seed(197537)
+    shuffled_files = list(files)
+    Random(2).shuffle(shuffled_files)
+
+    try:
+        os.mkdir(out_folder)
+        os.mkdir(out_metadata_folder)
+    except: pass
+
+    i = 0
+    for fname in files:
+        from_file = os.path.join(img_folder, fname)
+        metadata_name = fname.replace('png', 'json')
+        from_metadata = os.path.join(metadata_folder, metadata_name)
+        if not os.path.isdir(from_file):
+            to_file = os.path.join(out_folder, shuffled_files[i])
+            shutil.copyfile(from_file, to_file)
+
+            to_metadata = os.path.join(out_metadata_folder, shuffled_files[i].replace('png', 'json'))
+            shutil.copyfile(from_metadata, to_metadata)
+            i = i + 1
+
 def render_image(token_id, w, h):
-    bpy.context.scene.render.filepath = f'/home/chrisb/dev/crypto1/casper/casper-sp-game-1/artwork/render/nft/v1/{token_id}.png'
+    bpy.context.scene.render.filepath = f'{casper_folder}/img/{token_id}.png'
     bpy.context.scene.render.resolution_x = w
     bpy.context.scene.render.resolution_y = h 
     bpy.ops.render.render(write_still=True)
+
+def save_metadata(token_id, metadata):
+    metadata_folder = os.path.join(casper_folder, 'metadata')
+
+    try:
+        os.mkdir(metadata_folder)
+    except: pass
+
+    fname = f'{metadata_folder}/{token_id}.json'
+    f = open(fname, 'w')
+    f.write(json.dumps(metadata))
 
 def get_casper_defines(key):
     defines = {
@@ -583,7 +626,7 @@ def make_random_caspers():
 
     eyewear = ['Empty', '3D']
     headwear = ['Empty', 'Headphones']
-    skin_colors = [x for x in all_colors if 'glow' not in x]
+    skin_colors = [x for x in all_colors if 'glow' not in x and x != 'white']
     eye_colors = ['white']
     pupil_colors = [x for x in all_colors if 'glow' in x]
     
@@ -626,8 +669,8 @@ def style_casper(nft_metadata):
 
     config = {
         'token_id': nft_metadata['token_id'],
-        'width': 400,
-        'height': 400,
+        'width': 200,
+        'height': 200,
         'start_collection_hidden': ['World', 'Headwear', 'Eyewear'],
         'name': nft_metadata['name'],
         'eyewear': 'Eyewear' + nft_metadata['eyewear'],
@@ -646,6 +689,7 @@ def style_casper(nft_metadata):
     set_color('MatPupil', config['pupil_color'], colors)
 
     render_image(config['token_id'], config['width'], config['height'])
+    save_metadata(config['token_id'], nft_metadata)
 
 def style_fluence_scene(config, defines):
     topology = config['topology']
