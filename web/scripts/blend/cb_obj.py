@@ -551,6 +551,8 @@ def config_extra(config, position, colors):
             config_elem(extra, position, colors)
 
 casper_folder = '/home/chrisb/dev/crypto1/casper/casper-sp-game-1/artwork/render/nft/v1'
+casper_ipfs_image = 'ipfs://QmZhJprV9EUpVUhKBDSXwKmPvpxLjPJ3rrJWcPcMePZy9s'
+casper_ipfs_metadata = 'ipfs://Qmdb9FCJYCRihaQFJWhPgV5ZSQPLNbvmx7uniAfrh89cGt'
 
 def shuffle_files(folder):
     img_folder = join(folder, 'img')
@@ -600,7 +602,7 @@ def save_metadata(token_id, metadata):
     f = open(fname, 'w')
     f.write(json.dumps(metadata))
 
-def add_metadata_image_links(folder, base_uri):
+def add_metadata_image_links(casper_folder, base_uri):
     metadata_folder = join(casper_folder, 'metadata_shuffled')
     fnames = os.listdir(metadata_folder)
 
@@ -610,7 +612,7 @@ def add_metadata_image_links(folder, base_uri):
         with open(fpath, 'r+') as f:
             metadata = json.load(f)
             f.seek(0)
-            metadata['image'] = join(base_uri, token_id)
+            metadata['image'] = join(base_uri, f'{token_id}.png') 
             json.dump(metadata, f)
 
 def get_casper_defines(key):
@@ -648,6 +650,7 @@ def make_random_caspers():
     
     token_id = 0
 
+    print('Creating renders...')
     for ew in eyewear:
         for hw in headwear:
             for sc in skin_colors:
@@ -661,6 +664,10 @@ def make_random_caspers():
                     metadata = get_casper_metadata(token_id, ew, hw, sc, 'white', 'glowgreen')
                     style_casper(metadata)
                     token_id = token_id + 1
+
+    print(f'Created {token_id} renders')
+    print('Shuffling files...')
+    shuffle_files(casper_folder)
 
 def style_default_casper():
     metadata = get_casper_metadata(4, 'Empty', 'Headphones', 'violet', 'white', 'glowgreen')
