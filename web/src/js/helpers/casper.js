@@ -35,6 +35,9 @@ contractNFT.setContractHash(CONTRACT_NFT_PRA);
 const cep47 = new CEP47Client(apiUrl, NETWORK_NAME);
 cep47.setContractHash(CONTRACT_NFT_PRA);
 
+const cep47Cas = new CEP47Client(apiUrl, NETWORK_NAME);
+cep47Cas.setContractHash(CONTRACT_CASPOOKIES001);
+
 async function counter_get() {
   return contractClient.queryContractData(['count']);
 }
@@ -125,6 +128,32 @@ export async function getNFTsForAccount(publicKeyHex) {
   return tokens;
 }
 
+export async function getCaspookiesForAccount(publicKeyHex) {
+  let tokens = [];
+
+  try {
+    let publicKey = CLPublicKey.fromHex(publicKeyHex);
+    let balanceOf = await cep47Cas.balanceOf(publicKey);
+    for(let i = 0; i < balanceOf; i++) {
+      let token = await cep47Cas.getTokenByIndex(publicKey, i);
+      let meta = await cep47Cas.getTokenMeta(token);
+      let metaMap = {};
+
+      meta.forEach((v, k) => {
+        metaMap[k] = v;
+        console.log(JSON.stringify(['tokmeta', token, v, k]));
+      });
+      
+      tokens.push({token, metaMap});
+    }
+  }
+  catch(e) {
+    console.log(JSON.stringify(['nfts for account error', e]));
+  }
+
+  return tokens;
+}
+
 export async function mintNFT(publicKeyHex) {
   let publicKey = CLPublicKey.fromHex(publicKeyHex);
   const result = await cep47.mint(
@@ -138,6 +167,27 @@ export async function mintNFT(publicKeyHex) {
   const deployJSON = DeployUtil.deployToJson(result);
   let sig = await window.casperlabsHelper.sign(deployJSON, publicKeyHex);
   let res = await sendDeploy(sig);
+  return res;
+}
+
+export async function mintCaspookie(publicKeyHex) {
+
+  let res = createSuccessInfo();
+
+  try {
+    let publicKey = CLPublicKey.fromHex(publicKeyHex);
+
+    const result = await cep47Cas.simpleMint(publicKey, MINT_ONE_PAYMENT_AMOUNT, publicKey);
+
+    const deployJSON = DeployUtil.deployToJson(result);
+    let sig = await window.casperlabsHelper.sign(deployJSON, publicKeyHex);
+    res = await sendDeploy(sig);
+  }
+  catch(e) {
+    console.log(JSON.stringify(['mint caspookie failed', e]));
+    res = createErrorInfo('error_sending_tx', { error: e })
+  }
+
   return res;
 }
 

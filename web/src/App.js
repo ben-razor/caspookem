@@ -16,8 +16,9 @@ import Scene1 from './js/components/scenes/MainScene';
 import PauseScene from './js/components/scenes/PauseScene';
 import Game3D from './js/components/Game3D';
 import { csprToMote, casperAttemptConnect, addHighScore, getHighScore, getDeploy,
-         getAccountInfo, getAccountNamedKeyValue, getNFTsForAccount, mintNFT } from './js/helpers/casper';
+         getAccountInfo, getAccountNamedKeyValue, getNFTsForAccount, mintNFT, mintCaspookie, getCaspookiesForAccount } from './js/helpers/casper';
 import { getNFTName } from './js/helpers/casper';
+import path from 'path';
 
 let game;
 let stateCheck = new StateCheck();
@@ -27,6 +28,7 @@ const NETWORK_NAME = 'casper-test';
 const CONTRACT_ACCOUNT = '01483e93cb89a114afb30a7bb08b1cb463ca73329bfd1ae4595c1cde5b0f08bd3a';
 
 const baseImageURL = 'https://storage.googleapis.com/birdfeed-01000101.appspot.com/strange-juice-1/';
+const casBucketURL = 'https://casper-game-1.storage.googleapis.com/';
 const TOAST_TIMEOUT = 4000;
 
 const MS_IN_DAY = 86400000;
@@ -65,6 +67,8 @@ function App() {
   const [submittedTx, setSubmittedTx] = useState([]);
   const [txTimerId, setTxTimerId] = useState(0);
   const [activePublicKey, setActivePublicKey] = useState();
+  const [activeCaspookieMetadata, setActiveCaspookieMetadata ] = useState('');
+  const [activeCaspookieImage, setActiveCaspookieImage ] = useState('');
 
   function toast(message, type='info') {
     toasty[type](message, { 
@@ -100,25 +104,46 @@ function App() {
     setPendingTx([]);
   }, [pendingTx]);
 
+  function ipfsToBucketURL(ipfsURL) {
+    let bucketURL = ipfsURL.replace('ipfs://', casBucketURL);
+    return bucketURL;
+  }
+
   useEffect(() => {
     console.log(JSON.stringify(['apk changed', activePublicKey]));
     
     if(activePublicKey) {
       requestHighScore();
       (async () => {
-        let nftsForAccount = await getNFTsForAccount(activePublicKey);
-        console.log(JSON.stringify([nftsForAccount]));
+        let caspookieNFTs = await getCaspookiesForAccount(activePublicKey);
+        console.log(JSON.stringify([caspookieNFTs]));
 
-        for(let nft of nftsForAccount) {
-          var mainScene = game.scene.keys['MainScene'];
-          if(nft.color && nft.color !== '0x000000') {
-            mainScene?.setBallColor(hexColorToInt(nft.color));
-            break;
-          }
+        for(let cas of caspookieNFTs) {
+          let meta = cas.metaMap;
+
+          let bucketURL = ipfsToBucketURL(meta.token_uri);
+          console.log(JSON.stringify(['fetching metadata from', bucketURL]));
+
+          let r = await fetch(bucketURL);
+          let j = await r.json();
+
+          console.log(JSON.stringify(['Caspookie metadata:', j]));
+          setActiveCaspookieMetadata(j);
+          
         }
+
       })();
     }
   }, [activePublicKey]);
+
+  useEffect(() => {
+    if(activeCaspookieMetadata) {
+      let bucketURL = ipfsToBucketURL(activeCaspookieMetadata.image);
+      console.log(JSON.stringify(['loading image', bucketURL]));
+      
+      setActiveCaspookieImage(bucketURL)
+    }
+  }, [activeCaspookieMetadata]);
   
   useEffect(() => {
     if(stateCheck.changed('doPendingTx', pendingTx) || stateCheck.changed('apk1', activePublicKey)) {
@@ -207,16 +232,27 @@ function App() {
 
   async function requestMint() {
     (async () => {
-      let deploy = await mintNFT(activePublicKey);
-      console.log(JSON.stringify(['reqmint', deploy]));
+      console.log(JSON.stringify(['reqmint 1']));
+      requestCasperTx('mintCaspookie')
     })();
   }
 
-  async function requestCasperTx(type, data) {
+  async function requestCasperTx(type, data={}) {
     try {
       let res = await casperAttemptConnect();
 
       if(res.success) {
+        if(type === 'mintCaspookie') {
+          let txRes = await mintCaspookie(res.data.activePublicKey);
+
+          if(txRes.success) {
+            console.log(JSON.stringify(['deploy', txRes.data.deploy]));
+            
+            data.deploy = txRes.data.deploy;
+            let _submittedTx = [...submittedTx, { type, data }]
+            setSubmittedTx(_submittedTx);
+          }
+        }
         if(type === 'addHighScore') {
           let txRes = await addHighScore(data.score, res.data.activePublicKey, NETWORK_NAME, PAYMENT_ADD_HIGH_SCORE);
           if(txRes.success) {
@@ -229,7 +265,6 @@ function App() {
         }
         else if(type === 'getHighScore') {
           let hsRes = await getHighScore(res.data.activePublicKey);
-          console.log(JSON.stringify(['ghs', hsRes]));
 
           if(hsRes.success) {
             let savedHighScore = hsRes.data.highScore;
@@ -567,6 +602,14 @@ function App() {
       <div className="br-content">
         <div className="br-game-container">
           <div className="br-score-bar">
+            {
+              activeCaspookieImage ?
+                <div className="br-caspookie-image-container">
+                  <img className="br-caspookie-image" alt="Active caspookie" src={activeCaspookieImage} />
+                </div>
+                :
+                ''
+            }
             <div className="br-deed" id="deed-msg" style={ { display: 'none'}}>You Deed</div>
             <div className="br-score" id="score">0</div>
             <div className="br-high-score">High Score: <span id="high-score">{highScore}</span></div>

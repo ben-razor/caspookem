@@ -244,7 +244,21 @@ import {
         keys
       );
     }
+
+    public async simpleMint(recipient: CLKeyParameters, paymentAmount: string, deploySender: CLPublicKey) {
+      const runtimeArgs = RuntimeArgs.fromMap({
+        recipient: CLValueBuilder.key(recipient),
+      });
   
+      return this.contractClient.callEntrypoint(
+        'mint',
+        runtimeArgs,
+        deploySender,
+        this.networkName,
+        paymentAmount
+      );
+    }
+
     public async mintCopies(
       recipient: CLKeyParameters,
       ids: string[],
