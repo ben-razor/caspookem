@@ -87,6 +87,7 @@ function Game3D(props) {
   const newKart = props.newKart;
   const getTextureURL = props.getTextureURL;
   const getImageURL = props.getImageURL;
+  const activeCaspookieMetadata = props.activeCaspookieMetadata;
 
   window.nftData = nftData;
 
@@ -209,6 +210,26 @@ function Game3D(props) {
 
     return nftData;
   }
+
+  function blendColorToHex(blendColor) {
+    return '#' + blendColor.map(x => (Math.floor(x * 255)).toString(16).padStart(2, '0')).join('')
+  }
+
+  useEffect(() => {
+    console.log(JSON.stringify(['ACM', activeCaspookieMetadata]));
+    
+    if(activeCaspookieMetadata && activeCaspookieMetadata?.eyewear) {
+      let _controlEntry = {...controlEntry};
+
+      _controlEntry.eyewear = 'Eyewear' + activeCaspookieMetadata.eyewear;
+      _controlEntry.headwear = 'Headwear' + activeCaspookieMetadata.headwear;
+      let blendColor = gameConfig.colors[activeCaspookieMetadata.skin_color];
+      let hexColor = blendColorToHex(blendColor);
+      _controlEntry.color = hexColor;
+
+      setControlEntry(_controlEntry);
+    }
+  }, [activeCaspookieMetadata]);
 
   useEffect(() => {
     let changedKeys = characterChanged(nftData, prevNFTData);

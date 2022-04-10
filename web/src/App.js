@@ -626,7 +626,7 @@ function App() {
             showModal={showModal}
             getTextureURL={getTextureURL} getIconURL={getIconURL} 
             getImageURL={getImageURL} 
-            nftList={nftList} />
+            nftList={nftList} activeCaspookieMetadata={activeCaspookieMetadata} />
           }
         </div>
       </div>
