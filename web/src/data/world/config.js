@@ -60,6 +60,8 @@ const config = {
     eyewear: 'Eyewear3D',
     skin: 'SkinPlastic',
     color: '#11aaff',
+    eyeColor: '#ff00ff',
+    pupilColor: '#ffff00',
     decal1: '7',
     decal2: '0',
     decal3: '0',

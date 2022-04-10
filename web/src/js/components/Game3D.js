@@ -227,6 +227,14 @@ function Game3D(props) {
       let hexColor = blendColorToHex(blendColor);
       _controlEntry.color = hexColor;
 
+      blendColor = gameConfig.colors[activeCaspookieMetadata.eye_color];
+      hexColor = blendColorToHex(blendColor);
+      _controlEntry.eyeColor = hexColor;
+
+      blendColor = gameConfig.colors[activeCaspookieMetadata.pupil_color];
+      hexColor = blendColorToHex(blendColor);
+      _controlEntry.pupilColor = hexColor;
+
       setControlEntry(_controlEntry);
     }
   }, [activeCaspookieMetadata]);
@@ -307,9 +315,20 @@ function Game3D(props) {
         }
       }
 
+      if(o.name === 'Eye') {
+        let meshes = o.children.length ? o.children : [o];
+
+        for(let child of meshes) {
+          if(child.material.name === 'MatEye') {
+            child.material.color = new THREE.Color(controlEntry.eyeColor);
+          }
+          if(child.material.name === 'MatPupil') {
+            child.material.color = new THREE.Color(controlEntry.pupilColor);
+          }
+        }
+      }
+
       if(o.name === 'Body') {
-        console.log(JSON.stringify(['st b']));
-        
         let meshes = o.children.length ? o.children : [o];
 
         for(let child of meshes) {
