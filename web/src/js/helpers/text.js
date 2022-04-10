@@ -1,6 +1,6 @@
 const text_consts = {
-  "app_name": "NEAR Karts",
-  "nft_name": "NEAR Kart",
+  "app_name": "Caspooken",
+  "nft_name": "Caspookie",
   "nft_short_name": "Kart",
   "blockchain_name": "NEAR",
   "mint_price": "0.1 NEAR",
@@ -62,6 +62,7 @@ const text = {
 
     "text_high_score_saved": `High score saved on Casper!`,
     "text_tx_complete": `Transaction complete: {type}`,
+    "text_mint_nft": `Mint ${text_consts.nft_name}`,
 
     "success_save_kart": `${text_consts.nft_name} saved!!`,
     "success_image_upload": `${text_consts.nft_short_name} image uploaded`,

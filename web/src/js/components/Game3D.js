@@ -75,6 +75,7 @@ function Game3D(props) {
   const nftData = props.nftData;
   const tokensLoaded = props.tokensLoaded;
   const activeTokenId = props.activeTokenId;
+  const activeNFT = props.activeNFT;
   const execute = props.execute;
   const processingActions = props.processingActions;
   const toast = props.toast;
@@ -87,7 +88,9 @@ function Game3D(props) {
   const newKart = props.newKart;
   const getTextureURL = props.getTextureURL;
   const getImageURL = props.getImageURL;
-  const activeCaspookieMetadata = props.activeCaspookieMetadata;
+  const setActiveNFT = props.setActiveNFT;
+  const ipfsToBucketURL = props.ipfsToBucketURL;
+  const requestMint = props.requestMint;
 
   window.nftData = nftData;
 
@@ -126,8 +129,8 @@ function Game3D(props) {
   const [orbitControls, setOrbitControls] = useState();
   const [garagePanel, setGaragePanel] = useState('equip');
   const [postBattleScreen, setPostBattleScreen] = useState(postBattleScreens.NONE);
-  const [showEquipControls, setShowEquipControls] = useState(true);
-  const [showNFTList, setShowNFTList ] = useState(false);
+  const [showEquipControls, setShowEquipControls] = useState(false);
+  const [showNFTList, setShowNFTList ] = useState(true);
   const [threeElem, setThreeElem ] = useState();
 
   function characterChanged(nftData, prevNFTData) {
@@ -216,28 +219,28 @@ function Game3D(props) {
   }
 
   useEffect(() => {
-    console.log(JSON.stringify(['ACM', activeCaspookieMetadata]));
+    console.log(JSON.stringify(['ACM', activeNFT]));
     
-    if(activeCaspookieMetadata && activeCaspookieMetadata?.eyewear) {
+    if(activeNFT && activeNFT?.eyewear) {
       let _controlEntry = {...controlEntry};
 
-      _controlEntry.eyewear = 'Eyewear' + activeCaspookieMetadata.eyewear;
-      _controlEntry.headwear = 'Headwear' + activeCaspookieMetadata.headwear;
-      let blendColor = gameConfig.colors[activeCaspookieMetadata.skin_color];
+      _controlEntry.eyewear = 'Eyewear' + activeNFT.eyewear;
+      _controlEntry.headwear = 'Headwear' + activeNFT.headwear;
+      let blendColor = gameConfig.colors[activeNFT.skin_color];
       let hexColor = blendColorToHex(blendColor);
       _controlEntry.color = hexColor;
 
-      blendColor = gameConfig.colors[activeCaspookieMetadata.eye_color];
+      blendColor = gameConfig.colors[activeNFT.eye_color];
       hexColor = blendColorToHex(blendColor);
       _controlEntry.eyeColor = hexColor;
 
-      blendColor = gameConfig.colors[activeCaspookieMetadata.pupil_color];
+      blendColor = gameConfig.colors[activeNFT.pupil_color];
       hexColor = blendColorToHex(blendColor);
       _controlEntry.pupilColor = hexColor;
 
       setControlEntry(_controlEntry);
     }
-  }, [activeCaspookieMetadata]);
+  }, [activeNFT]);
 
   useEffect(() => {
     let changedKeys = characterChanged(nftData, prevNFTData);
@@ -1053,10 +1056,13 @@ function Game3D(props) {
     return kartTitle.replace('A NEAR Kart Called ', '');
   }
 
-  function displayNFTs(nftList, activeTokenId) {
+  function displayNFTs(nftList, activeNFT) {
     let nftUI = [];
     let active = false;
 
+    console.log(JSON.stringify(['NFTL', nftList]));
+    let activeTokenId = activeNFT?.token_id;
+    
     for(let nft of nftList) {
       if(activeTokenId === nft.token_id) {
         active = true;
@@ -1065,9 +1071,14 @@ function Game3D(props) {
         active = false;
       }
 
+      let bucketURL = ipfsToBucketURL(nft.image);
+      let nftImg = <div className="br-caspookie-image-container" key={bucketURL}>
+        <img className="br-caspookie-image" alt="Active caspookie" src={bucketURL} />
+      </div>
+
       nftUI.push(<div className={"br-nft-list-item " + (active ? 'br-nft-list-item-selected' : '')} 
-                      key={nft.token_id} onClick={e => execute('selectNFT', nft.token_id)}>
-        {kartName(nft.metadata.title)}
+                      key={nft?.token_id} onClick={e => execute('selectNFT', nft.token_id)}>
+        {nftImg}
       </div>);
     }
 
@@ -1077,8 +1088,8 @@ function Game3D(props) {
     }
 
     nftUI.push(<div className={"br-nft-list-item " + (newKartActive ? 'br-nft-list-item-selected' : '')} 
-                    key="new_kart" onClick={e => newKart() }>
-      { getText('text_new_nft_name')}
+                    key="new_kart" onClick={e => requestMint() }>
+      { getText('text_mint_nft')}
     </div>);
 
     return <Fragment>
@@ -1391,21 +1402,21 @@ function Game3D(props) {
   function getScreenGarage() {
     let nftListUI;
 
-    if(showNFTList) {
+    if(true) {
       nftListUI = <div className="br-nft-gallery">
-        { tokensLoaded ? displayNFTs(nftList, activeTokenId) : ''}
+        { true ? displayNFTs(nftList, activeNFT) : ''}
         { !nftList.length ? 
           <div className="br-info-message-start">
             <i className="fa fa-info br-info-icon"></i>
             <div className="br-space-right">
-              { getText('text_help_welcome') }
+                { getText('text_help_welcome') }
             </div>
             <BrButton label="The System" id="helpMore" className="br-button" onClick={ e => showModal() } />
           </div>
           :
           ''
         }
-        { nftList.length && nftData.level > 0 ?
+        { nftList.length && nftData?.level > 0 ?
           <BrButton label="Battle" id="gameSimpleBattle" className="br-button" 
                     onClick={ e => startBattle() }
                     isSubmitting={processingActions['gameSimpleBattle']} />

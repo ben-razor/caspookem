@@ -56,7 +56,7 @@ function App() {
   const [ helpMode, setHelpMode] = useState(helpModes.INTRO);
   const [ headerInfoText, setHeaderInfoText ] = useState(getText('text_header_info'));
   const [wallet, setWallet] = useState();
-  const [walletSignedIn, setWalletSignedIn] = useState(true);
+  const [isSignedIn, setIsSignedIn] = useState(true);
   const [nftList, setNFTList] = useState([]);
   const [processingActions, setProcessingActions] = useState({});
   const [screen, setScreen] = useState(screens.Garage);
@@ -67,8 +67,7 @@ function App() {
   const [submittedTx, setSubmittedTx] = useState([]);
   const [txTimerId, setTxTimerId] = useState(0);
   const [activePublicKey, setActivePublicKey] = useState();
-  const [activeCaspookieMetadata, setActiveCaspookieMetadata ] = useState('');
-  const [activeCaspookieImage, setActiveCaspookieImage ] = useState('');
+  const [activeNFT, setActiveNFT ] = useState('');
 
   function toast(message, type='info') {
     toasty[type](message, { 
@@ -109,6 +108,10 @@ function App() {
     return bucketURL;
   }
 
+  function ipfsToTokenId(ipfsURL) {
+    return parseInt(ipfsURL.split('/').slice(-1)[0].replace('.json', ''));
+  }
+
   useEffect(() => {
     console.log(JSON.stringify(['apk changed', activePublicKey]));
     
@@ -116,7 +119,9 @@ function App() {
       requestHighScore();
       (async () => {
         let caspookieNFTs = await getCaspookiesForAccount(activePublicKey);
+
         console.log(JSON.stringify([caspookieNFTs]));
+        let _nftList = [];
 
         for(let cas of caspookieNFTs) {
           let meta = cas.metaMap;
@@ -127,24 +132,20 @@ function App() {
           let r = await fetch(bucketURL);
           let j = await r.json();
 
+          let tokenId = ipfsToTokenId(meta.token_uri);
+          j.token_id = tokenId;
           console.log(JSON.stringify(['Caspookie metadata:', j]));
-          setActiveCaspookieMetadata(j);
-          
+          _nftList.push(j);
+          setActiveNFT(j);
         }
+
+        setNFTList(_nftList);
+
 
       })();
     }
   }, [activePublicKey]);
 
-  useEffect(() => {
-    if(activeCaspookieMetadata) {
-      let bucketURL = ipfsToBucketURL(activeCaspookieMetadata.image);
-      console.log(JSON.stringify(['loading image', bucketURL]));
-      
-      setActiveCaspookieImage(bucketURL)
-    }
-  }, [activeCaspookieMetadata]);
-  
   useEffect(() => {
     if(stateCheck.changed('doPendingTx', pendingTx) || stateCheck.changed('apk1', activePublicKey)) {
       console.log(JSON.stringify(['cl int']));
@@ -523,7 +524,18 @@ function App() {
 
   localLog('nftList', nftList);
 
-  let isSignedIn = wallet?.isSignedIn() && walletSignedIn;  // NEAR sign out doesn't have await so need this trick with walletSignedIn 
+  function execute(type, data) {
+    if(type === 'selectNFT') {
+      let tokenId = data;
+
+      for(let nft of nftList) {
+        if(tokenId === nft.token_id) {
+          let meta = {...nft}; 
+          setActiveNFT(meta);
+        }
+      }
+    }
+  }
 
   return (
     <div className="br-page">
@@ -602,20 +614,11 @@ function App() {
       <div className="br-content">
         <div className="br-game-container">
           <div className="br-score-bar">
-            {
-              activeCaspookieImage ?
-                <div className="br-caspookie-image-container">
-                  <img className="br-caspookie-image" alt="Active caspookie" src={activeCaspookieImage} />
-                </div>
-                :
-                ''
-            }
             <div className="br-deed" id="deed-msg" style={ { display: 'none'}}>You Deed</div>
             <div className="br-score" id="score">0</div>
             <div className="br-high-score">High Score: <span id="high-score">{highScore}</span></div>
             <button className="br-score-control" onClick={() => saveHighScore(highScore)}>Save Score</button>
             <button className="br-score-control" onClick={requestHighScore}>Get Score</button>
-            <button className="br-score-control" onClick={requestMint}>Mint</button>
           </div>
           { selectedGame === 'platformer2D' ?
             <div id="phaser-parent" className="phaser-parent">
@@ -626,7 +629,9 @@ function App() {
             showModal={showModal}
             getTextureURL={getTextureURL} getIconURL={getIconURL} 
             getImageURL={getImageURL} 
-            nftList={nftList} activeCaspookieMetadata={activeCaspookieMetadata} />
+            nftList={nftList} activeNFT={activeNFT} 
+            ipfsToBucketURL={ipfsToBucketURL} requestMint={requestMint} 
+            execute={execute} />
           }
         </div>
       </div>
