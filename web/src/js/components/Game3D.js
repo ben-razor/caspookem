@@ -636,7 +636,6 @@ function Game3D(props) {
           lastCallTime = time;
           totalTime += dt;
 
-          particles.Step(dt);
 
           if(objs['baddy']) {
             let point = baddyCurve.getPointAt((totalTime / 20) % 1.0);
@@ -681,7 +680,7 @@ function Game3D(props) {
               lPos.y = height;
               lifeformPositioner.position.copy(lPos);
               //lifeformPositioner.setRotationFromQuaternion(lifeformBody.quaternion);
-
+              particles.position.copy(lPos);
               let keys = controller._input._keys;
 
               if(keys.space) {
@@ -749,6 +748,7 @@ function Game3D(props) {
             }
           }
 
+          particles.Step(dt);
           // controller.Update(delta);
           mixer.update(delta);
         }

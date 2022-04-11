@@ -81,6 +81,8 @@ export class ParticleSystem {
         }
     };
 
+    this.position = new THREE.Vector3(0, 0, 0);
+
     this._material = new THREE.ShaderMaterial({
         uniforms: uniforms,
         vertexShader: _VS,
@@ -152,9 +154,9 @@ export class ParticleSystem {
       const life = (Math.random() * 0.75 + 0.25) * 2.0;
       this._particles.push({
           position: new THREE.Vector3(
-              (Math.random() * 2 - 1) * 1.0,
-              (Math.random() * 2 - 1) * 1.0,
-              (Math.random() * 2 - 1) * 1.0),
+              this.position.x + (Math.random() * 2 - 1) * 1.0,
+              this.position.y + (Math.random() * 2 - 1) * 1.0,
+              this.position.z + (Math.random() * 2 - 1) * 1.0),
           size: (Math.random() * 0.5 + 0.5) * 4.0,
           colour: new THREE.Color(),
           alpha: 1.0,
@@ -194,6 +196,7 @@ export class ParticleSystem {
     this._geometry.attributes.angle.needsUpdate = true;
   }
 
+
   _UpdateParticles(timeElapsed) {
     for (let p of this._particles) {
       p.life -= timeElapsed;
@@ -212,13 +215,14 @@ export class ParticleSystem {
       p.colour.copy(this._colourSpline.Get(t));
 
       p.position.add(p.velocity.clone().multiplyScalar(timeElapsed));
-
+      /*
       const drag = p.velocity.clone();
       drag.multiplyScalar(timeElapsed * 0.1);
       drag.x = Math.sign(p.velocity.x) * Math.min(Math.abs(drag.x), Math.abs(p.velocity.x));
       drag.y = Math.sign(p.velocity.y) * Math.min(Math.abs(drag.y), Math.abs(p.velocity.y));
       drag.z = Math.sign(p.velocity.z) * Math.min(Math.abs(drag.z), Math.abs(p.velocity.z));
       p.velocity.sub(drag);
+      */
     }
 
     if(this._camera) {
