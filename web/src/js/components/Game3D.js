@@ -8,11 +8,12 @@ import BrButton from './lib/BrButton';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { setAlphaToEmissive, loadImageToMaterial, hueToColor, hexColorToInt, intToHexColor, HitTester } from '../helpers/3d';
 import { cloneObj, StateCheck, isLocal, localLog } from '../helpers/helpers';
-import gameConfig, { partIdToName } from '../../data/world/config';
+import gameConfig, { getAssetURL, partIdToName } from '../../data/world/config';
 import getText, { exclamation } from '../helpers/text';
 import { CompactPicker } from 'react-color';
 import domtoimage from 'dom-to-image';
 import { BasicCharacterController } from './3d/CharacterController';
+import { ParticleSystem } from './3d/Particle';
 import { Vector3 } from 'three';
 
 function getServerURL(forceRemote=false) {
@@ -386,7 +387,7 @@ function Game3D(props) {
   }, [photoSubScene, controlEntry, styleScene]);
 
   useEffect(() => {
-    if(scene && threeElem) {
+    if(scene && camera && threeElem) {
       loader.load(lifeform, function ( gltf ) {
         scene.add(gltf.scene);
         setSJScene(gltf.scene);
@@ -489,7 +490,7 @@ function Game3D(props) {
         let toRemove = [];
         let removeIds = [];
 
-        window.addEventListener('click', (event) => {
+        threeElem.addEventListener('click', (event) => {
 
           const ballBody = new CANNON.Body({ mass: 1 })
           ballBody.addShape(ballShape)
@@ -601,6 +602,12 @@ function Game3D(props) {
           mesh: baddyMesh, body: baddyBody, spline: baddySpline
         }
 
+        let particles = new ParticleSystem({
+            parent: scene,
+            camera,
+            image: getAssetURL('fire.png', 'tex')
+        });
+
         function rotateAroundWorldAxis(obj, axis, radians) {
           let rotWorldMatrix = new THREE.Matrix4();
           rotWorldMatrix.makeRotationAxis(axis.normalize(), radians);
@@ -628,6 +635,8 @@ function Game3D(props) {
           const dt = Math.max(time - lastCallTime, 0.05);
           lastCallTime = time;
           totalTime += dt;
+
+          particles.Step(dt);
 
           if(objs['baddy']) {
             let point = baddyCurve.getPointAt((totalTime / 20) % 1.0);
@@ -672,51 +681,69 @@ function Game3D(props) {
               lPos.y = height;
               lifeformPositioner.position.copy(lPos);
               //lifeformPositioner.setRotationFromQuaternion(lifeformBody.quaternion);
-              
-              if(controller._input._keys.space) {
+
+              let keys = controller._input._keys;
+
+              if(keys.space) {
                 if(!jumping) {
                   lifeformBody.velocity.y = 10;
-                  if(controller._input._keys.left) {
+                  if(keys.left) {
                     lifeformBody.velocity.x = -6;
                   }
-                  if(controller._input._keys.right) {
+                  if(keys.right) {
                     lifeformBody.velocity.x = 6;
                   }
-                  if(controller._input._keys.forward) {
+                  if(keys.forward) {
                     lifeformBody.velocity.z = -6;
                   }
-                  if(controller._input._keys.backward) {
+                  if(keys.backward) {
                     lifeformBody.velocity.z = 6;
                   }
                   jumping = true;
                 }
               }
 
-              if(controller._input._keys.left) {
+              if(keys.left) {
                 if(!jumping) {
                   lifeformBody.velocity.x = -6;
                   lifeformPositioner.rotation.set(0, -Math.PI/2, 0);
                 }
               }
 
-              if(controller._input._keys.right) {
+              if(keys.right) {
                 if(!jumping) {
                   lifeformBody.velocity.x = 6;
                   lifeformPositioner.rotation.set(0, Math.PI/2, 0);
                 }
               }
 
-              if(controller._input._keys.backward) {
+              if(keys.backward) {
                 if(!jumping) {
                   lifeformBody.velocity.z = 6;
-                  lifeformPositioner.rotation.set(0, 0, 0);
+                  if(keys.left) {
+                    lifeformPositioner.rotation.set(0, -Math.PI/4, 0);
+                  }
+                  else if(keys.right) {
+                    lifeformPositioner.rotation.set(0, Math.PI/4, 0);
+                  }
+                  else {
+                    lifeformPositioner.rotation.set(0, 0, 0);
+                  }
                 }
               }
 
-              if(controller._input._keys.forward) {
+              if(keys.forward) {
                 if(height < 0.1) {
                   lifeformBody.velocity.z = -6;
-                  lifeformPositioner.rotation.set(0, Math.PI, 0);
+                  if(keys.left) {
+                    lifeformPositioner.rotation.set(0, -3*Math.PI/4, 0);
+                  }
+                  else if(keys.right) {
+                    lifeformPositioner.rotation.set(0, 3*Math.PI/4, 0);
+                  }
+                  else {
+                    lifeformPositioner.rotation.set(0, Math.PI, 0);
+                  }
                 }
               }
             }
@@ -730,13 +757,13 @@ function Game3D(props) {
 
       }, undefined, function ( error ) { console.error( error ); } );  
     }
-  }, [scene, threeElem]);
+  }, [scene, threeElem, camera]);
 
   const createScene = useCallback((threeElem, w, h, camPos, orbitControls=false, refreshEvery=1, camLookAt=[0,0,0]) => {
     var clock = new THREE.Clock();
     setClock(clock);
     var scene = new THREE.Scene();
-    var camera = new THREE.PerspectiveCamera( 50, w/h, 1, 100 );
+    var camera = new THREE.PerspectiveCamera( 50, w/h, 1, 1000 );
     camera.position.copy(camPos);
     camera.lookAt(camLookAt[0], camLookAt[1], camLookAt[2]);
 
@@ -792,10 +819,6 @@ function Game3D(props) {
     setScene(scene);
     setCamera(camera);
     setThreeElem(threeRef.current);
-
-    let { scene: photoScene, camera: photoCamera} = createScene(threePhotoRef.current, wPhoto, hPhoto, 
-      new THREE.Vector3(0, 1.6, 3.6), false, 20, [0, -0.5, 0]);
-    setPhotoScene(photoScene);
   }, []);
   
   function addPointLights(scene, color, intensity, dist, positions=[]) {
@@ -1430,7 +1453,7 @@ function Game3D(props) {
       <div className={ "br-screen br-screen-garage " + getScreenClass(screens.GARAGE)}>
         {nftListUI}
         <div className="br-garage loading-fade-in">
-          <div className="br-strange-juice-3d" ref={threeRef}>
+          <div className="br-strange-juice-3d" id="br-strange-juice-3d" ref={threeRef}>
             <div className="br-3d-overlay loading-fade-out-slow">
             </div>
             <div className='br-level'>

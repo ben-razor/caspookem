@@ -87,7 +87,8 @@ const config = {
     "extra1": "",
     "extra2": "",
     "extra3": ""
-  }
+  },
+  casBucketURL: 'https://casper-game-1.storage.googleapis.com/'
 }
 
 export function partIdToName(part, id) {
@@ -103,6 +104,14 @@ export function partIdToName(part, id) {
   }
 
   return name;
+}
+
+export function getAssetURL(fileName, type) {
+  let assetURL = '';
+
+  assetURL = config.casBucketURL + type + '/' + fileName;
+
+  return assetURL;
 }
 
 export default config;
