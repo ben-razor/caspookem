@@ -493,10 +493,14 @@ function Game3D(props) {
         let particles = new ParticleSystem({
             parent: scene,
             camera,
-            image: getAssetURL('fire.png', 'tex')
+            image: getAssetURL('fire-blue-dark.png', 'tex')
         });
 
-        threeElem.addEventListener('click', (event) => {
+        //threeElem.addEventListener('click', (event) => {
+        document.addEventListener('keydown', (e) => {
+          if(e.key.toLowerCase() !== controller.keyMap.fire) {
+            return;
+          }
 
           const ballBody = new CANNON.Body({ mass: 1 })
           ballBody.addShape(ballShape)
@@ -1426,10 +1430,6 @@ function Game3D(props) {
         { true ? displayNFTs(nftList, activeNFT) : ''}
         { !nftList.length ? 
           <div className="br-info-message-start">
-            <i className="fa fa-info br-info-icon"></i>
-            <div className="br-space-right">
-                { getText('text_help_welcome') }
-            </div>
             <BrButton label="The System" id="helpMore" className="br-button" onClick={ e => showModal() } />
           </div>
           :

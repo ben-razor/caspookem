@@ -7,10 +7,20 @@ class BasicCharacterController {
   }
 
   _Init() {
+    this.keyMap = {
+      forward: 'arrowup',
+      backward: 'arrowdown',
+      left: 'arrowleft',
+      right: 'arrowright',
+      jump: 'd',
+      fire: 'f',
+      faster: 'shift'
+    };
+
     this._decceleration = new THREE.Vector3(-0.0005, -0.0001, -5.0);
     this._acceleration = new THREE.Vector3(1, 0.25, 50.0);
     this._velocity = new THREE.Vector3(0, 0, 0);
-    this._input = new BasicCharacterControllerInput();
+    this._input = new BasicCharacterControllerInput(this.keyMap);
     this.prevPosition = new THREE.Vector3(0, 0, 0);
   }
 
@@ -83,11 +93,13 @@ class BasicCharacterController {
 };
 
 class BasicCharacterControllerInput {
-  constructor() {
-    this._Init();    
+  constructor(keyMap) {
+    this._Init(keyMap);    
   }
 
-  _Init() {
+  _Init(keyMap) {
+    this.keyMap = keyMap;
+    
     this._keys = {
       forward: false,
       backward: false,
@@ -101,54 +113,70 @@ class BasicCharacterControllerInput {
     
   }
 
+
   _onKeyDown(event) {
-    
-    switch (event.keyCode) {
-      case 87: // w
+    let km = this.keyMap;
+    let handled = true;
+    switch (event.key.toLowerCase()) {
+      case km.forward:
         this._keys.forward = true;
         break;
-      case 65: // a
+      case km.left:
         this._keys.left = true;
         break;
-      case 83: // s
+      case km.backward: 
         this._keys.backward = true;
         break;
-      case 68: // d
+      case km.right: 
         this._keys.right = true;
         break;
-      case 32: // SPACE
+      case km.jump:
         this._keys.space = true;
         break;
-      case 16: // SHIFT
+      case km.faster:
         this._keys.shift = true;
         break;
       default:
+        handled = false;
         break;
+    }
+
+    if(handled) {
+      event.preventDefault();
+      event.stopPropagation();
     }
   }
 
   _onKeyUp(event) {
-    switch(event.keyCode) {
-      case 87: // w
+    let km = this.keyMap;
+    let handled = true;
+
+    switch(event.key.toLowerCase()) {
+      case km.forward:
         this._keys.forward = false;
         break;
-      case 65: // a
+      case km.left:
         this._keys.left = false;
         break;
-      case 83: // s
+      case km.backward: 
         this._keys.backward = false;
         break;
-      case 68: // d
+      case km.right: 
         this._keys.right = false;
         break;
-      case 32: // SPACE
+      case km.jump:
         this._keys.space = false;
         break;
-      case 16: // SHIFT
+      case km.faster:
         this._keys.shift = false;
         break;
       default:
+        handled = false;
         break;
+    }
+    if(handled) {
+      event.preventDefault();
+      event.stopPropagation();
     }
   }
 };

@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="210mm"
+   height="297mm"
+   viewBox="0 0 210 297"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.1.2 (0a00cf5, 2022-02-04)"
+   sodipodi:docname="caspookem-1.svg"
+   inkscape:export-filename="/home/chrisb/dev/crypto1/casper/casper-sp-game-1/artwork/render/game/caspookem-1.png"
+   inkscape:export-xdpi="141.63303"
+   inkscape:export-ydpi="141.63303"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:zoom="1.453564"
+     inkscape:cx="297.20054"
+     inkscape:cy="330.56681"
+     inkscape:window-width="1366"
+     inkscape:window-height="705"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs2">
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient24887">
+      <stop
+         style="stop-color:#272727;stop-opacity:1"
+         offset="0"
+         id="stop24883" />
+      <stop
+         style="stop-color:#333333;stop-opacity:0;"
+         offset="1"
+         id="stop24885" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient22223">
+      <stop
+         style="stop-color:#06a7ff;stop-opacity:1"
+         offset="0"
+         id="stop22219" />
+      <stop
+         style="stop-color:#f8faff;stop-opacity:0.49411765"
+         offset="1"
+         id="stop22221" />
+    </linearGradient>
+    <rect
+       x="68.215106"
+       y="254.52556"
+       width="674.30111"
+       height="228.39538"
+       id="rect4082" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient22223"
+       id="linearGradient22225"
+       x1="240.34073"
+       y1="266.90042"
+       x2="240.34073"
+       y2="353.56735"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient24887"
+       id="linearGradient24889"
+       x1="65.478691"
+       y1="67.567551"
+       x2="65.478691"
+       y2="98.010193"
+       gradientUnits="userSpaceOnUse" />
+    <filter
+       inkscape:collect="always"
+       style="color-interpolation-filters:sRGB"
+       id="filter25781"
+       x="-0.010863061"
+       y="-0.040957877"
+       width="1.0217261"
+       height="1.0819158">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="0.4858379"
+         id="feGaussianBlur25783" />
+    </filter>
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <path
+       style="fill:url(#linearGradient24889);stroke:none;stroke-width:2.64583333;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;fill-opacity:1;stroke-miterlimit:4;stroke-dasharray:none;filter:url(#filter25781)"
+       d="m 18.347641,72.8685 c 1.920615,-2.656131 4.592892,-3.655802 4.592892,-3.655802 6.906185,-0.211955 5.913049,1.025921 7.739058,2.691783 2.710584,2.472856 4.311174,-3.625056 6.54282,-3.489436 2.50287,0.152102 1.134189,5.895973 3.008289,7.21828 2.491331,0.60671 6.723144,-7.546476 8.526216,-3.911878 l 1.447419,2.91768 c 1.838143,3.705293 7.017716,-4.905039 9.744337,-2.893555 0.804678,0.593628 -0.780571,2.418081 0.03285,2.999671 2.53259,1.810783 5.913794,-3.898886 8.870564,-2.923971 0.944385,0.311386 0.791717,2.084977 1.722128,2.435918 3.131998,1.181355 6.549609,-3.247619 9.768416,-2.328764 0.817694,0.233423 0.987602,1.546389 1.795262,1.812464 3.466258,1.141923 7.300051,-2.641605 10.819497,-1.675977 1.148927,0.31523 1.58828,2.048284 2.758284,2.272996 4.329497,0.831526 8.188657,-4.114949 12.596487,-4.031411 1.24438,0.02358 2.27209,1.147457 3.51044,1.272035 2.16166,0.217463 4.54,-1.995716 6.44731,-0.955406 3.64681,1.989096 4.67002,7.225785 5.13856,11.353282 0.28407,2.502479 -1.373,4.890934 -1.49333,7.406608 -0.0661,1.382652 1.44253,3.188324 0.42846,4.130537 -3.0402,2.824775 -8.14446,-2.754209 -12.25583,-2.189551 -2.5184,0.345879 -4.33052,3.472523 -6.8677,3.315467 -1.63596,-0.101269 -2.5052,-2.877517 -4.130795,-2.667619 -1.48734,0.192046 -1.583295,2.946498 -3.035549,3.320693 -2.944571,0.758712 -5.601431,-2.910438 -8.642162,-2.920328 -3.008269,-0.0098 -5.592891,3.275573 -8.568513,2.833473 -2.400104,-0.356593 -3.532478,-3.96906 -5.948288,-4.196046 -2.11863,-0.199064 -3.68411,2.719496 -5.810724,2.643762 -2.802442,-0.0998 -4.606232,-4.356885 -7.390119,-4.019817 -3.56006,0.431046 -4.365097,7.185762 -7.950626,7.24748 -2.301143,0.03961 -2.995486,-4.060237 -5.25966,-4.472967 -2.277071,-0.415081 -4.295598,2.921408 -6.536669,2.342663 -1.840354,-0.475262 -1.881972,-4.024815 -3.765176,-4.282342 -3.291129,-0.45006 -5.062118,5.930858 -8.347787,5.442535 C 26.081609,95.650513 26.146899,92.227333 24.418371,91.838874 22.016,91.29898 22.370228,93.181922 20.103517,92.220209 15.67069,90.339463 16.335198,86.47098 16.112216,81.660841 16.003604,79.317886 16.973309,74.769144 18.347641,72.8685 Z"
+       id="path20021"
+       sodipodi:nodetypes="sssscssssssssssssssssssssssssssssssssss" />
+    <text
+       xml:space="preserve"
+       transform="matrix(0.26458333,0,0,0.26458333,0.42925152,-0.04690265)"
+       id="text4080"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:96px;line-height:1.25;font-family:meta;-inkscape-font-specification:meta;white-space:pre;shape-inside:url(#rect4082);fill:url(#linearGradient22225);fill-opacity:1;stroke:none"><tspan
+         x="68.214844"
+         y="339.58533"
+         id="tspan26201"><tspan
+           style="font-family:'Metal Mania';-inkscape-font-specification:'Metal Mania'"
+           id="tspan26199">Caspookem</tspan></tspan></text>
+  </g>
+</svg>

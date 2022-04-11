@@ -1,6 +1,6 @@
 /* global BigInt */
 import { useState, useEffect, useCallback, Fragment } from 'react';
-import Logo from './images/caspervania-1.png';
+import Logo from './images/caspookem-1.png';
 import './scss/styles.scss';
 import { toast as toasty } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
