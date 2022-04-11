@@ -490,6 +490,12 @@ function Game3D(props) {
         let toRemove = [];
         let removeIds = [];
 
+        let particles = new ParticleSystem({
+            parent: scene,
+            camera,
+            image: getAssetURL('fire.png', 'tex')
+        });
+
         threeElem.addEventListener('click', (event) => {
 
           const ballBody = new CANNON.Body({ mass: 1 })
@@ -516,14 +522,8 @@ function Game3D(props) {
                 }
                 b1i++;
               }
-              world.removeBody(balls[b1i]);
-              let mesh2 = ballMeshes[b1i];
-              scene.remove(mesh2);
-              mesh2.geometry.dispose();
-              mesh2.material.dispose();
-              balls.splice(b1i, 1);
-              ballMeshes.splice(b1i, 1);
               toRemove.push(b1i);
+              particles.trigger(b1.position, 0.5);
             }
 
             if(b2.ballId) {
@@ -535,8 +535,8 @@ function Game3D(props) {
                 }
                 b2i++;
               }
-              
               toRemove.push(b2i);
+              particles.trigger(b2.position, 0.5);
             }
           })
 
@@ -602,12 +602,6 @@ function Game3D(props) {
           mesh: baddyMesh, body: baddyBody, spline: baddySpline
         }
 
-        let particles = new ParticleSystem({
-            parent: scene,
-            camera,
-            image: getAssetURL('fire.png', 'tex')
-        });
-
         function rotateAroundWorldAxis(obj, axis, radians) {
           let rotWorldMatrix = new THREE.Matrix4();
           rotWorldMatrix.makeRotationAxis(axis.normalize(), radians);
@@ -633,6 +627,9 @@ function Game3D(props) {
           let delta = clock.getDelta();
           const time = performance.now() / 1000
           const dt = Math.max(time - lastCallTime, 0.05);
+          if(!dt) {
+            console.log(JSON.stringify(['not dt', dt]));
+          }
           lastCallTime = time;
           totalTime += dt;
 
@@ -680,7 +677,6 @@ function Game3D(props) {
               lPos.y = height;
               lifeformPositioner.position.copy(lPos);
               //lifeformPositioner.setRotationFromQuaternion(lifeformBody.quaternion);
-              particles.position.copy(lPos);
               let keys = controller._input._keys;
 
               if(keys.space) {

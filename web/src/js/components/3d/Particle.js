@@ -81,7 +81,11 @@ export class ParticleSystem {
         }
     };
 
+    this.t = 0;
     this.position = new THREE.Vector3(0, 0, 0);
+    this.active = false;
+    this.duration = 1;
+    this.tStart = 0;
 
     this._material = new THREE.ShaderMaterial({
         uniforms: uniforms,
@@ -142,11 +146,32 @@ export class ParticleSystem {
     }
   }
 
+  trigger(position, duration=1) {
+    this.position.copy(position);
+    this.active = true;
+    this.tStart = this.t;
+    this.duration = duration;
+  }
+
   _AddParticles(timeElapsed) {
+    timeElapsed = timeElapsed || 0;
+    
     if (!this.gdfsghk) {
       this.gdfsghk = 0.0;
     }
-    this.gdfsghk += timeElapsed;
+    this.t += timeElapsed;
+
+    // console.log(JSON.stringify([this.t, this.tStart, this.duration, timeElapsed]));
+    
+    if(this.t > this.tStart + this.duration) {
+      this.active = false;
+    }
+
+    if(!this.active) {
+      return;
+    }
+
+    this.gdfsghk = this.t;
     let n = 2; //Math.floor(this.gdfsghk * 75.0);
     this.gdfsghk -= n / 75.0;
 
@@ -157,13 +182,13 @@ export class ParticleSystem {
               this.position.x + (Math.random() * 2 - 1) * 1.0,
               this.position.y + (Math.random() * 2 - 1) * 1.0,
               this.position.z + (Math.random() * 2 - 1) * 1.0),
-          size: (Math.random() * 0.5 + 0.5) * 4.0,
+          size: (Math.random() * 0.5 + 0.5) * 2.0,
           colour: new THREE.Color(),
           alpha: 1.0,
           life: life,
           maxLife: life,
           rotation: Math.random() * 2.0 * Math.PI,
-          velocity: new THREE.Vector3(0, 2, 0),
+          velocity: new THREE.Vector3(0, 1, 0),
       });
     }
   }
