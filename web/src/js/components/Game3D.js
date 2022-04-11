@@ -127,11 +127,13 @@ function Game3D(props) {
   const [battleAttacking, setBattleAttacking] = useState([0, 0])
   const [battleStarted, setBattleStarted] = useState();
   const [battleEnded, setBattleEnded] = useState();
-  const [orbitControls, setOrbitControls] = useState();
+  const [orbitControls, setOrbitControls] = useState(false);
+  const [orbitControlsEnabled, setOrbitControlsEnabled] = useState(false);
   const [garagePanel, setGaragePanel] = useState('equip');
   const [postBattleScreen, setPostBattleScreen] = useState(postBattleScreens.NONE);
   const [showEquipControls, setShowEquipControls] = useState(false);
   const [showNFTList, setShowNFTList ] = useState(true);
+  const [showNFTListHelp, setShowNFTListHelp ] = useState(false);
   const [threeElem, setThreeElem ] = useState();
 
   function characterChanged(nftData, prevNFTData) {
@@ -815,7 +817,7 @@ function Game3D(props) {
 
   useEffect(() => {
     let { scene, camera } = createScene(threeRef.current, w, h, 
-      new THREE.Vector3(0, 10, 30), true, 2, [0, 1.5, 0]);
+      new THREE.Vector3(0, 10, 30), orbitControlsEnabled, 2, [0, 1.5, 0]);
     setScene(scene);
     setCamera(camera);
     setThreeElem(threeRef.current);
@@ -1428,7 +1430,7 @@ function Game3D(props) {
     if(true) {
       nftListUI = <div className="br-nft-gallery">
         { true ? displayNFTs(nftList, activeNFT) : ''}
-        { !nftList.length ? 
+        { !nftList.length && showNFTListHelp ? 
           <div className="br-info-message-start">
             <BrButton label="The System" id="helpMore" className="br-button" onClick={ e => showModal() } />
           </div>
@@ -1458,8 +1460,13 @@ function Game3D(props) {
                 {nftData?.level || 0}
               </div>
             </div>
-            <button className="br-autorotate-button br-button br-icon-button"
-                    onMouseDown={toggleAutoRotate}><i className="fa fa-sync-alt"></i></button>
+            {
+              orbitControlsEnabled ?
+                <button className="br-autorotate-button br-button br-icon-button"
+                        onMouseDown={toggleAutoRotate}><i className="fa fa-sync-alt"></i></button>
+                :
+                ''
+            }
           </div>
           { showEquipControls ?
             <div className="br-strange-juice-overlay">

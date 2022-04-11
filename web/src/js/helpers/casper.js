@@ -328,9 +328,31 @@ export async function requestAccountInfo() {
     await AccountInformation();
 }
 
+export async function checkSignedIn() {
+  let res = createErrorInfo('error_casper_no_signer');
+  let activePublicKey;
+
+  if(window.casperlabsHelper) {
+     try {
+      activePublicKey = await window.casperlabsHelper.getActivePublicKey();
+
+      if(activePublicKey) {
+        res.success = true;
+        res.reason = 'ok';
+        res.data = { activePublicKey };
+      }
+    }
+    catch(e) { 
+      res.reason = 'error_casper_signer_no_account';
+    }
+  }
+
+  return res;
+}
+
 export async function casperAttemptConnect() {
   let success = false;
-  let reason = 'error_no_casper_signer';
+  let reason = 'error_casper_no_signer';
   let activePublicKey;
   
   if(window.casperlabsHelper) {

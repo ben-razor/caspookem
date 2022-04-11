@@ -1,10 +1,9 @@
 const text_consts = {
-  "app_name": "Caspooken",
+  "app_name": "Caspookem",
   "nft_name": "Caspookie",
-  "nft_short_name": "Kart",
-  "blockchain_name": "NEAR",
-  "mint_price": "0.1 NEAR",
-  "upgrade_price": "0.1 NEAR"
+  "nft_short_name": "Caspookie",
+  "blockchain_name": "Casper",
+  "mint_price": "0.1 CSPR"
 }
 
 const text = {
@@ -64,6 +63,10 @@ const text = {
     "text_tx_complete": `Transaction complete: {type}`,
     "text_mint_nft": `Mint ${text_consts.nft_name}`,
 
+    'text_sign_in_to_save': 'Sign in to save and view progress',
+    'text_wallet_name': 'Casper Signer',
+    'text_get_casper': 'Go get {casper_signer}',
+
     "success_save_kart": `${text_consts.nft_name} saved!!`,
     "success_image_upload": `${text_consts.nft_short_name} image uploaded`,
 
@@ -85,7 +88,7 @@ const text = {
     "error_upgrade_payment_too_low": `Upgrade requires an attached deposit of at least ${text_consts.upgrade_price}`,
 
     "error_casper_error": `Error connecting to Casper network`,
-    "error_no_casper_signer": `Casper Wallet not found`,
+    "error_casper_no_signer": `Casper wallet not found.`,
     "error_casper_signer_no_account": `Please sign in to Casper network`,
     "error_tx_pending": `A transaction of this type is waiting for Casper network`
   }

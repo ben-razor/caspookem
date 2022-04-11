@@ -16,7 +16,8 @@ import Scene1 from './js/components/scenes/MainScene';
 import PauseScene from './js/components/scenes/PauseScene';
 import Game3D from './js/components/Game3D';
 import { csprToMote, casperAttemptConnect, addHighScore, getHighScore, getDeploy,
-         getAccountInfo, getAccountNamedKeyValue, getNFTsForAccount, mintNFT, mintCaspookie, getCaspookiesForAccount } from './js/helpers/casper';
+         getAccountInfo, getAccountNamedKeyValue, mintCaspookie, getCaspookiesForAccount,
+        checkSignedIn } from './js/helpers/casper';
 import { getNFTName } from './js/helpers/casper';
 import path from 'path';
 
@@ -33,6 +34,9 @@ const TOAST_TIMEOUT = 4000;
 
 const MS_IN_DAY = 86400000;
 const MS_IN_MONTH = MS_IN_DAY * 30;
+
+const MODAL_2_ENABLED = false;
+const SHOW_HEADER_EXTRA_INFO = true;
 
 const screens= {
   GARAGE: 1,
@@ -57,6 +61,7 @@ function App() {
   const [ headerInfoText, setHeaderInfoText ] = useState(getText('text_header_info'));
   const [wallet, setWallet] = useState();
   const [isSignedIn, setIsSignedIn] = useState(true);
+  const [signedInInfo, setSignedInInfo] = useState({});
   const [nftList, setNFTList] = useState([]);
   const [processingActions, setProcessingActions] = useState({});
   const [screen, setScreen] = useState(screens.Garage);
@@ -153,17 +158,23 @@ function App() {
       clearInterval(timerId);
 
       let _timerId = setInterval(async () => {
-        try {
-          let _activePublicKey = await window.casperlabsHelper.getActivePublicKey();
+        let res = await checkSignedIn();
+
+        if(res.success) {
+          let _activePublicKey = res.data.activePublicKey;
 
           if(_activePublicKey !== activePublicKey) {
             console.log(JSON.stringify(['Connected!']));
             doPendingTx();
             setActivePublicKey(_activePublicKey);
           }
+          setIsSignedIn(true);
+          setSignedInInfo(res);
         }
-        catch(e) { 
+        else { 
           setActivePublicKey();
+          setIsSignedIn(false);
+          setSignedInInfo(res);
         }
       }, 500);
 
@@ -398,7 +409,7 @@ function App() {
         </div>
       </div>
       <Fragment>
-        <BrButton label={wallet?.isSignedIn() ? getText('text_sign_out') : getText('text_sign_in') } id="signIn" className="br-button" onClick={()=>{}} />
+        <BrButton label={ isSignedIn ? getText('text_sign_out') : getText('text_sign_in') } id="signIn" className="br-button" onClick={()=>{}} />
       </Fragment>
       <div className="br-front-screen-image"></div>
       <div className="br-intro-section">
@@ -465,6 +476,42 @@ function App() {
   function getHeaderInfoUI() {
     let ui;
 
+    if(signedInInfo.success) {
+      ui = <div className="br-score-bar">
+        <div className="br-deed" id="deed-msg" style={ { display: 'none'}}>You Deed</div>
+        <div className="br-score" id="score">0</div>
+        <div className="br-high-score">High Score: <span id="high-score">{highScore}</span></div>
+
+        <button className="br-button br-icon-button"
+                onMouseDown={saveHighScore}><i className="fa fa-save"></i></button>
+        <button className="br-button br-icon-button"
+                onMouseDown={requestHighScore}><i className="fa fa-refresh"></i></button>
+      </div>
+    }
+    else {
+      if(signedInInfo.reason === 'error_casper_no_signer') {
+        let link = <a href="https://chrome.google.com/webstore/detail/casper-signer/djhndpllfiibmcdbnmaaahkhchcoijce" target="_blank" rel="noreferrer">
+          { getText('text_wallet_name')}
+        </a>
+
+        ui = <div className="br-info-message">
+          <i className="fa fa-info br-info-icon"></i>
+          <div>
+            { getText('error_casper_no_signer') }
+            <br />
+            <div>Go get { link }!</div>
+          </div>
+        </div>
+      }
+      else {
+        ui = <div className="br-info-message">
+          <i className="fa fa-info br-info-icon"></i>
+          { getText('text_sign_in_to_save') }
+        </div>
+      }
+    }
+
+    /*
     if(headerInfoText) {
       ui = <div className="br-last-battle-panel">
         <div className="br-last-battle-details">
@@ -475,6 +522,7 @@ function App() {
                   isSubmitting={processingActions['headerAction']} />
       </div>
     }
+    */
 
     return ui;
   }
@@ -561,31 +609,40 @@ function App() {
           </div>
         </Modal>
       </div>
-      <div>
-        <Modal
-          isOpen={modal2IsOpen}
-          onRequestClose={e => closeModal(2)}
-          style={customStyles}
-          contentLabel="NEAR Karts Leaderboard"
-          appElement={document.getElementById('root')}
-        >
-          <div className="br-modal-title">
-            <h2 className="br-modal-heading">Modal 2 Title</h2>
-            <div className="br-modal-close">
-              <BrButton label={<i className="fas fa-times-circle" />} className="br-button br-icon-button" 
-                          onClick={e => closeModal(2)} />
+      { MODAL_2_ENABLED ?
+        <div>
+          <Modal
+            isOpen={modal2IsOpen}
+            onRequestClose={e => closeModal(2)}
+            style={customStyles}
+            contentLabel="NEAR Karts Leaderboard"
+            appElement={document.getElementById('root')}
+          >
+            <div className="br-modal-title">
+              <h2 className="br-modal-heading">Modal 2 Title</h2>
+              <div className="br-modal-close">
+                <BrButton label={<i className="fas fa-times-circle" />} className="br-button br-icon-button" 
+                            onClick={e => closeModal(2)} />
+              </div>
             </div>
-          </div>
-          <div className="br-modal-panel">
-            <div className="br-modal-content">
-              Modal 2 content
+            <div className="br-modal-panel">
+              <div className="br-modal-content">
+                Modal 2 content
+              </div>
             </div>
-          </div>
-        </Modal>
-      </div>
+          </Modal>
+        </div>  
+        :
+        ''
+      }
+   
       <div className="br-header">
         <div className="br-header-logo-panel">
-          { getHeaderInfoUI() }
+          { SHOW_HEADER_EXTRA_INFO ?
+            getHeaderInfoUI()
+            :
+            ''
+          }
         </div>
         <div className="br-header-title-panel">
           <img className="br-header-logo" alt="Ben Razor Head" src={Logo} />
@@ -598,28 +655,24 @@ function App() {
               :
               ''
             }
-            <Fragment>
-              <BrButton label={ getText("text_header_button_2") } id="showHighScoresButton" className="br-button" onClick={e => showModal(2)} />
-            </Fragment>
-            { isSignedIn ?
+            { MODAL_2_ENABLED ? 
               <Fragment>
-                <BrButton label={wallet?.isSignedIn() ? "Sign out" : "Sign in"} id="signIn" className="br-button" onClick={()=>{}} />
+                <BrButton label={ getText("text_header_button_2") } id="showHighScoresButton" className="br-button" onClick={e => showModal(2)} />
               </Fragment>
               :
               ''
-            } 
+            }
+            <Fragment>
+              <BrButton label={ isSignedIn ? "Sign out" : "Sign in"} id="signIn" 
+                        className={"br-button " + (isSignedIn ? 'br-button-ok ' : 'br-button-not-ok') } 
+                        onClick={()=>{casperAttemptConnect()}} />
+            </Fragment>
           </div>
         </div>
       </div>
       <div className="br-content">
         <div className="br-game-container">
-          <div className="br-score-bar">
-            <div className="br-deed" id="deed-msg" style={ { display: 'none'}}>You Deed</div>
-            <div className="br-score" id="score">0</div>
-            <div className="br-high-score">High Score: <span id="high-score">{highScore}</span></div>
-            <button className="br-score-control" onClick={() => saveHighScore(highScore)}>Save Score</button>
-            <button className="br-score-control" onClick={requestHighScore}>Get Score</button>
-          </div>
+
           { selectedGame === 'platformer2D' ?
             <div id="phaser-parent" className="phaser-parent">
             </div>
