@@ -5,7 +5,10 @@ const scenes = [
       { id: 'computer', positionType: 'object', objId: 'WorldL1Computer', geometry: { type: "box", dims: [.2, 2, .2] } },
       { id: 'WorldL1ColumnL', positionType: 'object', objId: 'WorldL1ColumnL', geometry: { type: "box", dims: [.2, 2.25, .2] } },
       { id: 'WorldL1ColumnR', positionType: 'object', objId: 'WorldL1ColumnR', geometry: { type: "box", dims: [.2, 2.25, .2] } },
-      { id: 'BackWall', positionType: 'position', position: [0, 0, -14], geometry: { type: "plane", orientation: [0, 0, 0] } },
+      { id: 'BackWall', positionType: 'position', position: [0, 0, -16], geometry: { type: "plane", orientation: [0, 0, 0] } },
+      { id: 'FrontWall', positionType: 'position', position: [0, 0, 16], geometry: { type: "plane", orientation: [0, Math.PI, 0] } },
+      { id: 'SideWallR', positionType: 'position', position: [16, 0, 0], geometry: { type: "plane", orientation: [0, -Math.PI / 2, 0] } },
+      { id: 'SideWallL', positionType: 'position', position: [-16, 0, 0], geometry: { type: "plane", orientation: [0, Math.PI / 2, 0] } },
     ],
     triggers: [
       { id: 'door', positionType: 'object', objId: 'SceneRoomZeroDoor', geometry: { type: "sphere", radius: 0.5 } }
