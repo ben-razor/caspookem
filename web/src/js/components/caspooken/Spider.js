@@ -1,41 +1,58 @@
 import * as THREE from 'three'
 import * as CANNON from 'cannon-es'
+import { TimeTrigger } from './TimeTrigger';
 
 export class Spider {
-    constructor(world, scene, physicsMaterial) {
+    constructor(world, scene, physicsMaterial, options={ speed: 0.5, spiderSenses: 0.5}) {
         this.world = world;
         this.scene = scene;
         this.physicsMaterial = physicsMaterial;
         this.debug = true;
-        this.size = 1;
+        this.size = 0.7;
         this.enabled = false;
-        this.speed = 1;
+        this.speed = options.speed;
         this.vTo = new THREE.Vector3(0,0,0);
 
+        this.timeTrigger = new TimeTrigger(options.spiderSenses);
+        this.timeTrigger.addCallback(this)
+
         this.positioner = scene.getObjectByName('Empty');
-        
-        this.enable();
+        this.positioner.visible = false;
     }
 
     enable() {
-        const geometry = new THREE.SphereBufferGeometry(this.size, 32, 32)
-        let debugMaterial = new THREE.MeshBasicMaterial({ color: '#aa22aa' })
-        this.debugMesh = new THREE.Mesh(geometry, debugMaterial);
-        this.scene.add(this.debugMesh);
+        if(!this.enabled) {
+            const geometry = new THREE.SphereBufferGeometry(this.size, 32, 32)
+            let debugMaterial = new THREE.MeshBasicMaterial({ color: '#aa22aa' })
+            this.debugMesh = new THREE.Mesh(geometry, debugMaterial);
+            this.scene.add(this.debugMesh);
 
-        const shape = new CANNON.Sphere(this.size);
-        this.body = new CANNON.Body({ mass: 0, material: this.physicsMaterial })
-        this.body.objId = 'spider';
-        this.body.addShape(shape);
-        this.world.addBody(this.body);
-        this.enabled = true;
+            const shape = new CANNON.Sphere(this.size);
+            this.body = new CANNON.Body({ mass: 1, material: this.physicsMaterial })
+            this.body.objId = 'spider';
+            this.body.addShape(shape);
+            this.world.addBody(this.body);
+            this.enabled = true;
+            this.positioner.visible = true;
+        }
     }
 
     disable() {
-        this.enabled = false;
-        this.world.removeBody(this.body);
-        this.positioner.visible = false;
-        this.debugMesh.visible = false;
+        if(this.enabled) {
+            this.enabled = false;
+            this.world.removeBody(this.body);
+            this.body = null;
+            this.positioner.visible = false;
+            this.debugMesh.visible = false;
+        }
+    }
+
+    setSpeed(speed) {
+        this.speed = speed;
+    }
+
+    setSpiderSenses(interval) {
+        this.timeTrigger.setTimeout(interval);
     }
 
     setTarget(position) {
@@ -44,8 +61,25 @@ export class Spider {
         this.vTo.copy(this.target);
         this.vTo.sub(this.body.position);
         this.vTo.normalize();
-        this.vTo.multiplyScalar(this.speed * 0.1);
-        this.vTo.y = 0;
+        this.vTo.multiplyScalar(this.speed * 10);
+        this.vTo.y = this.size + 0.01;
+
+        console.log(JSON.stringify(['starget', this.vTo]));
+        
+        this.body.velocity.x = this.vTo.x;
+        this.body.velocity.y = this.vTo.y;
+        this.body.velocity.z = this.vTo.z;
+    }
+
+    timeTriggered(timeout) {
+        console.log(JSON.stringify(['Timetriggered!', timeout]));
+        if(this.targetObj) {
+            this.setTarget(this.targetObj.position);
+        }
+    }
+
+    setTargetObj(obj) {
+        this.targetObj = obj;
     }
 
     setCurve(curve) {
@@ -55,8 +89,10 @@ export class Spider {
 
     update(dt, totalTime) {
         if(this.enabled) {
+            this.timeTrigger.update(dt);
+
             if(this.target) {
-                this.body.position.addScaledVector(1, this.vTo, this.body.position);
+                // this.body.position.addScaledVector(1, this.vTo, this.body.position);
             }
             else if(this.curve) {
                 let point = this.curve.getPointAt((totalTime / 20) % 1.0);
@@ -68,6 +104,7 @@ export class Spider {
 
             this.debugMesh.position.copy(this.body.position);
             this.positioner.position.copy(this.body.position);
+            this.positioner.position.y = this.body.position.y - this.size;
         }
     }
 }

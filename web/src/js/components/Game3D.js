@@ -16,6 +16,7 @@ import { BasicCharacterController } from './3d/CharacterController';
 import { ParticleSystem } from './3d/Particle';
 import { Vector3 } from 'three';
 import { Spider } from './caspooken/Spider';
+import { TimeTrigger } from './caspooken/TimeTrigger';
 
 function getServerURL(forceRemote=false) {
   let url = 'https://localhost:8926';
@@ -615,7 +616,13 @@ function Game3D(props) {
         scene.add(baddySpline);
 
         let spider = new Spider(world, scene);
-        spider.setCurve(baddyCurve);
+        spider.setTargetObj(lifeformPositioner);
+
+        let spiderTimer = new TimeTrigger(15, 1);
+        
+        spiderTimer.addCallback({
+          timeTriggered: (dt, t) => { console.log(JSON.stringify(['spider time', dt, t])); spider.enable() }
+        });
 
         function rotateAroundWorldAxis(obj, axis, radians) {
           let rotWorldMatrix = new THREE.Matrix4();
@@ -644,7 +651,7 @@ function Game3D(props) {
 
           let delta = clock.getDelta();
           const time = performance.now() / 1000
-          const dt = Math.max(time - lastCallTime, 0.05);
+          const dt = Math.max(time - lastCallTime, 0.01);
           if(!dt) {
             console.log(JSON.stringify(['not dt', dt]));
           }
@@ -652,6 +659,7 @@ function Game3D(props) {
           totalTime += dt;
 
           spider.update(dt, totalTime);
+          spiderTimer.update(dt);
 
           if(removeIds.length) {
             spider.disable();
@@ -666,7 +674,6 @@ function Game3D(props) {
               ballMeshes.splice(objId, 1);
             }
             toRemove = [];
-            spider.setTarget(lifeformPositioner.position);
           }
 
           if(cannonPhysics) {
