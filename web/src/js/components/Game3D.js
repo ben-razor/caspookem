@@ -2,7 +2,7 @@ import React, {useEffect, useState, useCallback, Fragment} from 'react';
 import * as THREE from 'three';
 import * as CANNON from 'cannon-es';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
-import lifeform from '../../data/models/ghost-6.gltf';
+import lifeform from '../../data/models/ghost-7.gltf';
 import imageFrame from '../../images/frame-dark-1.png';
 import BrButton from './lib/BrButton';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
@@ -426,9 +426,19 @@ function Game3D(props) {
         world.addContactMaterial(physics_physics)
 
         let lifeformPositioner = gltf.scene.getObjectByName('EmptyLifeform');
-        const clipWalk = THREE.AnimationClip.findByName( clips, 'Walk1' );
+        const clipWalk = THREE.AnimationClip.findByName( clips, 'Walk2' );
+        const clipThrow = THREE.AnimationClip.findByName( clips, 'Throw' );
         const walkAction = mixer.clipAction( clipWalk );
+        const throwAction = mixer.clipAction( clipThrow );
         walkAction.play();
+
+        let spiderPositioner = gltf.scene.getObjectByName('Empty');
+        let spiderMesh = gltf.scene.getObjectByName('spider.001');
+        let spiderArmature = gltf.scene.getObjectByName('Armature.spider.001');
+
+        const clipSpiderWalk = THREE.AnimationClip.findByName( clips, 'spider.walk' );
+        const spiderWalkAction = mixer.clipAction( clipSpiderWalk );
+        spiderWalkAction.play();
 
         //const lifeformShape = new CANNON.Box(new CANNON.Vec3(0.25, 1, 0.25))
         const lifeformShape = new CANNON.Sphere(1)
@@ -473,8 +483,8 @@ function Game3D(props) {
 
         let hitRight = false;
 
-        const shootVelocity = 15
-        const ballShape = new CANNON.Sphere(0.5)
+        const shootVelocity = 20; 
+        const ballShape = new CANNON.Sphere(0.28)
         const ballGeometry = new THREE.SphereBufferGeometry(ballShape.radius, 32, 32)
         
         function getShootDirection() {
@@ -485,9 +495,11 @@ function Game3D(props) {
           return forward;
         }
 
+        const fireTexture = new THREE.TextureLoader().load(getAssetURL('fire-blue-dark.png', 'tex'));
+
         let balls = [];
         let ballMeshes = [];
-        let material = new THREE.MeshLambertMaterial({ color: 0xdddddd })
+        let material = new THREE.MeshToonMaterial({ color: '#0022aa', alphaMap: fireTexture, alphaBlend: THREE.AdditiveBlending, opacity: 1 })
         let ballIndex = 0;
         let toRemove = [];
         let removeIds = [];
@@ -495,7 +507,7 @@ function Game3D(props) {
         let particles = new ParticleSystem({
             parent: scene,
             camera,
-            image: getAssetURL('fire-blue-dark.png', 'tex')
+            texture: fireTexture 
         });
 
         //threeElem.addEventListener('click', (event) => {
@@ -565,14 +577,23 @@ function Game3D(props) {
           )
 
           // Move the ball outside the player sphere
-          const x = lifeformBody.position.x + shootDirection.x * (.5 + ballShape.radius)
-          let y = lifeformBody.position.y + shootDirection.y * (.5 + ballShape.radius)
-          const z = lifeformBody.position.z + shootDirection.z * (.5 + ballShape.radius)
+          let offsetter = shootDirection.clone();
+          let sider = shootDirection.clone();
+          let rotY = new THREE.Euler(0, Math.PI / 2, 0);
+          sider.applyEuler(rotY);
+          offsetter.multiplyScalar(0.6);
+          sider.multiplyScalar(0.8)
+          offsetter.add(sider);
+          const x = lifeformBody.position.x + offsetter.x;
+          let y = lifeformBody.position.y + offsetter.y;
+          const z = lifeformBody.position.z + offsetter.z;
           console.log(JSON.stringify(['lbp', lifeformBody.position]));
           
-          y = y + 2;
+          y = y + 1.2;
           ballBody.position.set(x, y, z)
           ballMesh.position.copy(ballBody.position)
+
+          throwAction.setDuration(0.8).stop().reset().setLoop(THREE.LoopOnce).play();
         })
 
         const baddyCurve = new THREE.SplineCurve( [
@@ -617,10 +638,13 @@ function Game3D(props) {
         }
 
         let removeObj = function(world, scene, mesh, body, spline) {
-          world.removeBody(body);
           scene.remove(mesh);
           mesh.geometry.dispose();
           mesh.material.dispose();
+
+          if(body) {
+            world.removeBody(body);
+          }
 
           if(spline) {
             scene.remove(spline);
@@ -647,12 +671,15 @@ function Game3D(props) {
             var euler = new THREE.Euler( -Math.PI/2, 0, 0, 'XYZ' );
             baddyMesh.position.applyEuler(euler);
             baddyBody.position.copy(baddyMesh.position);
+            spiderPositioner.position.copy(baddyBody.position);
           }
 
           if(removeIds.length) {
             for(let objId of removeIds) {
               removeObj(world, scene, objs[objId].mesh, objs[objId].body, objs[objId].spline);
+              console.log(JSON.stringify(['sm', spiderMesh]));
               delete objs['baddy'];
+              spiderPositioner.visible = false;
             }
             removeIds = [];
           }

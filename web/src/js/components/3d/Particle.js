@@ -74,7 +74,7 @@ export class ParticleSystem {
   constructor(params) {
     const uniforms = {
         diffuseTexture: {
-            value: new THREE.TextureLoader().load(params.image)
+            value: params.texture
         },
         pointMultiplier: {
             value: window.innerHeight / (2.0 * Math.tan(0.5 * 60.0 * Math.PI / 180.0))
