@@ -11,11 +11,19 @@ export class Obstacle {
 
     console.log(JSON.stringify(['obst', obConf]));
 
-    let obj = scene.getObjectByName(obConf.objId);
-    if(!obj) {
-      console.log(JSON.stringify(['obstacle not found', obConf.objId]));
-      
+    this.body = new CANNON.Body({ mass: 0, material: physicsMaterial })
+
+    if(obConf.positionType === 'object') {
+      let obj = scene.getObjectByName(obConf.objId);
+      if(!obj) {
+        console.log(JSON.stringify(['obstacle not found', obConf.objId]));
+      }
+      this.body.position.copy(obj.position);
     }
+    else if(obConf.positionType === 'position') {
+      this.body.position.set(obConf.position[0], obConf.position[1], obConf.position[2]);
+    }
+
     let geometry = obConf.geometry;
     let shapeType = geometry.type;
     let collisionShape = null;
@@ -27,10 +35,13 @@ export class Obstacle {
     else if(shapeType === 'sphere') {
       collisionShape = new CANNON.Sphere(geometry.radius)
     }
+    else if(shapeType === 'plane') {
+      let orientation = geometry.orientation;
+      collisionShape = new CANNON.Plane()
+      this.body.quaternion.setFromEuler(orientation[0], orientation[1], orientation[2]);
+    }
 
-    this.body = new CANNON.Body({ mass: 0, material: physicsMaterial })
     this.body.addShape(collisionShape)
-    this.body.position.copy(obj.position);
   }
 
   enable() {

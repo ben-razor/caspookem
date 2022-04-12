@@ -360,11 +360,9 @@ function Game3D(props) {
 
         let obstacles = [];
         for(let obConf of sceneConf.obstacles) {
-          if(obConf.positionType === 'object') {
-            let ob = new Obstacle(world, scene, obConf, physicsMaterial);
-            ob.enable();
-            obstacles.push(ob);
-          }
+          let ob = new Obstacle(world, scene, obConf, physicsMaterial);
+          ob.enable();
+          obstacles.push(ob);
         }
 
         const groundShape = new CANNON.Plane()
@@ -512,25 +510,6 @@ function Game3D(props) {
           throwAction.setDuration(0.8).stop().reset().setLoop(THREE.LoopOnce).play();
         })
 
-        const baddyCurve = new THREE.SplineCurve( [
-          new THREE.Vector2( -10, 0 ),
-          new THREE.Vector2( -5, 5 ),
-          new THREE.Vector2( 0, 0 ),
-          new THREE.Vector2( 5, -5 ),
-          new THREE.Vector2( 10, 0 )
-        ] );
-        
-        const points = baddyCurve.getPoints( 50 );
-        const geometry = new THREE.BufferGeometry().setFromPoints( points );
-        
-        const lineMaterial = new THREE.LineBasicMaterial( { color: 0xff0000 } );
-        
-        let objs = { }
-
-        // Create the final object to add to the scene
-        const baddySpline = new THREE.Line( geometry, lineMaterial );
-        scene.add(baddySpline);
-
         let spiders = [];
         let spiderTimers = [];
 
@@ -554,15 +533,6 @@ function Game3D(props) {
 
           spiders.push(spider);
           spiderTimers.push(spiderTimer);
-        }
-        
-
-        function rotateAroundWorldAxis(obj, axis, radians) {
-          let rotWorldMatrix = new THREE.Matrix4();
-          rotWorldMatrix.makeRotationAxis(axis.normalize(), radians);
-          rotWorldMatrix.multiply(obj.matrix);
-          obj.matrix = rotWorldMatrix;
-          obj.setRotationFromMatrix(obj.matrix);
         }
 
         let removeObj = function(world, scene, mesh, body, spline) {

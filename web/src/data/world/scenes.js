@@ -4,7 +4,8 @@ const scenes = [
     obstacles: [ 
       { id: 'computer', positionType: 'object', objId: 'WorldL1Computer', geometry: { type: "box", dims: [.2, 2, .2] } },
       { id: 'WorldL1ColumnL', positionType: 'object', objId: 'WorldL1ColumnL', geometry: { type: "box", dims: [.2, 2.25, .2] } },
-      { id: 'WorldL1ColumnR', positionType: 'object', objId: 'WorldL1ColumnR', geometry: { type: "box", dims: [.2, 2.25, .2] } }
+      { id: 'WorldL1ColumnR', positionType: 'object', objId: 'WorldL1ColumnR', geometry: { type: "box", dims: [.2, 2.25, .2] } },
+      { id: 'BackWall', positionType: 'position', position: [0, 0, -14], geometry: { type: "plane", orientation: [0, 0, 0] } },
     ],
     triggers: [
       { id: 'door', positionType: 'object', objId: 'SceneRoomZeroDoor', geometry: { type: "sphere", radius: 0.5 } }
