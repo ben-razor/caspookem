@@ -15,6 +15,7 @@ import domtoimage from 'dom-to-image';
 import { BasicCharacterController } from './3d/CharacterController';
 import { ParticleSystem } from './3d/Particle';
 import { Vector3 } from 'three';
+import { Spider } from './caspooken/Spider';
 
 function getServerURL(forceRemote=false) {
   let url = 'https://localhost:8926';
@@ -432,7 +433,7 @@ function Game3D(props) {
         const throwAction = mixer.clipAction( clipThrow );
         walkAction.play();
 
-        let spiderPositioner = gltf.scene.getObjectByName('Empty');
+        let spiderPositioner = gltf.scene.getObjectByName('Empty.spider.001');
         let spiderMesh = gltf.scene.getObjectByName('spider.001');
         let spiderArmature = gltf.scene.getObjectByName('Armature.spider.001');
 
@@ -525,9 +526,11 @@ function Game3D(props) {
             let b2 = a.target;
 
             if(b1.objId) {
+              console.log(JSON.stringify(['ro', b1.objId]));
               removeIds.push(b1.objId);
             }
             if(b2.objId) {
+              console.log(JSON.stringify(['ro2', b2.objId]));
               removeIds.push(b2.objId);
             }
             
@@ -615,19 +618,8 @@ function Game3D(props) {
         const baddySpline = new THREE.Line( geometry, lineMaterial );
         scene.add(baddySpline);
 
-        const baddyMesh = new THREE.Mesh(ballGeometry, material);
-        baddyMesh.position.copy(baddyCurve.getPoint(0.5));
-        scene.add(baddyMesh);
-
-        const baddyShape = new CANNON.Sphere(0.5)
-        const baddyBody = new CANNON.Body({ mass: 0, material: physicsMaterial })
-        baddyBody.objId = 'baddy';
-        baddyBody.addShape(baddyShape);
-        world.addBody(baddyBody);
-
-        objs['baddy'] = {
-          mesh: baddyMesh, body: baddyBody, spline: baddySpline
-        }
+        let spider = new Spider(world, scene);
+        spider.setCurve(baddyCurve);
 
         function rotateAroundWorldAxis(obj, axis, radians) {
           let rotWorldMatrix = new THREE.Matrix4();
@@ -663,24 +655,10 @@ function Game3D(props) {
           lastCallTime = time;
           totalTime += dt;
 
-
-          if(objs['baddy']) {
-            let point = baddyCurve.getPointAt((totalTime / 20) % 1.0);
-            let baddyPos = new THREE.Vector3(point.x, point.y, 0);
-            baddyMesh.position.copy(baddyPos);
-            var euler = new THREE.Euler( -Math.PI/2, 0, 0, 'XYZ' );
-            baddyMesh.position.applyEuler(euler);
-            baddyBody.position.copy(baddyMesh.position);
-            spiderPositioner.position.copy(baddyBody.position);
-          }
+          spider.update(dt, totalTime);
 
           if(removeIds.length) {
-            for(let objId of removeIds) {
-              removeObj(world, scene, objs[objId].mesh, objs[objId].body, objs[objId].spline);
-              console.log(JSON.stringify(['sm', spiderMesh]));
-              delete objs['baddy'];
-              spiderPositioner.visible = false;
-            }
+            spider.disable();
             removeIds = [];
           }
 
@@ -1112,7 +1090,6 @@ function Game3D(props) {
     let nftUI = [];
     let active = false;
 
-    console.log(JSON.stringify(['NFTL', nftList]));
     let activeTokenId = activeNFT?.token_id;
     
     for(let nft of nftList) {

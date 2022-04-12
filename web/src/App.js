@@ -37,6 +37,8 @@ const MS_IN_MONTH = MS_IN_DAY * 30;
 
 const MODAL_2_ENABLED = false;
 const SHOW_HEADER_EXTRA_INFO = true;
+const INTERVAL_CHECK_SIGN_IN = 2000;
+const INTERVAL_CHECK_TX_COMPLETE = 4000;
 
 const screens= {
   GARAGE: 1,
@@ -176,7 +178,7 @@ function App() {
           setIsSignedIn(false);
           setSignedInInfo(res);
         }
-      }, 500);
+      }, INTERVAL_CHECK_SIGN_IN);
 
       setTimerId(_timerId);
     }
@@ -184,11 +186,9 @@ function App() {
   }, [pendingTx, doPendingTx, timerId, activePublicKey]);
 
   useEffect(() => {
-    console.log(JSON.stringify(['cstx 1']));
     
     if(stateCheck.changed('checkSubmittedTx', submittedTx)) {
       
-      console.log(JSON.stringify(['cstx 2']));
       clearInterval(txTimerId);
 
       let _txTimerId = setInterval(async () => {
@@ -207,7 +207,6 @@ function App() {
                 else {
                   toast(getText('text_tx_complete', txInfo));
                 }
-                console.log(JSON.stringify(['deployed!']));
                 successful.push(i++);
               }
             }
@@ -223,7 +222,7 @@ function App() {
         catch(e) { 
           console.log(JSON.stringify(['getDeploy monitor error', e]));
         }
-      }, 2000);
+      }, INTERVAL_CHECK_TX_COMPLETE);
 
       setTxTimerId(_txTimerId);
     }
@@ -569,8 +568,6 @@ function App() {
   function showModal(index=0) {
     openModal(index);
   }
-
-  localLog('nftList', nftList);
 
   function execute(type, data) {
     if(type === 'selectNFT') {
