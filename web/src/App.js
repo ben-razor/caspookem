@@ -74,6 +74,7 @@ function App() {
   const [txTimerId, setTxTimerId] = useState(0);
   const [activePublicKey, setActivePublicKey] = useState();
   const [activeNFT, setActiveNFT ] = useState('');
+  const [score, setScore ] = useState(0);
 
   function toast(message, type='info') {
     toasty[type](message, { 
@@ -202,6 +203,11 @@ function App() {
               if(res.success) {
                 if(txInfo.type === 'addHighScore') {
                   toast(getText('text_high_score_saved'));
+                  console.log(JSON.stringify(['Updating high score', txInfo]));
+                  
+                  if(txInfo.data.score > highScore) {
+                    setHighScore(txInfo.data.score);
+                  }
                 }
                 else {
                   toast(getText('text_tx_complete', txInfo));
@@ -475,15 +481,25 @@ function App() {
     let ui;
 
     if(signedInInfo.success) {
-      ui = <div className="br-score-bar">
-        <div className="br-deed" id="deed-msg" style={ { display: 'none'}}>You Deed</div>
-        <div className="br-high-score">High Score: <span id="high-score">{highScore}</span></div>
-
-        <button className="br-button br-icon-button"
-                onMouseDown={saveHighScore}><i className="fa fa-save"></i></button>
-        <button className="br-button br-icon-button"
-                onMouseDown={requestHighScore}><i className="fa fa-refresh"></i></button>
+      ui = <div className="br-score-panel">
+        <div className="br-score-bar">
+          <div className="br-deed" id="deed-msg" style={ { display: 'none'}}>You Deed</div>
+          <div className="br-high-score">Score: <span id="high-score">{score}</span></div>
+          <div className="br-high-score">High Score: <span id="high-score">{highScore}</span></div>
+        </div>
+        { score > highScore ?
+          <div className="br-score-bar">
+            <div className="br-high-score">
+              New high Score!!<br />Save To Casper 
+            </div>
+            <button className="br-button br-icon-button"
+                  onMouseDown={e => saveHighScore(score)}><i className="fa fa-save"></i></button>
+          </div>
+          :
+          ''
+        }
       </div>
+
     }
     else {
       if(signedInInfo.reason === 'error_casper_no_signer') {
@@ -679,7 +695,7 @@ function App() {
             getImageURL={getImageURL} 
             nftList={nftList} activeNFT={activeNFT} 
             ipfsToBucketURL={ipfsToBucketURL} requestMint={requestMint} 
-            execute={execute} />
+            execute={execute} score={score} setScore={setScore} />
           }
         </div>
       </div>

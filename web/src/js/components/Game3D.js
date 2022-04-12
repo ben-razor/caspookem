@@ -48,7 +48,7 @@ if(DEBUG_FAST_BATTLE) {
   textDelay = 200;
 }
 
-const LIGHT_INTENSITY = 14;
+const LIGHT_INTENSITY = 10;
 
 const keysPressed = {};
 
@@ -72,6 +72,8 @@ const postBattleScreens = {
   END: 7
 };
 
+let score = 0;
+
 function Game3D(props) {
   const showModal = props.showModal;
   const nftList = props.nftList;
@@ -86,6 +88,7 @@ function Game3D(props) {
   const getTextureURL = props.getTextureURL;
   const ipfsToBucketURL = props.ipfsToBucketURL;
   const requestMint = props.requestMint;
+  const setScore = props.setScore;
 
   window.nftData = nftData;
 
@@ -112,7 +115,6 @@ function Game3D(props) {
   const [showNFTList, setShowNFTList ] = useState(true);
   const [showNFTListHelp, setShowNFTListHelp ] = useState(false);
   const [threeElem, setThreeElem ] = useState();
-  const [score, setScore ] = useState(0);
 
   function characterChanged(nftData, prevNFTData) {
     if(!nftData || !prevNFTData) {
@@ -378,7 +380,7 @@ function Game3D(props) {
           left: 'a',
           right: 'd',
           jump: 'j',
-          fire: ' ',
+          fire: 'n',
           faster: 'shift'
         });
 
@@ -392,8 +394,6 @@ function Game3D(props) {
           console.log(JSON.stringify(['i collided']));
           jumping = false;
         })
-
-        let hitRight = false;
 
         const shootVelocity = 20; 
         const ballShape = new CANNON.Sphere(0.28)
@@ -439,10 +439,14 @@ function Game3D(props) {
             if(b1.objId) {
               console.log(JSON.stringify(['ro', b1.objId]));
               removeIds.push(b1.objId);
+              score = score + 100;
+              setScore(score);
             }
             if(b2.objId) {
               console.log(JSON.stringify(['ro2', b2.objId]));
               removeIds.push(b2.objId);
+              score = score + 100;
+              setScore(score);
             }
             
             if(b1.ballId) {
@@ -554,7 +558,7 @@ function Game3D(props) {
 
           let delta = clock.getDelta();
           const time = performance.now() / 1000
-          const dt = Math.max(time - lastCallTime);
+          const dt = time - lastCallTime;
           if(!dt) {
             console.log(JSON.stringify(['not dt', dt]));
           }
@@ -590,7 +594,7 @@ function Game3D(props) {
 
           if(cannonPhysics) {
             if(totalTime > 5) {
-              world.step(1/60, dt, 0.001);
+              world.step(Math.min(dt, 0.1));
 
               // Update ball positions
               for (let i = 0; i < balls.length; i++) {
@@ -718,7 +722,7 @@ function Game3D(props) {
       new THREE.Vector3(5, 5, 5), new THREE.Vector3(-5, 5, 5), new THREE.Vector3(0, 5, -2)
     ])
 
-    const light = new THREE.AmbientLight( 0xb0b0b0 ); // soft white light
+    const light = new THREE.AmbientLight( 0xe0e0e0 ); // soft white light
     scene.add( light );
 
     let i = 0;

@@ -25,7 +25,7 @@ const config = {
     { id: "TransportTracks", name: "Tracks" },
     { id: "TransportDoubleTracks", name: "Double Tracks" },
   ],
-  start_hidden: [ 'Eyewear', 'Headwear', 'Jewellery', 'Outfit', 'NFT'],
+  start_hidden: [ 'Eyewear', 'Headwear', 'Jewellery', 'Outfit', 'NFT', 'WorldL1Floor'],
   decal_panels: [ 'DecalFront', 'DecalLeft', 'DecalRight'],
   decals: [
     { id: '0', name: 'Empty'},
