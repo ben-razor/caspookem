@@ -1,6 +1,7 @@
 import { Tilemaps } from "phaser";
 
 export class TimeTrigger {
+  
   constructor(timeout, count=undefined) {
     this.countout = count;
     this.count = 0;

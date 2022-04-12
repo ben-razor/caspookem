@@ -17,6 +17,8 @@ import { ParticleSystem } from './3d/Particle';
 import { Vector3 } from 'three';
 import { Spider } from './caspooken/Spider';
 import { TimeTrigger } from './caspooken/TimeTrigger';
+import { getObstacle, getSceneConfig } from '../../data/world/scenes';
+import { Obstacle } from './caspooken/Obstacle';
 
 function getServerURL(forceRemote=false) {
   let url = 'https://localhost:8926';
@@ -434,12 +436,9 @@ function Game3D(props) {
         const throwAction = mixer.clipAction( clipThrow );
         walkAction.play();
 
-        console.log(JSON.stringify(['clips', clips]));
-        
         for(let clip of clips) {
           if(clip.name === 'spider.walk') {
-            const clipSpiderWalk = clip;
-            const spiderWalkAction = mixer.clipAction( clipSpiderWalk );
+            const spiderWalkAction = mixer.clipAction( clip );
             spiderWalkAction.play();
           }
         }
@@ -447,7 +446,6 @@ function Game3D(props) {
         //const lifeformShape = new CANNON.Box(new CANNON.Vec3(0.25, 1, 0.25))
         const lifeformShape = new CANNON.Sphere(1)
         const lifeformBody = new CANNON.Body({ mass: 5, fixedRotation: true, material: physicsMaterial })
-        // lifeformBody.linearDamping = 0.9;
         lifeformBody.addShape(lifeformShape)
         let startPos = lifeformPositioner.position.clone();
         startPos.set(0, 5, 0);
@@ -456,14 +454,16 @@ function Game3D(props) {
         lifeformBody.position.copy(startPos);
         world.addBody(lifeformBody)
 
-        let computer = gltf.scene.getObjectByName('WorldL1Computer');
-        computer.children[0].geometry.computeBoundingBox();
+        let sceneConf = getSceneConfig('Scene0');
 
-        const computerShape = new CANNON.Box(new CANNON.Vec3(0.25, 2, 0.25))
-        const computerBody = new CANNON.Body({ mass: 0, material: physicsMaterial })
-        computerBody.addShape(computerShape)
-        computerBody.position.copy(computer.position);
-        world.addBody(computerBody)
+        let obstacles = [];
+        for(let obConf of sceneConf.obstacles) {
+          if(obConf.positionType === 'object') {
+            let ob = new Obstacle(world, scene, obConf, physicsMaterial);
+            ob.enable();
+            obstacles.push(ob);
+          }
+        }
 
         const groundShape = new CANNON.Plane()
         const groundBody = new CANNON.Body({ mass: 0, material: physicsMaterial })
@@ -472,7 +472,15 @@ function Game3D(props) {
         groundBody.quaternion.setFromEuler(-Math.PI / 2, 0, 0)
         world.addBody(groundBody)
 
-        let controller = new BasicCharacterController(lifeformPositioner);
+        let controller = new BasicCharacterController(lifeformPositioner, {
+          forward: 'w',
+          backward: 's',
+          left: 'a',
+          right: 'd',
+          jump: 'j',
+          fire: ' ',
+          faster: 'shift'
+        });
 
         let cannonPhysics = true;
 

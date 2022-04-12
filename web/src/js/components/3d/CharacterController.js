@@ -1,22 +1,28 @@
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.118/build/three.module.js';
 
 class BasicCharacterController {
-  constructor(target) {
+  constructor(target, keyMap) {
     this._target = target;
+
+    if(keyMap) {
+      this.keyMap = keyMap;
+    }
+    else {
+      this.keyMap = {
+        forward: 'arrowup',
+        backward: 'arrowdown',
+        left: 'arrowleft',
+        right: 'arrowright',
+        jump: 'd',
+        fire: 'f',
+        faster: 'shift'
+      };
+    }
+
     this._Init();
   }
 
   _Init() {
-    this.keyMap = {
-      forward: 'arrowup',
-      backward: 'arrowdown',
-      left: 'arrowleft',
-      right: 'arrowright',
-      jump: 'd',
-      fire: 'f',
-      faster: 'shift'
-    };
-
     this._decceleration = new THREE.Vector3(-0.0005, -0.0001, -5.0);
     this._acceleration = new THREE.Vector3(1, 0.25, 50.0);
     this._velocity = new THREE.Vector3(0, 0, 0);

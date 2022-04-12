@@ -1,8 +1,11 @@
 const scenes = [
   {
-    sceneName: "SceneRoomZero",
-    storySection: 'glow',
-    obstacles: [ ],
+    sceneName: "Scene0",
+    obstacles: [ 
+      { id: 'computer', positionType: 'object', objId: 'WorldL1Computer', geometry: { type: "box", dims: [.2, 2, .2] } },
+      { id: 'WorldL1ColumnL', positionType: 'object', objId: 'WorldL1ColumnL', geometry: { type: "box", dims: [.2, 4.5, .2] } },
+      { id: 'WorldL1ColumnR', positionType: 'object', objId: 'WorldL1ColumnR', geometry: { type: "box", dims: [.2, 4.5, .2] } }
+    ],
     triggers: [
       { id: 'door', positionType: 'object', objId: 'SceneRoomZeroDoor', geometry: { type: "sphere", radius: 0.5 } }
     ],
@@ -61,5 +64,29 @@ const scenes = [
     startPos: { x: 0, y: 0, z: 0 }
   }
 ]
+
+export function getSceneConfig(sceneName) {
+  for(let scene of scenes) {
+    if(scene.sceneName === sceneName) {
+      return scene;
+    }
+  }
+}
+
+export function getObstacle(sceneName, objId) {
+  let sceneConf = getSceneConfig(sceneName);
+  let obstacle = null;
+
+  if(sceneConf.obstacles) {
+    for(let obConfig of sceneConf.obstacles) {
+
+      if(obConfig.objId === objId) {
+        obstacle = obConfig;
+      }
+    }
+  }
+
+  return obstacle;
+}
 
 export default scenes;
