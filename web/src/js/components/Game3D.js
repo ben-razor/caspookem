@@ -2,7 +2,7 @@ import React, {useEffect, useState, useCallback, Fragment} from 'react';
 import * as THREE from 'three';
 import * as CANNON from 'cannon-es';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
-import lifeform from '../../data/models/ghost-7.gltf';
+import lifeform from '../../data/models/ghost-6.gltf';
 import imageFrame from '../../images/frame-dark-1.png';
 import BrButton from './lib/BrButton';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
@@ -615,14 +615,31 @@ function Game3D(props) {
         const baddySpline = new THREE.Line( geometry, lineMaterial );
         scene.add(baddySpline);
 
-        let spider = new Spider(world, scene);
-        spider.setTargetObj(lifeformPositioner);
+        let spiders = [];
+        let spiderTimers = [];
 
-        let spiderTimer = new TimeTrigger(15, 1);
+        for(let i = 1; i <= 5; i++) {
+          let spider = new Spider('Emptyspider00' + i, world, scene);
+          spider.setTargetObj(lifeformPositioner);
+
+          let spiderTimer = new TimeTrigger(15, 1);
+
+
+          spiderTimer.addCallback({
+            timeTriggered: (dt, t) => { 
+              let angle = Math.random() * Math.PI*2;
+              console.log(JSON.stringify(['spider time', dt, t])); 
+              let spiderPos = new THREE.Vector3(8, 0, 0);
+              let rotator = new THREE.Euler(0, angle, 0, 'Y');
+              spiderPos.applyEuler(rotator);
+              spider.enable(spiderPos); 
+            }
+          });
+
+          spiders.push(spider);
+          spiderTimers.push(spiderTimer);
+        }
         
-        spiderTimer.addCallback({
-          timeTriggered: (dt, t) => { console.log(JSON.stringify(['spider time', dt, t])); spider.enable() }
-        });
 
         function rotateAroundWorldAxis(obj, axis, radians) {
           let rotWorldMatrix = new THREE.Matrix4();
@@ -651,18 +668,27 @@ function Game3D(props) {
 
           let delta = clock.getDelta();
           const time = performance.now() / 1000
-          const dt = Math.max(time - lastCallTime, 0.01);
+          const dt = Math.max(time - lastCallTime);
           if(!dt) {
             console.log(JSON.stringify(['not dt', dt]));
           }
           lastCallTime = time;
           totalTime += dt;
 
-          spider.update(dt, totalTime);
-          spiderTimer.update(dt);
+          for(let i = 0; i < spiders.length; i++) {
+            spiders[i].update(dt, totalTime);
+            spiderTimers[i].update(dt);
+          }
 
           if(removeIds.length) {
-            spider.disable();
+            for(let removeId of removeIds) {
+              for(let i = 0; i < spiders.length; i++) {
+                if(spiders[i].id === removeId) {
+                  spiders[i].disable();
+                  break;
+                }
+              }
+            }
             removeIds = [];
           }
 

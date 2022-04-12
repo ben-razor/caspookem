@@ -3,7 +3,13 @@ import * as CANNON from 'cannon-es'
 import { TimeTrigger } from './TimeTrigger';
 
 export class Spider {
-    constructor(world, scene, physicsMaterial, options={ speed: 0.5, spiderSenses: 0.5}) {
+    constructor(id, world, scene, physicsMaterial, options={ speed: 0.5, spiderSenses: 0.5}) {
+        this.id = id;
+        this.positioner = scene.getObjectByName(id);
+        if(!this.postioner) {
+            console.log(JSON.stringify(['Cant find object with id: ', this.id]));
+        }
+
         this.world = world;
         this.scene = scene;
         this.physicsMaterial = physicsMaterial;
@@ -16,11 +22,10 @@ export class Spider {
         this.timeTrigger = new TimeTrigger(options.spiderSenses);
         this.timeTrigger.addCallback(this)
 
-        this.positioner = scene.getObjectByName('Empty');
         this.positioner.visible = false;
     }
 
-    enable() {
+    enable(startPos) {
         if(!this.enabled) {
             const geometry = new THREE.SphereBufferGeometry(this.size, 32, 32)
             let debugMaterial = new THREE.MeshBasicMaterial({ color: '#aa22aa' })
@@ -29,8 +34,11 @@ export class Spider {
 
             const shape = new CANNON.Sphere(this.size);
             this.body = new CANNON.Body({ mass: 1, material: this.physicsMaterial })
-            this.body.objId = 'spider';
+            this.body.objId = this.id;
             this.body.addShape(shape);
+            if(startPos) {
+                this.body.position.copy(startPos);
+            }
             this.world.addBody(this.body);
             this.enabled = true;
             this.positioner.visible = true;
