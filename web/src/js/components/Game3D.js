@@ -11,10 +11,8 @@ import { cloneObj, StateCheck, isLocal, localLog } from '../helpers/helpers';
 import gameConfig, { getAssetURL, partIdToName } from '../../data/world/config';
 import getText, { exclamation } from '../helpers/text';
 import { CompactPicker } from 'react-color';
-import domtoimage from 'dom-to-image';
 import { BasicCharacterController } from './3d/CharacterController';
 import { ParticleSystem } from './3d/Particle';
-import { Vector3 } from 'three';
 import { Spider } from './caspooken/Spider';
 import { TimeTrigger } from './caspooken/TimeTrigger';
 import { getObstacle, getSceneConfig } from '../../data/world/scenes';
@@ -78,22 +76,14 @@ function Game3D(props) {
   const showModal = props.showModal;
   const nftList = props.nftList;
   const nftData = props.nftData;
-  const tokensLoaded = props.tokensLoaded;
-  const activeTokenId = props.activeTokenId;
   const activeNFT = props.activeNFT;
   const execute = props.execute;
   const processingActions = props.processingActions;
   const toast = props.toast;
-  const battleResult = props.battleResult;
-  const battleConfig = props.battleConfig;
-  const setBattleConfig = props.setBattleConfig;
   const screens = props.screens;
   const screen = props.screen;
   const setScreen = props.setScreen;
-  const newKart = props.newKart;
   const getTextureURL = props.getTextureURL;
-  const getImageURL = props.getImageURL;
-  const setActiveNFT = props.setActiveNFT;
   const ipfsToBucketURL = props.ipfsToBucketURL;
   const requestMint = props.requestMint;
 
@@ -102,35 +92,18 @@ function Game3D(props) {
   const threeRef = React.createRef();
   const threePhotoRef = React.createRef();
   const photoComposerRef = React.createRef();
-  const battleTextRef = React.createRef();
 
   const [scene, setScene] = useState();
   const [camera, setCamera] = useState();
   const [clock, setClock] = useState();
   const [sjScene, setSJScene] = useState();
-  const [photoScene, setPhotoScene] = useState();
   const [photoSubScene, setPhotoSubScene] = useState();
-  const [sceneIndex, setSceneIndex] = useState(0);
-  const [groupIndex, setGroupIndex] = useState(0);
-  const [lineIndex, setLineIndex] = useState(0);
-  const [prevNFTData, setPrevNFTData] = useState({});
-  const [kartNameEntry, setKartNameEntry] = useState('');
-  const [replayReq, setReplayReq] = useState(0);
   const [controlEntry, setControlEntry] = useState({ ...gameConfig.defaultEntry });
   const [styleInitialized, setStyleInitialized] = useState();
 
   const [imageDataURL, setImageDataURL] = useState('');
-  const [imageRendered, setImageRendered] = useState(false);
-  const [renderRequested, setRenderRequested] = useState();
   const [prevScreen, setPrevScreen] = useState(screens.GARAGE);
-  const [battle, setBattle] = useState({});
-  const [battlers, setBattlers] = useState([]);
   const [battleText, setBattleText] = useState([]);
-  const [battlePower, setBattlePower] = useState([100, 100])
-  const [battleHit, setBattleHit] = useState([0, 0])
-  const [battleAttacking, setBattleAttacking] = useState([0, 0])
-  const [battleStarted, setBattleStarted] = useState();
-  const [battleEnded, setBattleEnded] = useState();
   const [orbitControls, setOrbitControls] = useState(false);
   const [orbitControlsEnabled, setOrbitControlsEnabled] = useState(false);
   const [garagePanel, setGaragePanel] = useState('equip');
@@ -139,6 +112,7 @@ function Game3D(props) {
   const [showNFTList, setShowNFTList ] = useState(true);
   const [showNFTListHelp, setShowNFTListHelp ] = useState(false);
   const [threeElem, setThreeElem ] = useState();
+  const [score, setScore ] = useState(0);
 
   function characterChanged(nftData, prevNFTData) {
     if(!nftData || !prevNFTData) {
@@ -158,67 +132,9 @@ function Game3D(props) {
     return changedKeys;
   }
 
-  function nftDataToKartConfig(nftData) {
-    let kartConfig = {};
-    for(let side of ['left', 'right']) {
-      if(nftData[side] >= gameConfig.shield_index_start) {
-        kartConfig[side] = gameConfig.shields_side[nftData[side] - gameConfig.shield_index_start]?.id || 'empty';
-      }
-      else {
-        kartConfig[side] = gameConfig.weapons_range[nftData[side]]?.id || 'empty';
-      }
-    }
-
-    kartConfig.front = gameConfig.weapons_melee[nftData.front]?.id || 'empty';
-    kartConfig.skin = gameConfig.skin[nftData.skin]?.id || 'SkinPlastic';
-    kartConfig.transport = gameConfig.transport[nftData.transport]?.id || 'TransportWheels';
-
-    kartConfig.color = intToHexColor(nftData.color1);
-
-    kartConfig.decal1 = nftData.decal1;
-    kartConfig.decal2 = nftData.decal2;
-    kartConfig.decal3 = nftData.decal3;
-    
-    kartConfig.unlockedDecals = nftData.extra1 ? [...nftData.extra1.split(','), '0', '7'] : ['', '0', '7'];
-
-    return kartConfig;
-  }
-
   function validDecal(decal) {
     let isValid = !decal || decal === '0' || controlEntry.unlockedDecals.includes(decal);
     return isValid;
-  }
-
-  function kartConfigToNFTData(kartConfig) {
-    let nftData = {...gameConfig.baseNFTData};
-    let index;
-
-    for(let side of ['left', 'right']) {
-      let elem = kartConfig[side];
-      if(elem.startsWith('Weapon')) {
-        index = gameConfig.weapons_range.findIndex(x => x.id === elem); 
-        nftData[side] = index > 0 ? index : 0;
-      }
-      else if(elem.startsWith('Shield')) {
-        index = gameConfig.shields_side.findIndex(x => x.id === elem);
-        nftData[side] = index > -1 ? index + gameConfig.shield_index_start: 0;
-      }
-    }
-
-    index = gameConfig.weapons_melee.findIndex(x => x.id === kartConfig.front);
-    nftData.front = index > 0 ? index : 0;
-    index = gameConfig.skin.findIndex(x => x.id === kartConfig.skin);
-    nftData.skin = index > 0 ? index : 0;
-    index = gameConfig.transport.findIndex(x => x.id === kartConfig.transport);
-    nftData.transport = index > 0 ? index : 0;
-
-    nftData.color1 = hexColorToInt(kartConfig.color);
-
-    nftData.decal1 = kartConfig.decal1;
-    nftData.decal2 = kartConfig.decal2;
-    nftData.decal3 = kartConfig.decal3;
-
-    return nftData;
   }
 
   function blendColorToHex(blendColor) {
@@ -248,20 +164,6 @@ function Game3D(props) {
       setControlEntry(_controlEntry);
     }
   }, [activeNFT]);
-
-  useEffect(() => {
-    let changedKeys = characterChanged(nftData, prevNFTData);
-
-    if(changedKeys.length && nftData !== {}) {
-      let kartConfig = nftDataToKartConfig(nftData);
-      setControlEntry(kartConfig);
-      setPrevNFTData({...nftData});
-      if(DEBUG_FORCE_BATTLE) {
-        startBattle();
-      }
-    }
-
-  }, [nftData, prevNFTData]);
 
   function startHidden(name) {
     let hidden = false;
@@ -1026,90 +928,6 @@ function Game3D(props) {
     return controlUI;
   }
 
-  useEffect(() => {
-    if(postBattleScreen !== postBattleScreens.NONE) {
-      clearInterval(battleTimer);
-      battleTimer = setTimeout(() => {
-        if(postBattleScreen === postBattleScreens.RESULT) {
-          if(battle.winner === 0) {
-            setPostBattleScreen(postBattleScreens.LEVEL_UP);
-          }
-          else {
-            setPostBattleScreen(postBattleScreens.END);
-          }
-        }
-        else if(postBattleScreen === postBattleScreens.LEVEL_UP) {
-          setPostBattleScreen(postBattleScreens.PRIZE_PREPARE);
-        }
-        else if(postBattleScreen === postBattleScreens.PRIZE_PREPARE) {
-          setPostBattleScreen(postBattleScreens.PRIZE_RESULT);
-        }
-        else if(postBattleScreen === postBattleScreens.PRIZE_RESULT) {
-          setPostBattleScreen(postBattleScreens.END);
-        }
-      }, postBattleDelay);
-
-      return () => { clearInterval(battleTimer) }
-    }
-    else {
-      clearInterval(battleTimer);
-    }
-  }, [postBattleScreen]);
-
-  function getMintUpgradeUI() {
-    let ui;
-
-    if(nftData.level === 0) {
-      ui = <Fragment>
-        <div className="br-text-entry-row-label">
-          <input type="text" placeholder={getText('text_kart_name_label')} 
-                value={kartNameEntry} onChange={e => setKartNameEntry(e.target.value)} />
-        </div>
-        <div className="br-text-entry-row-control">
-          <BrButton label="Mint" id="render" className="br-button" onClick={render}
-                isSubmitting={renderRequested || processingActions['mintWithImage']} />
-        </div>
-      </Fragment>
-    }
-    else {
-      if(nftData.locked) {
-        let nextUpgradeLevel = (Math.floor(nftData.level / 5) + 1) * 5;
-        ui = <div className="br-info-message br-full-width">
-          <i className="fa fa-info br-info-icon"></i>
-          <div>
-            { getText('text_locked') }
-            <br />
-            { getText('text_next_upgrade', { next_upgrade_level: nextUpgradeLevel }) }
-          </div>
-        </div>
-      }
-      else {
-        ui = <Fragment>
-          <div className="br-text-entry-row-label">
-            { getText('text_upgrade_save') }
-          </div>
-          <div className="br-text-entry-row-control">
-            <BrButton label="Upgrade" id="upgrade" className="br-button" onClick={render}
-                  isSubmitting={renderRequested || processingActions['upgrade']} />
-          </div>
-        </Fragment>
-      }
-    }
-
-    return ui;
-  }
-
-  function getContractControls() {
-    return <div className="br-contract-controls">
-      { nftData && 
-        <div className="br-text-entry-row">
-          { getMintUpgradeUI() }
-          
-        </div>
-      }
-    </div>
-  }
-
   function getTextUI(storyLines) {
     let linesUI = [];
 
@@ -1123,11 +941,6 @@ function Game3D(props) {
     return <div className="br-strange-juice-story-lines">
       {linesUI}
     </div>
-  }
-
-  function kartName(kartTitle) {
-    kartTitle = kartTitle || '';
-    return kartTitle.replace('A NEAR Kart Called ', '');
   }
 
   function displayNFTs(nftList, activeNFT) {
@@ -1172,144 +985,6 @@ function Game3D(props) {
     </Fragment>
   }
 
-  function dataURLToFile(src, fileName, mimeType){
-    return (fetch(src)
-        .then(function(res){return res.arrayBuffer();})
-        .then(function(buf){return new File([buf], fileName, {type:mimeType});})
-    );
-  }
-
-  function render() {
-    toast(getText('text_creating_image'));
-    setRenderRequested(true);
-    /* 
-     * Convers a hidden threejs canvas to a dataURL
-     * setImageDataURL sets the imageDataURL of an offscreen composer element which applys rounded corners etc.
-     * This needs a time to update so set kartImageRendered to let that happen
-     * In the useEffect for kartImageRendered, dom-to-image does its job and calls saveImageData to upload
-     */
-    let dataURL = threePhotoRef.current.getElementsByTagName('canvas')[0].toDataURL();
-    setImageDataURL(dataURL);
-    setImageRendered(true);
-  }
-
-  const mintOrUpgrade = useCallback((verifiedImageData) => {
-    let newNFTData = kartConfigToNFTData(controlEntry);
-    newNFTData.level = nftData.level;
-    newNFTData.locked = nftData.locked;
-
-    verifiedImageData.name = kartNameEntry;
-    verifiedImageData.nftData = newNFTData;
-
-    if(nftData.level === 0) {
-      toast(getText('text_mint_request'));
-      execute('mintWithImage', verifiedImageData);
-    }
-    else {
-      if(!nftData.locked) {
-        toast(getText('text_upgrade_request'));
-        execute('upgrade', verifiedImageData);
-      }
-      else {
-        toast(getText('error_upgrade_kart_locked', 'warning'));
-      }
-    }
-  }, [controlEntry, execute, kartNameEntry, nftData, toast]);
-
-  const saveImageData = useCallback(async (dataURL) => {
-    let f = await dataURLToFile(dataURL, 'bla.png', 'image/png');
-
-    try {
-      let fd = new FormData();
-      fd.append('file', f);
-      let r = await fetch(`${serverURL}/upload`, {method: 'POST', headers: {
-      }, body: fd})
-
-      let j = await r.json();
-      if(j.success) {
-        if(true) {
-          toast(getText('success_image_upload'));
-          localLog('image data ', getImageURL(j.data.cid));
-          if(!DEBUG_NO_MINT) {
-            mintOrUpgrade(j.data);
-          }
-        }
-      }
-      else {
-        toast(getText('error_image_upload_failed'), 'error');
-      }
-    }
-    catch(e) {
-      toast(getText('error_image_upload_failed'), 'error');
-    }
-
-    setImageRendered(false);
-    setRenderRequested(false);
-  }, [toast, mintOrUpgrade]);
-
-  useEffect(() => {
-    if(stateCheck.changed('ImageRendered', imageRendered, false) && imageRendered) { 
-      domtoimage.toPng(photoComposerRef.current, { style: { display: 'block'}})
-      .then(function (dataUrl) {
-         saveImageData(dataUrl);
-      })
-      .catch(function (error) {
-          console.error('Unable to render composed  image', error);
-      });
-    }
-  }, [imageRendered, saveImageData, photoComposerRef]);
-
-  function displayBattleText(battleText) {
-    let lines = [];
-    let groupLines = [];
-
-    let textGroupIndex = 0;
-    for(let group of battleText) {
-      if(!battleStarted || textGroupIndex > groupIndex) {
-        break;
-      }
-      let textLineIndex = 0;
-      groupLines = [];
-
-      for(let line of group) {
-        let isCurrentGroup = textGroupIndex === groupIndex; // Only limit displayed lines for currentGroup
-
-        let activeLineClass = '';
-
-        if(isCurrentGroup && textLineIndex === lineIndex) {
-          activeLineClass = 'br-battle-text-line-active';
-        }
-
-        let id = `br-battle-text-line-${textGroupIndex}-${textLineIndex}`;
-        groupLines.push(<div className={"br-battle-text-line " + activeLineClass} id={id} key={id}>
-          {line}
-        </div>);
-
-        textLineIndex++;
-
-        if(isCurrentGroup && textLineIndex > lineIndex ) {
-          break;
-        }
-      }
-      textGroupIndex++;
-
-      let id = `br-battle-text-group-${textGroupIndex}`;
-      lines.push(
-        <div className="br-battle-text-group" id={id} key={id}>
-          {groupLines.reverse()}
-        </div>
-      )
-    }
-
-    if(lines.length) {
-      lines.reverse();
-    }
-
-    return <div className="br-battle-text" ref={battleTextRef}>
-      {lines}
-    </div>
-  }
-
   useEffect(() => {
     setBattleText([]);
 
@@ -1347,22 +1022,6 @@ function Game3D(props) {
     return screenClass;
   }
 
-  useEffect(() => {
-    if(battlers.length) {
-      changeScreen(screens.BATTLE_SETUP)
-    }
-    else {
-      changeScreen(screens.GARAGE);
-    }
-  }, [battlers]);
-
-  useEffect(() => {
-    if(battleResult && battleResult.metadata) {
-      setBattleConfig(battleResult);
-      setScreen(screens.BATTLE_SETUP);
-    }
-  }, [battleResult]);
-
   function getGaragePanelTabs() {
     let equipActiveClass = garagePanel === 'equip' ? ' br-pill-active ' : '';
     let pimpActiveClass = garagePanel === 'pimp' ? ' br-pill-active ' : '';
@@ -1383,93 +1042,6 @@ function Game3D(props) {
     }
     let weapon_index = Math.max(level + 2, 3);
     return weapon_index;
-  }
-
-  function getScreenPostBattle(postBattleScreen) {
-    let content;
-
-    if(postBattleScreen === postBattleScreens.RESULT) {
-      content = <div className="br-post-battle-panel br-post-battle-result">
-        { battle.winner === 0 ?
-          <div className="br-post-battle-text br-post-battle-result-won">
-            { exclamation(getText('text_you_won')) }
-          </div>
-          :
-          <div className="br-post-battle-text br-post-battle-result-lost">
-            { exclamation(getText('text_you_lost')) }
-          </div>
-        }
-      </div>
-    }
-    else if(postBattleScreen === postBattleScreens.LEVEL_UP) {
-      content = <div className="br-post-battle-panel br-post-battle-level-up-start">
-        <h3 className="br-post-battle-title br-level-up">
-          { exclamation(getText('text_level_up'))}
-        </h3>
-        <div className="br-post-battle-text br-level-up-level">
-          { nftData.level }
-        </div>
-      </div>
-    }
-    else if(postBattleScreen === postBattleScreens.PRIZE_PREPARE) {
-      content = <div className="br-post-battle-panel br-post-battle-prize-prepare">
-        <h3 className="br-post-battle-title br-prize">
-          { getText('text_prize') }
-        </h3>
-        <div className="br-prize-spinner">
-          <div className="br-question-mark br-question-mark-anim">
-
-          </div>
-        </div>
-      </div>
-    }
-    else if(postBattleScreen === postBattleScreens.PRIZE_RESULT) {
-
-      let prizeSummary;
-      let title = exclamation(getText('text_no_prize'));
-      let image;
-      let decalName;
-      title = getText('text_won_prize', {'prize_name': decalName});
-      if(battle.prize > 0) {
-        decalName  = partIdToName('decals', battleConfig.prize.toString());
-        image = getTextureURL('badge', battle.prize.toString());
-      }
-      else {
-        decalName  = getText('text_no_prize');
-        prizeSummary = getText('text_better_luck');
-      }
-
-      content = <div className="br-post-battle-panel br-post-battle-prize-result">
-        <h3 className="br-post-battle-title br-prize">
-          {title}
-        </h3>
-        {
-          image ? <img className="br-prize-image" src={image} alt="Prize" /> : ''
-        }
-        <div className="br-post-battle-text">
-          { decalName ?  decalName : '' }
-        </div>
-        { prizeSummary ?  <div className="br-prize-summary loading-fade-in"> { prizeSummary } </div> : '' }
-      </div>
-    }
-    else if(postBattleScreen === postBattleScreens.END) {
-      content = <div className="br-post-battle-panel br-post-battle-end">
-        <div className="br-post-battle-end-panel">
-          <div className="br-post-battle-end-replay">
-            <BrButton label="Replay" id="br-post-battle-replay-button" className="br-button" onClick={e => replay() } />
-          </div>
-          <div className="br-post-battle-end-garage">
-            <BrButton label={ getText('text_return_to_garage') } id="br-post-battle-garage-button" 
-                      className="br-button" 
-                      onClick={e => changeScreen(screens.GARAGE)} />
-          </div>
-        </div>
-      </div>
-    }
-
-    return <div className="br-post-battle-screen">
-      { content }
-    </div>
   }
 
   function getScreenGarage() {
@@ -1520,7 +1092,6 @@ function Game3D(props) {
             <div className="br-strange-juice-overlay">
               { getGaragePanelTabs() }
               { getControlUI(gameConfig, nftData) } 
-              { getContractControls() }
             </div>
             :
             ''
@@ -1538,145 +1109,8 @@ function Game3D(props) {
     </Fragment> 
   }
 
-  function getScreenBattleSetup() {
-    return <div className={"br-screen br-screen-battle-setup " + getScreenClass(screens.BATTLE_SETUP)}>
-      <div className="br-back-button-holder">
-        <BrButton label={<i className="fa fa-arrow-left"></i>} id="go-battle-setup-to-garage" 
-                  className="br-button" 
-                  onClick={e => changeScreen(screens.GARAGE)} />
-      </div>
-      <h1>{getText('text_battle_arena')}</h1>
-      { battlers.length ?
-        <div className="br-battle-setup">
-          <div className="br-battle-setup-home">
-            <h3>{getText('text_your_kart')}</h3>
-            <div className="br-battle-setup-home-kart">
-              <img className={"br-battle-viewer-image"} alt="Home Kart" src={getImageURL(battlers[0].media)} />
-              <div className="br-battle-setup-home-kart-name">
-                {kartName(battlers[0].title)}
-              </div>
-            </div>
-          </div>
-          <div className="br-battle-setup-vs">
-            <h1>{getText('text_vs')}</h1>
-            <BrButton label="Battle" id="battle" className="br-button" onClick={e => watchBattle()} />
-          </div>
-          <div className="br-battle-setup-away">
-            <h3>{getText('text_opponent_kart')}</h3>
-            <div className="br-battle-setup-home-kart">
-              <img className={"br-battle-viewer-image"} alt="Home Kart" src={getImageURL(battlers[1].media)} />
-              <div className="br-battle-setup-away-kart-name">
-                {kartName(battlers[1].title)}
-              </div>
-            </div>
-          </div>
-        </div> :
-        <div className="br-battle-setup-loading-panel">
-          <h3>{getText("text_battle_waiting_1")}</h3>
-        </div>
-      }
-     
-    </div>
-  }
-
-  function replay() {
-    setPostBattleScreen(DEBUG_FORCE_POST_BATTLE ? postBattleScreens.RESULT : postBattleScreen.NONE);
-    setLineIndex(0);
-    setGroupIndex(0);
-    setBattlePower([100, 100]);
-    setReplayReq(replayReq + 1);
-    setBattleEnded(false);
-  }
-
-  function getScreenBattle() {
-    let ui;
-    if(battle.battle && battleText.length) {
-      let homeMetadata = battle.metadata[0];
-      let awayMetadata = battle.metadata[1];
-
-      ui = <div className="br-battle-viewer">
-        <div className={"br-battle-viewer-panel" + 
-                        (battleAttacking[0] ? ' br-battle-viewer-attacking ' : '') +
-                        (battleHit[0] ? ' box-hit ' : '' )}>
-        <div className="br-battle-viewer-kart-details">
-          {kartName(homeMetadata.title)}
-        </div>
-        <div className="br-power-bar-panel">
-            <div className={"br-power-bar-outer" + (battleHit[0] ? " br-anim-shake-short br-hurt" : '')}>
-              <div className="br-power-bar-inner" style={ { width: `${battlePower[0]}%`}}></div>
-            </div>
-            <div className="br-power">
-              {battlePower[0]}
-            </div>
-          </div>
-          <div className="br-battle-viewer-image-panel">
-            <img className={"br-battle-viewer-image " + (battleHit[0] ? "box-hit" : '')} 
-                 alt="Home Kart" src={getImageURL(homeMetadata.media)} />
-          </div>
-        </div>
-        <div className="br-battle-viewer-main-panel">
-
-          { postBattleScreen !== postBattleScreens.NONE ?  getScreenPostBattle(postBattleScreen) : '' }
-
-          { (battleAttacking[0] || battleAttacking[1]) && !(battleHit[0] || battleHit[1]) ?
-            <div className="br-battle-visuals">
-                <div className={"br-battle-arrows br-battle-arrows-anim" +
-                                (battleAttacking[1] ? ' br-reverse ' : '')}>
-                </div>
-            </div>
-            :
-            ''
-          }
-
-          { displayBattleText(battleText) }
-
-        </div>
-        <div className={"br-battle-viewer-panel" + 
-                        (battleAttacking[1] ? ' br-battle-viewer-attacking ' : '') +
-                        (battleHit[1] ? ' box-hit ' : '')}>
-          <div className="br-battle-viewer-kart-details">
-            {kartName(awayMetadata.title)}
-          </div>
-          <div className="br-power-bar-panel">
-            <div className={"br-power-bar-outer" + (battleHit[1] ? " br-anim-shake-short br-hurt" : '')}>
-              <div className="br-power-bar-inner" style={ { width: `${battlePower[1]}%`} }></div>
-            </div>
-            <div className="br-power">
-              {battlePower[1]}
-            </div>
-          </div>          
-          <div className="br-battle-viewer-image-panel">
-            <img className={"br-battle-viewer-image " + (battleHit[1] ? "box-hit" : '')} 
-                 alt="Away Kart" src={getImageURL(awayMetadata.media)} />
-          </div>
-        </div>
-      </div>
-    }
-    else {
-      ui = <div className="br-screen-battle-no-battle">
-        <h3>{ getText('text_battle_loading') }</h3>
-      </div>
-    }
-
-    return <div className={"br-screen br-screen-battle " + getScreenClass(screens.BATTLE)}>
-      <div className="br-back-button-holder">
-        <BrButton label={<i className="fa fa-arrow-left"></i>} id="go-battle-to-garage" 
-                  className="br-button" 
-                  onClick={e => changeScreen(screens.GARAGE)} />
-      </div>
-      <h2>{ getText('text_battle') }</h2>
-      <div className="br-battle-controls-holder">
-        <BrButton label="Replay" id="go-battle-to-garage" className="br-button" onClick={e => replay() } />
-      </div>
-      { ui }
-    </div>
-  }
-
   return <div className="br-screen-container">
     { getScreenGarage() }
-    { getScreenBattleSetup() }
-    { getScreenBattle() }
-
     <div className="br-photo-booth" ref={threePhotoRef}>
     </div>
   </div>

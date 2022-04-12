@@ -60,14 +60,13 @@ function App() {
   const [ modalIsOpen, setModalIsOpen ] = useState(false);
   const [ modal2IsOpen, setModal2IsOpen ] = useState(false);
   const [ helpMode, setHelpMode] = useState(helpModes.INTRO);
-  const [ headerInfoText, setHeaderInfoText ] = useState(getText('text_header_info'));
-  const [wallet, setWallet] = useState();
   const [isSignedIn, setIsSignedIn] = useState(true);
   const [signedInInfo, setSignedInInfo] = useState({});
   const [nftList, setNFTList] = useState([]);
   const [processingActions, setProcessingActions] = useState({});
-  const [screen, setScreen] = useState(screens.Garage);
+  const [screen, setScreen] = useState(screens.GARAGE);
   const [selectedGame, setSelectedGame] = useState('game3D');
+
   const [highScore, setHighScore] = useState(0);
   const [pendingTx, setPendingTx] = useState([]);
   const [timerId, setTimerId] = useState(0);
@@ -478,7 +477,6 @@ function App() {
     if(signedInInfo.success) {
       ui = <div className="br-score-bar">
         <div className="br-deed" id="deed-msg" style={ { display: 'none'}}>You Deed</div>
-        <div className="br-score" id="score">0</div>
         <div className="br-high-score">High Score: <span id="high-score">{highScore}</span></div>
 
         <button className="br-button br-icon-button"
