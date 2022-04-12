@@ -13,7 +13,7 @@ export class Spider {
         this.world = world;
         this.scene = scene;
         this.physicsMaterial = physicsMaterial;
-        this.debug = true;
+        this.debug = false;
         this.size = 0.7;
         this.enabled = false;
         this.speed = options.speed;
@@ -29,8 +29,10 @@ export class Spider {
         if(!this.enabled) {
             const geometry = new THREE.SphereBufferGeometry(this.size, 32, 32)
             let debugMaterial = new THREE.MeshBasicMaterial({ color: '#aa22aa' })
-            this.debugMesh = new THREE.Mesh(geometry, debugMaterial);
-            this.scene.add(this.debugMesh);
+            if(this.debug) {
+                this.debugMesh = new THREE.Mesh(geometry, debugMaterial);
+                this.scene.add(this.debugMesh);
+            }
 
             const shape = new CANNON.Sphere(this.size);
             this.body = new CANNON.Body({ mass: 1, material: this.physicsMaterial })
@@ -51,7 +53,9 @@ export class Spider {
             this.world.removeBody(this.body);
             this.body = null;
             this.positioner.visible = false;
-            this.debugMesh.visible = false;
+            if(this.debugMesh) {
+                this.debugMesh.visible = false;
+            }
         }
     }
 
@@ -110,7 +114,10 @@ export class Spider {
                 this.body.position.copy(baddyPos);
             }
 
-            this.debugMesh.position.copy(this.body.position);
+            if(this.debugMesh) {
+                this.debugMesh.position.copy(this.body.position);
+            }
+
             this.positioner.position.copy(this.body.position);
             this.positioner.position.y = this.body.position.y - this.size;
         }

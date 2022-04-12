@@ -434,9 +434,15 @@ function Game3D(props) {
         const throwAction = mixer.clipAction( clipThrow );
         walkAction.play();
 
-        const clipSpiderWalk = THREE.AnimationClip.findByName( clips, 'spider.walk' );
-        const spiderWalkAction = mixer.clipAction( clipSpiderWalk );
-        spiderWalkAction.play();
+        console.log(JSON.stringify(['clips', clips]));
+        
+        for(let clip of clips) {
+          if(clip.name === 'spider.walk') {
+            const clipSpiderWalk = clip;
+            const spiderWalkAction = mixer.clipAction( clipSpiderWalk );
+            spiderWalkAction.play();
+          }
+        }
 
         //const lifeformShape = new CANNON.Box(new CANNON.Vec3(0.25, 1, 0.25))
         const lifeformShape = new CANNON.Sphere(1)
@@ -628,10 +634,10 @@ function Game3D(props) {
           spiderTimer.addCallback({
             timeTriggered: (dt, t) => { 
               let angle = Math.random() * Math.PI*2;
-              console.log(JSON.stringify(['spider time', dt, t])); 
-              let spiderPos = new THREE.Vector3(8, 0, 0);
-              let rotator = new THREE.Euler(0, angle, 0, 'Y');
+              let spiderPos = new THREE.Vector3(14, 0, 0);
+              let rotator = new THREE.Euler(0, angle, 0);
               spiderPos.applyEuler(rotator);
+              console.log(JSON.stringify(['spider time', dt, t, angle, spiderPos])); 
               spider.enable(spiderPos); 
             }
           });
