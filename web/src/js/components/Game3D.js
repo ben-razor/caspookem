@@ -433,10 +433,6 @@ function Game3D(props) {
         const throwAction = mixer.clipAction( clipThrow );
         walkAction.play();
 
-        let spiderPositioner = gltf.scene.getObjectByName('Empty.spider.001');
-        let spiderMesh = gltf.scene.getObjectByName('spider.001');
-        let spiderArmature = gltf.scene.getObjectByName('Armature.spider.001');
-
         const clipSpiderWalk = THREE.AnimationClip.findByName( clips, 'spider.walk' );
         const spiderWalkAction = mixer.clipAction( clipSpiderWalk );
         spiderWalkAction.play();
@@ -670,6 +666,7 @@ function Game3D(props) {
               ballMeshes.splice(objId, 1);
             }
             toRemove = [];
+            spider.setTarget(lifeformPositioner.position);
           }
 
           if(cannonPhysics) {

@@ -9,14 +9,12 @@ export class Spider {
         this.debug = true;
         this.size = 1;
         this.enabled = false;
+        this.speed = 1;
+        this.vTo = new THREE.Vector3(0,0,0);
 
         this.positioner = scene.getObjectByName('Empty');
         
         this.enable();
-    }
-
-    setCurve(curve) {
-        this.curve = curve;
     }
 
     enable() {
@@ -40,17 +38,35 @@ export class Spider {
         this.debugMesh.visible = false;
     }
 
+    setTarget(position) {
+        this.target = position;
+        this.curve = null;
+        this.vTo.copy(this.target);
+        this.vTo.sub(this.body.position);
+        this.vTo.normalize();
+        this.vTo.multiplyScalar(this.speed * 0.1);
+        this.vTo.y = 0;
+    }
+
+    setCurve(curve) {
+        this.curve = curve;
+        this.target = null;
+    }
+
     update(dt, totalTime) {
         if(this.enabled) {
-            if(this.curve) {
+            if(this.target) {
+                this.body.position.addScaledVector(1, this.vTo, this.body.position);
+            }
+            else if(this.curve) {
                 let point = this.curve.getPointAt((totalTime / 20) % 1.0);
                 let baddyPos = new THREE.Vector3(point.x, point.y, 0);
-                this.debugMesh.position.copy(baddyPos);
                 var euler = new THREE.Euler( -Math.PI/2, 0, 0, 'XYZ' );
-                this.debugMesh.position.applyEuler(euler);
-                this.body.position.copy(this.debugMesh.position);
+                baddyPos.applyEuler(euler);
+                this.body.position.copy(baddyPos);
             }
 
+            this.debugMesh.position.copy(this.body.position);
             this.positioner.position.copy(this.body.position);
         }
     }
