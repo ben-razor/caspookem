@@ -63,6 +63,11 @@ const text = {
     "text_tx_complete": `Transaction complete: {type}`,
     "text_mint_nft": `Mint ${text_consts.nft_name}`,
 
+    "text_updating_blockchain": `${text_consts.blockchain_name} is working its magic`,
+    "text_unknown_transaction": `Unknown transaction`,
+    "text_adding_high_score": `Adding high score`,
+    "text_minting": `Minting ${text_consts.nft_name}`,
+
     'text_sign_in_to_save': 'Sign in to save and view progress',
     'text_wallet_name': 'Casper Signer',
     'text_get_casper': 'Go get {casper_signer}',
@@ -97,6 +102,8 @@ const text = {
 const langs = ["en"];
 let lang = langs[0];
 
+Object.assign(text[lang], text_consts);
+
 export default function getText(id, replacements) {
   let t = text[lang][id] || id;
   if(replacements) {
@@ -109,4 +116,8 @@ export default function getText(id, replacements) {
 
 export function exclamation(text) {
   return text + '!!';
+}
+
+export function ellipsis(text) {
+  return text + '…';
 }

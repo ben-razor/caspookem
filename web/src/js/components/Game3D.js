@@ -89,6 +89,7 @@ function Game3D(props) {
   const ipfsToBucketURL = props.ipfsToBucketURL;
   const requestMint = props.requestMint;
   const setScore = props.setScore;
+  const signedInInfo = props.signedInInfo;
 
   window.nftData = nftData;
 
@@ -1021,7 +1022,7 @@ function Game3D(props) {
   function getScreenGarage() {
     let nftListUI;
 
-    if(true) {
+    if(signedInInfo.success) {
       nftListUI = <div className="br-nft-gallery">
         { true ? displayNFTs(nftList, activeNFT) : ''}
         { !nftList.length && showNFTListHelp ? 
@@ -1031,13 +1032,6 @@ function Game3D(props) {
           :
           ''
         }
-        { nftList.length && nftData?.level > 0 ?
-          <BrButton label="Battle" id="gameSimpleBattle" className="br-button" 
-                    onClick={ e => startBattle() }
-                    isSubmitting={processingActions['gameSimpleBattle']} />
-          :
-          ''
-        } 
       </div>
     }
 

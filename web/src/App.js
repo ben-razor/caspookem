@@ -6,7 +6,7 @@ import { toast as toasty } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import BrButton from './js/components/lib/BrButton';
 import { localLog, StateCheck } from './js/helpers/helpers';
-import getText from './js/helpers/text';
+import getText, { ellipsis } from './js/helpers/text';
 import { hexColorToInt } from './js/helpers/3d';
 import bigInt from 'big-integer';
 import Modal from 'react-modal';
@@ -20,6 +20,7 @@ import { csprToMote, casperAttemptConnect, addHighScore, getHighScore, getDeploy
         checkSignedIn } from './js/helpers/casper';
 import { getNFTName } from './js/helpers/casper';
 import path from 'path';
+import { config } from 'process';
 
 let game;
 let stateCheck = new StateCheck();
@@ -39,6 +40,7 @@ const MODAL_2_ENABLED = false;
 const SHOW_HEADER_EXTRA_INFO = true;
 const INTERVAL_CHECK_SIGN_IN = 2000;
 const INTERVAL_CHECK_TX_COMPLETE = 4000;
+const TESTING_PENDING_TX = false;
 
 const screens= {
   GARAGE: 1,
@@ -481,13 +483,14 @@ function App() {
     let ui;
 
     if(signedInInfo.success) {
+      let canSubmitScore = true; // score > highScore
       ui = <div className="br-score-panel">
         <div className="br-score-bar">
           <div className="br-deed" id="deed-msg" style={ { display: 'none'}}>You Deed</div>
           <div className="br-high-score">Score: <span id="high-score">{score}</span></div>
           <div className="br-high-score">High Score: <span id="high-score">{highScore}</span></div>
         </div>
-        { score > highScore ?
+        { canSubmitScore ?
           <div className="br-score-bar">
             <div className="br-high-score">
               New high Score!!<br />Save To Casper 
@@ -596,18 +599,61 @@ function App() {
     }
   }
 
+  function getPendingTransactionList(submittedTx) {
+    let items = [];
+
+    if(TESTING_PENDING_TX) {
+      submittedTx = [
+        {"type":"addHighScore","data":{"score":0,"deploy":"3edc478d1da1f3bdc8ca9ec82bc97151ed6b38196b826c551c69fec2ec62f9db"}},
+        {"type":"mintCaspookie","data":{"score":0,"deploy":"3edc478d1da1f3bdc8ca9ec82bc97151ed6b38196b826c551c69fec2ec62f9db"}}
+      ];
+    }
+    console.log(JSON.stringify(['pending ', submittedTx]));
+    
+
+    if(submittedTx.length) {
+      items.push(
+        <div className="br-pending-list-title" key="pending-list-title">
+          {getText('text_updating_blockchain')}
+        </div>
+      )
+
+      let i = 0;
+      for(let p of submittedTx) {
+        let text = getText('text_unknown_transaction');
+
+        if(p.type === 'addHighScore') {
+          text = getText('text_adding_high_score');
+        }
+        else if(p.type === 'mintCaspookie') {
+          text = getText('text_minting');
+        }
+
+        items.push(<div className="br-pending-list-item" key={"pending-list-" + i++}>
+          <div className="br-pending-list-spinner"><i class="fas fa-spinner fa-spin"></i></div>
+          { ellipsis(text) }
+        </div>);
+      }
+    }
+
+    return <div className="br-pending-list">
+      {items}
+    </div>
+  }
+  
   return (
     <div className="br-page">
+      { getPendingTransactionList(submittedTx) }
       <div>
         <Modal
           isOpen={modalIsOpen}
           onAfterOpen={afterOpenModal}
           onRequestClose={closeModal}
           style={customStyles}
-          contentLabel="NEAR Karts"
+          contentLabel={getText('app_name')}
         >
           <div className="br-modal-title">
-            <h2 className="br-modal-heading">NEAR Karts</h2>
+            <h2 className="br-modal-heading">{getText('app_name')}</h2>
             <div className="br-modal-close">
               <BrButton label={<i className="fas fa-times-circle" />} className="br-button br-icon-button" 
                           onClick={closeModal} />
@@ -626,11 +672,11 @@ function App() {
             isOpen={modal2IsOpen}
             onRequestClose={e => closeModal(2)}
             style={customStyles}
-            contentLabel="NEAR Karts Leaderboard"
+            contentLabel={getText('modal_2_title')}
             appElement={document.getElementById('root')}
           >
             <div className="br-modal-title">
-              <h2 className="br-modal-heading">Modal 2 Title</h2>
+              <h2 className="br-modal-heading">{getText('modal_2_title')}</h2>
               <div className="br-modal-close">
                 <BrButton label={<i className="fas fa-times-circle" />} className="br-button br-icon-button" 
                             onClick={e => closeModal(2)} />
@@ -695,7 +741,8 @@ function App() {
             getImageURL={getImageURL} 
             nftList={nftList} activeNFT={activeNFT} 
             ipfsToBucketURL={ipfsToBucketURL} requestMint={requestMint} 
-            execute={execute} score={score} setScore={setScore} />
+            execute={execute} score={score} setScore={setScore} 
+            signedInInfo={signedInInfo} />
           }
         </div>
       </div>
