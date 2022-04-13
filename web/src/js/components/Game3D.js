@@ -2,7 +2,7 @@ import React, {useEffect, useState, useCallback, Fragment} from 'react';
 import * as THREE from 'three';
 import * as CANNON from 'cannon-es';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
-import lifeform from '../../data/models/ghost-6.gltf';
+import lifeform from '../../data/models/ghost-7.gltf';
 import imageFrame from '../../images/frame-dark-1.png';
 import BrButton from './lib/BrButton';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
@@ -310,7 +310,7 @@ function Game3D(props) {
         let physicsMaterial = new CANNON.Material('physics')
         const physics_physics = new CANNON.ContactMaterial(physicsMaterial, physicsMaterial, {
           friction: 0.04,
-          restitution: 0.3,
+          restitution: 0.1,
         })
 
         // We must add the contact materials to the world
@@ -406,7 +406,7 @@ function Game3D(props) {
             return;
           }
 
-          const ballBody = new CANNON.Body({ mass: 1 })
+          const ballBody = new CANNON.Body({ mass: 0.01, isTrigger: true })
           ballBody.addShape(ballShape)
           const ballMesh = new THREE.Mesh(ballGeometry, material)
 
@@ -645,7 +645,7 @@ function Game3D(props) {
               }
 
               if(keys.forward) {
-                if(height < 0.1) {
+                if(!jumping) {
                   lifeform.body.velocity.z = -6;
                   if(keys.left) {
                     lifeform.positioner.rotation.set(0, -3*Math.PI/4, 0);
@@ -707,7 +707,7 @@ function Game3D(props) {
       new THREE.Vector3(5, 5, 5), new THREE.Vector3(-5, 5, 5), new THREE.Vector3(0, 5, -2)
     ])
 
-    const light = new THREE.AmbientLight( 0xe0e0e0 ); // soft white light
+    const light = new THREE.AmbientLight( 0xf0f0f0 ); // soft white light
     scene.add( light );
 
     let i = 0;

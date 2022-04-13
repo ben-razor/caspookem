@@ -12,7 +12,7 @@ export class Lifeform {
     this.positioner = scene.getObjectByName('EmptyLifeform');
     this.positioner.visible = false;
     const lifeformShape = new CANNON.Sphere(1)
-    this.body = new CANNON.Body({ mass: 5, fixedRotation: true, material: physicsMaterial })
+    this.body = new CANNON.Body({ mass: 20, fixedRotation: true, material: physicsMaterial })
     this.body.objId = 'lifeform';
     this.body.classes = [];
     this.body.addShape(lifeformShape)

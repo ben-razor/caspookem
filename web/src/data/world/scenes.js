@@ -9,6 +9,17 @@ const scenes = [
       { id: 'FrontWall', classes: ['no-land'], positionType: 'position', position: [0, 0, 16], geometry: { type: "plane", orientation: [0, Math.PI, 0] } },
       { id: 'SideWallR', classes: ['no-land'], positionType: 'position', position: [16, 0, 0], geometry: { type: "plane", orientation: [0, -Math.PI / 2, 0] } },
       { id: 'SideWallL', classes: ['no-land'], positionType: 'position', position: [-16, 0, 0], geometry: { type: "plane", orientation: [0, Math.PI / 2, 0] } },
+      { id: 'CrateStandard001', classes: ['crate'], positionType: 'object', objId: 'CrateStandard001', geometry: { type: "box", dims: [1, 1, 1] } },
+      { id: 'CrateStandard002', classes: ['crate'], positionType: 'object', objId: 'CrateStandard002', geometry: { type: "box", dims: [1, 1, 1] } },
+      { id: 'CrateStandard003', classes: ['crate'], positionType: 'object', objId: 'CrateStandard003', geometry: { type: "box", dims: [1, 1, 1] } },
+      { id: 'CrateStandard004', classes: ['crate'], positionType: 'object', objId: 'CrateStandard004', geometry: { type: "box", dims: [1, 1, 1] } },
+      { id: 'CrateStandard005', classes: ['crate'], positionType: 'object', objId: 'CrateStandard005', geometry: { type: "box", dims: [1, 1, 1] } },
+      { id: 'CrateStandard006', classes: ['crate'], positionType: 'object', objId: 'CrateStandard006', geometry: { type: "box", dims: [1, 1, 1] } },
+      { id: 'CrateStandard007', classes: ['crate'], positionType: 'object', objId: 'CrateStandard007', geometry: { type: "box", dims: [1, 1, 1] } },
+      { id: 'CrateStandard008', classes: ['crate'], positionType: 'object', objId: 'CrateStandard008', geometry: { type: "box", dims: [1, 1, 1] } },
+      { id: 'BlueCrateCenter001', classes: ['crate'], positionType: 'object', objId: 'BlueCrateCenter001', geometry: { type: "box", dims: [1, 1, 1] } },
+      { id: 'BlueCrateCenter002', classes: ['crate'], positionType: 'object', objId: 'BlueCrateCenter002', geometry: { type: "box", dims: [1, 1, 1] } },
+      { id: 'BlueCrateCenter003', classes: ['crate'], positionType: 'object', objId: 'BlueCrateCenter003', geometry: { type: "box", dims: [1, 1, 1] } },
     ],
     triggers: [
       { id: 'door', positionType: 'object', objId: 'SceneRoomZeroDoor', geometry: { type: "sphere", radius: 0.5 } }
