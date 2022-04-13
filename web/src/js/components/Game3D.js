@@ -51,6 +51,8 @@ let gameScore = 0;
 let gameHealth = 100;
 let gameJustDied = false;
 let gameJustStarted = false;
+let gameSpiders = 0;
+let gameDoorTriggered = 0;
 let gameEquipment = [];
 
 function Game3D(props) {
@@ -94,6 +96,8 @@ function Game3D(props) {
   const [health, setHealth] = useState(100);
   const [hit, setHit] = useState(false);
   const [equipment, setEquipment] = useState([]);
+  const [doorTriggered, setDoorTriggered ] = useState(0);
+  const [gameText, setGameText] = useState('');
 
   function characterChanged(nftData, prevNFTData) {
     if(!nftData || !prevNFTData) {
@@ -155,6 +159,27 @@ function Game3D(props) {
     }
     return hidden;
   }
+
+  const getDoorText = useCallback(() => {
+    let doorText = '';
+
+    let hasEquip = gameEquipment.find(x => x.type === 'gem-pink-1');
+
+    if(!hasEquip) {
+      doorText = getText('text_door_possession', { 'object': getText('text_equip_pink_crystal')});
+    }
+    else if(gameSpiders < 3) {
+      doorText = getText('text_door_mashup', { 'number': 3, 'lifeforms': getText('text_lifeform_spiders')});
+    }
+    else if(!nftList.length) {
+      doorText = getText('text_door_mint_caspookies');
+    }
+    else {
+      doorText = getText('text_door_is_pleased');
+    }
+
+    return 'Door: ' + doorText;
+  }, [nftList]);
 
   const styleScene = useCallback((scene, controlEntry) => {
     scene.traverse(o => {
@@ -284,6 +309,18 @@ function Game3D(props) {
   }, [health, changeScreen, screens]);
 
   useEffect(() => {
+      console.log(JSON.stringify(['door triggered']));
+    if(doorTriggered) {
+      let doorText = getDoorText();
+      console.log(JSON.stringify(['door triggered 2', doorText]));
+      setGameText('');
+      setTimeout(() => {
+        setGameText(doorText);
+      }, 10)
+    }
+  }, [doorTriggered, getDoorText]);
+
+  useEffect(() => {
     if(scene && camera && threeElem) {
       loader.load(lifeform, function ( gltf ) {
         scene.add(gltf.scene);
@@ -393,6 +430,12 @@ function Game3D(props) {
             gameEquipment.push({ id: b2.objId, type: 'gem-pink-1' });
             setEquipment(gameEquipment);
             removeIds.push(b2.objId);
+            gameScore += 1000;
+            setScore(gameScore);
+          }
+          if(b2.classes?.includes('door')) {
+            console.log(JSON.stringify(['it be door time', gameDoorTriggered]));
+            setDoorTriggered(++gameDoorTriggered);
           }
           if(!b2.classes?.includes('no-land')) {
             jumping = false;
@@ -436,6 +479,7 @@ function Game3D(props) {
               console.log(JSON.stringify(['ro', cOther.objId]));
               removeIds.push(cOther.objId);
               gameScore = gameScore + 100;
+              gameSpiders++;
               setScore(gameScore);
             }
            
@@ -532,6 +576,13 @@ function Game3D(props) {
           }
         }
 
+        function enableTriggers() {
+          for(let i = 0; i < triggers.length; i++) {
+            let trigger = triggers[i];
+            trigger.enable();
+          }
+        }
+
         let removeObj = function(world, scene, mesh, body, spline) {
           scene.remove(mesh);
           mesh.geometry.dispose();
@@ -578,6 +629,7 @@ function Game3D(props) {
 
           if(gameJustStarted) {
             startSpiders();
+            enableTriggers();
             lifeform.enable(sceneConf.startPos);
             gameJustStarted = false;
           }
@@ -990,10 +1042,12 @@ function Game3D(props) {
     
     gameScore = 0;
     gameHealth = 100;
+    gameSpiders = 0;
     gameEquipment = [];
     setScore(gameScore);
     setHealth(gameHealth);
     setEquipment(gameEquipment);
+    setGameText('');
     changeScreen(screens.GAME);
     gameJustStarted = true;
   }
@@ -1065,6 +1119,15 @@ function Game3D(props) {
                 </div>
               </div>
             </div>
+            {gameText ?
+              <div className="br-bottom-osd loading-fade-out">
+                <div className="br-game-text">
+                  {gameText}
+                </div>
+              </div>
+              :
+              ''
+            }
             {
               orbitControlsEnabled ?
                 <button className="br-autorotate-button br-button br-icon-button"

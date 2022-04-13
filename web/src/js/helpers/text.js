@@ -72,6 +72,14 @@ const text = {
     'text_wallet_name': 'Casper Signer',
     'text_get_casper': 'Go get {casper_signer}',
 
+    'text_door_possession': 'Only those that possess the {object} may pass',
+    'text_door_mashup': 'Only those that mashed up {number} {lifeforms} may pass',
+    'text_door_mint_caspookies': 'Only minted caspookies may pass. Mint you should!',
+    'text_door_is_pleased': 'Door is pleased. You may pass.',
+
+    'text_equip_pink_crystal': 'pink crystal',
+    'text_lifeform_spiders': 'spiders',
+
     "success_save_kart": `${text_consts.nft_name} saved!!`,
     "success_image_upload": `${text_consts.nft_short_name} image uploaded`,
 

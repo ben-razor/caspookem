@@ -616,6 +616,21 @@
     z-index: 1000;
 }
 
+.br-bottom-osd {
+    position: absolute;
+    display: flex;
+    width: 100%;
+    padding: 1em;
+    justify-content: center;
+    bottom: 0;
+    opacity: 0;
+}
+
+.br-game-text {
+    background-color: black;
+    color: white;
+}
+
 .br-hud {
     display: flex;
     flex-direction: row;
