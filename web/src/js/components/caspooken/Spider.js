@@ -4,7 +4,9 @@ import { TimeTrigger } from './TimeTrigger';
 import { Vec3 } from 'cannon-es';
 
 export class Spider {
-    constructor(id, classes=[], world, scene, physicsMaterial, options={ speed: 0.5, spiderSenses: 0.5}) {
+    constructor(id, classes=[], world, scene, physicsMaterial, options={ 
+        minSpeed: 0.4, maxSpeed: 1, speed: 0.4, spiderSenses: 0.5
+    }) {
         this.id = id;
         this.classes = ['spider'];
         this.positioner = scene.getObjectByName(id);
@@ -19,6 +21,8 @@ export class Spider {
         this.size = 0.7;
         this.enabled = false;
         this.speed = options.speed;
+        this.minSpeed = options.minSpeed;
+        this.maxSpeed = options.maxSpeed;
         this.vTo = new THREE.Vector3(0,0,0);
 
         this.timeTrigger = new TimeTrigger(options.spiderSenses);
@@ -56,6 +60,7 @@ export class Spider {
         let angle = Math.random() * Math.PI*2;
         let spiderPos = new THREE.Vector3(10, 8, 0);
         let rotator = new THREE.Euler(0, angle, 0);
+        this.speed = this.minSpeed;
         spiderPos.applyEuler(rotator);
         this.enable(spiderPos); 
     }
@@ -73,7 +78,7 @@ export class Spider {
     }
 
     setSpeed(speed) {
-        this.speed = speed;
+        this.speed = Math.min(Math.max(speed, this.minSpeed), this.maxSpeed);
     }
 
     setSpiderSenses(interval) {
@@ -100,6 +105,16 @@ export class Spider {
         console.log(JSON.stringify(['Timetriggered!', timeout]));
         if(this.targetObj) {
             this.setTarget(this.targetObj.position);
+            
+            let angerRand = Math.random();
+            let speedRand = Math.random() * 0.2;
+
+            if(angerRand > 0.9) {
+                this.setSpeed(this.speed + speedRand);
+            }
+            else if(angerRand < 0.1) {
+                this.setSpeed(this.speed - speedRand);
+            }
         }
     }
 
