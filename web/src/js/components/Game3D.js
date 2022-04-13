@@ -23,9 +23,7 @@ const DEBUG_FAST_BATTLE = false;
 const loader = new GLTFLoader();
 
 const w = 1000;
-const h = 600;
-const wPhoto = 400;
-const hPhoto = 400;
+const h = 540;
 
 let textDelay = 2000;
 let postBattleDelay = 3000;
@@ -45,16 +43,6 @@ document.addEventListener('keyup', e => {
 });
 
 const stateCheck = new StateCheck();
-
-const postBattleScreens = {
-  NONE: 0,
-  RESULT: 1,
-  LEVEL_UP: 2,
-  PRIZE_PREPARE: 4,
-  PRIZE_RESULT: 5,
-  PRIZE_SUMMARY: 6,
-  END: 7
-};
 
 let gameScore = 0;
 let gameHealth = 100;
@@ -92,7 +80,7 @@ function Game3D(props) {
   const [styleInitialized, setStyleInitialized] = useState();
 
   const [imageDataURL, setImageDataURL] = useState('');
-  const [prevScreen, setPrevScreen] = useState(screens.GARAGE);
+  const [prevScreen, setPrevScreen] = useState(screens.GAME);
   const [orbitControls, setOrbitControls] = useState(false);
   const [orbitControlsEnabled, setOrbitControlsEnabled] = useState(false);
   const [garagePanel, setGaragePanel] = useState('equip');
@@ -278,10 +266,16 @@ function Game3D(props) {
   }, [sjScene, controlEntry, styleScene]);
 
   useEffect(() => {
-    if(photoSubScene) {
-      styleScene(photoSubScene, controlEntry);
+    if(hit) {
+      setHit(false);
     }
-  }, [photoSubScene, controlEntry, styleScene]);
+  }, [hit]);
+
+  useEffect(() => {
+    if(health === 0 && stateCheck.changed('health', health, 100)) {
+      changeScreen(screens.GAME_OVER);
+    }
+  }, [health]);
 
   useEffect(() => {
     if(scene && camera && threeElem) {
@@ -389,6 +383,7 @@ function Game3D(props) {
               gameHealth = 0;
             }
             setHealth(gameHealth);
+            setHit(true);
           }
           if(!b2.classes.includes('no-land')) {
             jumping = false;
@@ -925,9 +920,10 @@ function Game3D(props) {
       newKartActive = true;
     }
 
-    nftUI.push(<div className={"br-nft-list-item " + (newKartActive ? 'br-nft-list-item-selected' : '')} 
-                    key="new_kart" onClick={e => requestMint() }>
-      { getText('text_mint_nft')}
+    nftUI.push(<div className={"br-nft-list-item br-no-border"} 
+                    key="new_nft" onClick={e => requestMint() }>
+      
+      <BrButton label={ getText('text_mint_nft')} id="mintNFT" className="br-button" onClick={ e => requestMint() } />
     </div>);
 
     return <Fragment>
@@ -941,6 +937,11 @@ function Game3D(props) {
     setPrevScreen(screen);
     setScreen(screenID);
   }
+
+  useEffect(() => {
+    console.log(JSON.stringify(['sc', screen]));
+    
+  }, [screen]);
 
   function getScreenClass(screenId) {
     let screenClass = 'br-screen-hidden';
@@ -977,7 +978,7 @@ function Game3D(props) {
     return weapon_index;
   }
 
-  function getScreenGarage() {
+  function getNFTListUI() {
     let nftListUI;
 
     if(signedInInfo.success) {
@@ -993,10 +994,13 @@ function Game3D(props) {
       </div>
     }
 
+    return nftListUI;
+  }
+
+  function getScreenGame() {
     return <Fragment>
-      <div className={ "br-screen br-screen-garage " + getScreenClass(screens.GARAGE)}>
-        {nftListUI}
-        <div className="br-garage loading-fade-in">
+      <div className={ "br-screen br-screen-game " + getScreenClass(screens.GAME)}>
+        <div className="br-game loading-fade-in">
           <div className="br-strange-juice-3d" id="br-strange-juice-3d" ref={threeRef}>
             <div className="br-3d-overlay loading-fade-out-slow">
             </div>
@@ -1012,7 +1016,7 @@ function Game3D(props) {
               </div>
               <div className="br-power-bar-panel">
                 <div className={"br-power-bar-outer" + (hit ? " br-anim-shake-short br-hurt" : '')}>
-                  <div className="br-power-bar-inner" style={ { width: `${health}%`}}></div>
+                  <div className={"br-power-bar-inner" + (hit ? " br-anim-shake-short br-hurt" : '')} style={ { width: `${health}%`}}></div>
                 </div>
                 <div className="br-power">
                   {health}
@@ -1036,22 +1040,44 @@ function Game3D(props) {
             ''
           }
         </div>
-
-        <div className="br-offscreen">
-          <div className="br-photo-composer" ref={photoComposerRef} style={{ width: wPhoto, height: hPhoto, borderRadius: '20px'}}>
-            <img className="br-photo-frame" src={imageFrame} alt="Frame" />
-            <img alt="Kart NFT" src={imageDataURL} style={ { width: '400px', height: '400px', borderRadius: '80px' } } />
-          </div>
-        </div>
-
       </div>
     </Fragment> 
   }
 
-  return <div className="br-screen-container">
-    { getScreenGarage() }
-    <div className="br-photo-booth" ref={threePhotoRef}>
+  function getScreenGamePrepare() {
+      return <div className={ "br-screen br-screen-game-prepare " + getScreenClass(screens.GAME_PREPARE)}>
+        <div>
+          Start Game
+        </div>
+      </div>
+  }
+  
+  function restart() {
+    console.log(JSON.stringify(['restarting']));
+    
+    gameScore = 0;
+    gameHealth = 100;
+    setScore(gameScore);
+    setHealth(gameHealth);
+    changeScreen(screens.GAME);
+  }
+
+  function getScreenGameOver() {
+    return <div className={ "br-screen br-screen-game-over " + getScreenClass(screens.GAME_OVER)}>
+      <div class="br-scary-text">
+        You Deed
+      </div>
+      <div class="br-game-over-controls">
+        <BrButton label="Play Again" id="playMore" className="br-button" onClick={ e => restart() } />
+      </div>
     </div>
+  }
+
+  return <div className="br-screen-container">
+    { getNFTListUI() }
+    { getScreenGamePrepare() }
+    { getScreenGame() }
+    { getScreenGameOver() }
   </div>
 }
 

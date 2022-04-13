@@ -11,7 +11,6 @@ import { hexColorToInt } from './js/helpers/3d';
 import bigInt from 'big-integer';
 import Modal from 'react-modal';
 import gameConfig from './data/world/config';
-import Phaser from 'phaser';
 import Scene1 from './js/components/scenes/MainScene';
 import PauseScene from './js/components/scenes/PauseScene';
 import Game3D from './js/components/Game3D';
@@ -43,15 +42,10 @@ const INTERVAL_CHECK_TX_COMPLETE = 4000;
 const TESTING_PENDING_TX = false;
 
 const screens= {
-  GARAGE: 1,
-  BATTLE_SETUP: 2,
-  BATTLE: 3
+  GAME_PREPARE: 1,
+  GAME: 2,
+  GAME_OVER: 3
 };
-
-const highScoreModes = {
-  DAILY: 1,
-  MONTHLY: 2
-}
 
 const helpModes = {
   INTRO: 1,
@@ -66,7 +60,7 @@ function App() {
   const [signedInInfo, setSignedInInfo] = useState({});
   const [nftList, setNFTList] = useState([]);
   const [processingActions, setProcessingActions] = useState({});
-  const [screen, setScreen] = useState(screens.GARAGE);
+  const [screen, setScreen] = useState(screens.GAME);
   const [selectedGame, setSelectedGame] = useState('game3D');
 
   const [highScore, setHighScore] = useState(0);
@@ -332,37 +326,6 @@ function App() {
       console.log(JSON.stringify(['added', _pendingTx]));
     }
   }
-
-  useEffect(() => {
-    if(selectedGame !== 'phaser2D') {
-      return;
-    }
-    Scene1.setGameOver(onGameOver);
-
-    var config = {
-      type: Phaser.AUTO,
-      backgroundColor:0x888888,
-      parent: 'phaser-parent',
-      pixelArt: true,
-      width: 800,
-      height: 600,
-      physics: {
-        default: 'arcade',
-        arcade: {
-          debug: true,
-          gravity: { y: 200 },
-        },
-      },
-      fps: {
-        target: 20,
-        forceSetTimeOut: true
-      },
-      scene: [Scene1, PauseScene],
-    };
-
-    game = new Phaser.Game(config);
-
-  }, []);
 
   useEffect(() => {
     (async () => {
@@ -706,7 +669,7 @@ function App() {
         </div>
         <div className="br-header-controls-panel">
           <div className="br-header-controls">
-            { screen === screens.GARAGE ?
+            { screen === screens.GAME ?
               <button className="br-button br-icon-button"
                       onMouseDown={showModal}><i className="fa fa-info"></i></button>
               :
@@ -729,21 +692,15 @@ function App() {
       </div>
       <div className="br-content">
         <div className="br-game-container">
-
-          { selectedGame === 'platformer2D' ?
-            <div id="phaser-parent" className="phaser-parent">
-            </div>
-            :
-            <Game3D processingActions={processingActions} toast={toast} 
-            screens={screens} screen={screen} setScreen={setScreen} 
-            showModal={showModal}
-            getTextureURL={getTextureURL} getIconURL={getIconURL} 
-            getImageURL={getImageURL} 
-            nftList={nftList} activeNFT={activeNFT} 
-            ipfsToBucketURL={ipfsToBucketURL} requestMint={requestMint} 
-            execute={execute} score={score} setScore={setScore} 
-            signedInInfo={signedInInfo} />
-          }
+          <Game3D processingActions={processingActions} toast={toast} 
+          screens={screens} screen={screen} setScreen={setScreen} 
+          showModal={showModal}
+          getTextureURL={getTextureURL} getIconURL={getIconURL} 
+          getImageURL={getImageURL} 
+          nftList={nftList} activeNFT={activeNFT} 
+          ipfsToBucketURL={ipfsToBucketURL} requestMint={requestMint} 
+          execute={execute} score={score} setScore={setScore} 
+          signedInInfo={signedInInfo} />
         </div>
       </div>
     </div>

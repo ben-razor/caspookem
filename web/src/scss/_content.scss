@@ -82,7 +82,7 @@
 
 .br-intro-section {
     padding: $spacing-sm;
-    font-family: NearKartsFancy, monospace;
+    font-family: BrFancy, monospace;
 }
 
 .br-balances {
@@ -195,6 +195,7 @@
 .br-screen-container {
     margin: auto;
     width: 100%;
+    min-height: 532px;
 }
 
 .br-strange-juice-text-overlay {
@@ -205,7 +206,7 @@
     top: 10px;
     left: 10px;
     width: 400px;
-    font-family: NearKartsRegular, sans-serif;
+    font-family: BrRegular, sans-serif;
     border: 1px solid hsl(0deg, 0%, 70%);
     border-radius: 1em;
     padding: 0.4em;
@@ -222,7 +223,7 @@
     margin-left: 2em;
     flex-direction: column;
     color: white;
-    font-family: NearKartsRegular, sans-serif;
+    font-family: BrRegular, sans-serif;
     border: 1px solid hsl(0deg, 0%, 70%);
     border-radius: 1em;
     background-color:hsla(0deg, 0%, 10%, 0.1);
@@ -319,13 +320,15 @@
     border: 1px solid rgb(255, 255, 255);
 }
 
-.br-garage {
+.br-game {
     display: flex;
     justify-content: space-between;
 }
 
 .br-nft-gallery {
-    padding: $spacing-sm;
+    position: relative;
+    z-index: 1000;
+    padding: 0.1em;
     box-sizing: content-box;
     display: flex;
     justify-content: space-between;
@@ -350,37 +353,18 @@
     display: flex;
     align-items: center;
     border: 1px solid hsl(0deg, 0%, 70%);
-    border-radius: 1em;
-    padding: $spacing-sm;
+    border-radius: .6em;
+    padding: 0.2em;
     margin-right: $spacing-sm;
     user-select: none;
     cursor: default;
     white-space: pre;
+    min-height: 2.5em;
 }
 
 .br-nft-list-item-selected {
     background-color: black;
     color: white;
-}
-
-.br-photo-booth {
-    position: relative;
-    top: 600px;
-    display: none;
-    width: 400px;
-    height: 400px;
-}
-
-.br-photo-overlay {
-    display: none;
-}
-
-.br-photo-frame {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 400px;
-    height: 400px;
 }
 
 .br-screen-hidden {
@@ -405,16 +389,16 @@
     left: 0;
     top: 0;
     width: 100%;
-    min-height: 400px;
+    min-height: 432px;
+    height: 432px;
+    border-radius: 1em;
 }
 
-.br-screen-garage {
-}
-
-.br-screen-battle-setup {
+.br-screen-game-over {
     display: flex;
     flex-direction: column;
-    height: 300px;
+    justify-content: center;
+    background-color: black;
 }
 
 .br-screen-battle {
@@ -476,7 +460,7 @@
     flex-direction: column;
     position: relative;
     align-items: center;
-    font-family: NearKartsThin;
+    font-family: BrThin;
     font-size: 0.9em;
     display: flex;
     min-height: 400px;
@@ -661,7 +645,7 @@
 }
 
 .br-hurt {
-    background-color: hsl(0deg, 100%, 24%);
+    background-color: hsl(0deg, 100%, 34%);
 }
 
 .br-pills {
@@ -973,11 +957,6 @@
     font-size: 90%;
 }
 
-.br-phaser-parent {
-    width: 800px;
-    height: 600px;
-}
-
 .br-score-bar {
     display: flex;
     flex-direction: row;
@@ -1012,7 +991,6 @@
 
 .br-game-container {
     width: 800px;
-    height: 600px;
     margin: auto;
 }
 
@@ -1055,4 +1033,23 @@
     color: black;
     background-color: hsla(0deg, 0%, 100%, 0.1);
     background-image: linear-gradient( 180deg, white, hsla(0deg, 0%, 100%, 0.5));
+}
+
+.br-scary-text {
+    font-family: BrScary, sans-serif;
+    font-size: 4em;
+    color: hsl(200deg, 70%, 55%);
+    
+    background: linear-gradient(hsl(200deg, 70%, 55%), hsla(0deg, 0%, 100%, 0.6));
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    -webkit-text-stroke: 1px hsl(200deg, 70%, 20%);
+}
+
+.br-game-over-controls {
+    margin-top: 2em;
+}
+
+.br-no-border {
+    border-width: 0;
 }

@@ -1,20 +1,25 @@
 @font-face {
-    font-family: "NearKartsRegular";
+    font-family: "BrRegular";
     src: url('../fonts/ArchitectsDaughter-Regular.ttf'); 
 }
 
 @font-face {
-    font-family: "NearKartsThin";
+    font-family: "BrThin";
     src: url('../fonts/Exo-Regular.ttf'); 
 }
 
 @font-face {
-    font-family: "NearKartsFancy";
+    font-family: "BrFancy";
     src: url('../fonts/ShurikenStd-Boy.otf'); 
 }
 
+@font-face {
+    font-family: "BrScary";
+    src: url('../fonts/RubikWetPaint-Regular.ttf'); 
+}
+
 body {
-    font-family: NearKartsRegular, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    font-family: BrRegular, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif; 
     background-image: url(../images/gfx/bg-1.png);
     background-size: cover;
@@ -36,7 +41,7 @@ p {
 }
 
 button, select, input {
-    font-family: NearKartsRegular, sans-serif; 
+    font-family: BrRegular, sans-serif; 
 }
 
 input[type=text], textarea {
@@ -52,14 +57,12 @@ input[type=checkbox] {
 }
 
 textarea:focus, input:focus, input[type]:focus, .uneditable-input:focus {  
-    font-family: NearKartsRegular, sans-serif; 
+    font-family: BrRegular, sans-serif; 
     outline: 1px solid $color-1-alt1;
 }
 
 canvas {
     border-radius: 1em;
-    width: 600px;
-    height: 400px;
 }
 
 .br-photo-booth canvas {
