@@ -72,7 +72,8 @@ const postBattleScreens = {
   END: 7
 };
 
-let score = 0;
+let gameScore = 0;
+let gameHealth = 100;
 
 function Game3D(props) {
   const showModal = props.showModal;
@@ -88,6 +89,7 @@ function Game3D(props) {
   const getTextureURL = props.getTextureURL;
   const ipfsToBucketURL = props.ipfsToBucketURL;
   const requestMint = props.requestMint;
+  const score = props.score;
   const setScore = props.setScore;
   const signedInInfo = props.signedInInfo;
 
@@ -116,6 +118,8 @@ function Game3D(props) {
   const [showNFTList, setShowNFTList ] = useState(true);
   const [showNFTListHelp, setShowNFTListHelp ] = useState(false);
   const [threeElem, setThreeElem ] = useState();
+  const [health, setHealth] = useState(100);
+  const [hit, setHit] = useState(false);
 
   function characterChanged(nftData, prevNFTData) {
     if(!nftData || !prevNFTData) {
@@ -395,17 +399,17 @@ function Game3D(props) {
         let jumping = false;
 
         lifeformBody.addEventListener('collide', a => {
-          let b1 = a.target;
           let b2 = a.body;
 
-          console.log(JSON.stringify(['i collided', b1.objId, b2.objId]));
-
+          if(b2.classes.includes('spider')) {
+            gameHealth = Math.floor(gameHealth - (5 + Math.random() * 5));
+            if(gameHealth < 0) {
+              gameHealth = 0;
+            }
+            setHealth(gameHealth);
+          }
           if(!b2.classes.includes('no-land')) {
             jumping = false;
-          }
-          else {
-            console.log(JSON.stringify(['no-land']));
-            
           }
         })
 
@@ -446,47 +450,41 @@ function Game3D(props) {
           ballBody.addShape(ballShape)
           const ballMesh = new THREE.Mesh(ballGeometry, material)
 
-          ballBody.addEventListener('collide', (a) => {
-            let b1 = a.body;
-            let b2 = a.target;
+          ballBody.addEventListener('collide', a => {
+            let cOther = a.body;
+            let cBall = a.target;
 
-            if(b1.objId) {
-              console.log(JSON.stringify(['ro', b1.objId]));
-              removeIds.push(b1.objId);
-              score = score + 100;
-              setScore(score);
+            if(cOther.classes.includes('spider')) {
+              console.log(JSON.stringify(['ro', cOther.objId]));
+              removeIds.push(cOther.objId);
+              gameScore = gameScore + 100;
+              setScore(gameScore);
             }
-            if(b2.objId) {
-              console.log(JSON.stringify(['ro2', b2.objId]));
-              removeIds.push(b2.objId);
-              score = score + 100;
-              setScore(score);
-            }
-            
-            if(b1.ballId) {
-              console.log(JSON.stringify(['b1 coll']));
-              let b1i = 0;
+           
+            if(cOther.ballId) {
+              console.log(JSON.stringify(['cOther coll']));
+              let cOtheri = 0;
               for(let ballBody of balls) {
-                if(ballBody.ballId === b1.ballId) {
+                if(ballBody.ballId === cOther.ballId) {
                   break;
                 }
-                b1i++;
+                cOtheri++;
               }
-              toRemove.push(b1i);
-              particles.trigger(b1.position, 0.5);
+              toRemove.push(cOtheri);
+              particles.trigger(cOther.position, 0.5);
             }
 
-            if(b2.ballId) {
-              console.log(JSON.stringify(['b2 coll']));
-              let b2i = 0;
+            if(cBall.ballId) {
+              console.log(JSON.stringify(['cBall coll']));
+              let cBalli = 0;
               for(let ballBody of balls) {
-                if(ballBody.ballId === b2.ballId) {
+                if(ballBody.ballId === cBall.ballId) {
                   break;
                 }
-                b2i++;
+                cBalli++;
               }
-              toRemove.push(b2i);
-              particles.trigger(b2.position, 0.5);
+              toRemove.push(cBalli);
+              particles.trigger(cBall.position, 0.5);
             }
           })
 
@@ -1043,10 +1041,23 @@ function Game3D(props) {
           <div className="br-strange-juice-3d" id="br-strange-juice-3d" ref={threeRef}>
             <div className="br-3d-overlay loading-fade-out-slow">
             </div>
-            <div className='br-level'>
-              {getText('text_level')}
-              <div className="br-level-number">
-                {nftData?.level || 0}
+            <div className="br-hud">
+              <div className='br-level'>
+                {getText('text_level')}
+                <div className="br-level-number">
+                  {nftData?.level || 0}
+                </div>
+              </div>
+              <div className="br-hud-score">
+                Score: {score}
+              </div>
+              <div className="br-power-bar-panel">
+                <div className={"br-power-bar-outer" + (hit ? " br-anim-shake-short br-hurt" : '')}>
+                  <div className="br-power-bar-inner" style={ { width: `${health}%`}}></div>
+                </div>
+                <div className="br-power">
+                  {health}
+                </div>
               </div>
             </div>
             {

@@ -624,18 +624,28 @@
     z-index: 1000;
 }
 
+.br-hud {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    position: absolute;
+    z-index: 1;
+    width: 100%;
+    padding: 1em;
+}
+
+.br-hud-score {
+    color: white;
+    font-weight: bold;
+}
+
 .br-level {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    position: absolute;
     min-width: 5em;
     min-height: 5em;
-    left: 10px;
-    top: 10px;
-    z-index: 1;
-    padding: $spacing-sm;
     border: 2px solid white;
     border-radius: $spacing-sm;
     color: white;
