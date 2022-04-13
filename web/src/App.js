@@ -10,18 +10,12 @@ import getText, { ellipsis } from './js/helpers/text';
 import { hexColorToInt } from './js/helpers/3d';
 import bigInt from 'big-integer';
 import Modal from 'react-modal';
-import gameConfig from './data/world/config';
-import Scene1 from './js/components/scenes/MainScene';
-import PauseScene from './js/components/scenes/PauseScene';
 import Game3D from './js/components/Game3D';
 import { csprToMote, casperAttemptConnect, addHighScore, getHighScore, getDeploy,
          getAccountInfo, getAccountNamedKeyValue, mintCaspookie, getCaspookiesForAccount,
         checkSignedIn } from './js/helpers/casper';
 import { getNFTName } from './js/helpers/casper';
-import path from 'path';
-import { config } from 'process';
 
-let game;
 let stateCheck = new StateCheck();
 
 const PAYMENT_ADD_HIGH_SCORE = csprToMote(0.1);

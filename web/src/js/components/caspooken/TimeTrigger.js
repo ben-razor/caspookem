@@ -1,5 +1,3 @@
-import { Tilemaps } from "phaser";
-
 export class TimeTrigger {
   
   constructor(timeout, count=undefined) {
