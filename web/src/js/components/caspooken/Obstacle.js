@@ -12,6 +12,8 @@ export class Obstacle {
     console.log(JSON.stringify(['obst', obConf]));
 
     this.body = new CANNON.Body({ mass: 0, material: physicsMaterial })
+    this.body.objId = obConf.id;
+    this.body.classes = obConf.classes;
 
     if(obConf.positionType === 'object') {
       let obj = scene.getObjectByName(obConf.objId);

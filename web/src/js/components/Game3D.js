@@ -351,6 +351,8 @@ function Game3D(props) {
         //const lifeformShape = new CANNON.Box(new CANNON.Vec3(0.25, 1, 0.25))
         const lifeformShape = new CANNON.Sphere(1)
         const lifeformBody = new CANNON.Body({ mass: 5, fixedRotation: true, material: physicsMaterial })
+        lifeformBody.objId = 'lifeform';
+        lifeformBody.classes = [];
         lifeformBody.addShape(lifeformShape)
         let startPos = lifeformPositioner.position.clone();
         startPos.set(0, 5, 0);
@@ -370,6 +372,8 @@ function Game3D(props) {
 
         const groundShape = new CANNON.Plane()
         const groundBody = new CANNON.Body({ mass: 0, material: physicsMaterial })
+        groundBody.objId = 'floor';
+        groundBody.classes = [];
         groundBody.position.copy(new THREE.Vector3(0, 0, 0));
         groundBody.addShape(groundShape)
         groundBody.quaternion.setFromEuler(-Math.PI / 2, 0, 0)
@@ -387,13 +391,22 @@ function Game3D(props) {
 
         let cannonPhysics = true;
 
-        let lastCallTime = 0;
         let totalTime = 0;
         let jumping = false;
 
-        lifeformBody.addEventListener('collide', (a, b) => {
-          console.log(JSON.stringify(['i collided']));
-          jumping = false;
+        lifeformBody.addEventListener('collide', a => {
+          let b1 = a.target;
+          let b2 = a.body;
+
+          console.log(JSON.stringify(['i collided', b1.objId, b2.objId]));
+
+          if(!b2.classes.includes('no-land')) {
+            jumping = false;
+          }
+          else {
+            console.log(JSON.stringify(['no-land']));
+            
+          }
         })
 
         const shootVelocity = 20; 
@@ -519,16 +532,15 @@ function Game3D(props) {
         let spiderTimers = [];
 
         for(let i = 1; i <= 5; i++) {
-          let spider = new Spider('Emptyspider00' + i, world, scene);
+          let spider = new Spider('Emptyspider00' + i, ['spider'], world, scene);
           spider.setTargetObj(lifeformPositioner);
 
-          let spiderTimer = new TimeTrigger(15, 1);
-
+          let spiderTimer = new TimeTrigger(5, 1);
 
           spiderTimer.addCallback({
             timeTriggered: (dt, t) => { 
               let angle = Math.random() * Math.PI*2;
-              let spiderPos = new THREE.Vector3(14, 0, 0);
+              let spiderPos = new THREE.Vector3(10, 8, 0);
               let rotator = new THREE.Euler(0, angle, 0);
               spiderPos.applyEuler(rotator);
               console.log(JSON.stringify(['spider time', dt, t, angle, spiderPos])); 
@@ -557,15 +569,9 @@ function Game3D(props) {
         var animateLifeform = function () {
           requestAnimationFrame( animateLifeform );
 
-          let delta = clock.getDelta();
-          const time = performance.now() / 1000
-          const dt = time - lastCallTime;
-          if(!dt) {
-            console.log(JSON.stringify(['not dt', dt]));
-          }
-          lastCallTime = time;
+          let dt = clock.getDelta();
           totalTime += dt;
-
+          
           for(let i = 0; i < spiders.length; i++) {
             spiders[i].update(dt, totalTime);
             spiderTimers[i].update(dt);
@@ -597,18 +603,14 @@ function Game3D(props) {
             if(totalTime > 5) {
               world.step(Math.min(dt, 0.1));
 
-              // Update ball positions
               for (let i = 0; i < balls.length; i++) {
                 ballMeshes[i].position.copy(balls[i].position)
                 ballMeshes[i].quaternion.copy(balls[i].quaternion)
               }
 
-              // console.log(JSON.stringify([totalTime, dt, lifeformBody.position]));
-              let lPos = lifeformBody.position.clone();
               let height = lifeformBody.position.y - 1;
-              lPos.y = height;
-              lifeformPositioner.position.copy(lPos);
-              //lifeformPositioner.setRotationFromQuaternion(lifeformBody.quaternion);
+              lifeformPositioner.position.copy(lifeformBody.position);
+              lifeformPositioner.position.y = height;
               let keys = controller._input._keys;
 
               if(keys.space) {
@@ -677,8 +679,7 @@ function Game3D(props) {
           }
 
           particles.Step(dt);
-          // controller.Update(delta);
-          mixer.update(delta);
+          mixer.update(dt);
         }
 
         animateLifeform();
