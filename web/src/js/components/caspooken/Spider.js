@@ -52,6 +52,14 @@ export class Spider {
         }
     }
 
+    spawn() {
+        let angle = Math.random() * Math.PI*2;
+        let spiderPos = new THREE.Vector3(10, 8, 0);
+        let rotator = new THREE.Euler(0, angle, 0);
+        spiderPos.applyEuler(rotator);
+        this.enable(spiderPos); 
+    }
+
     disable() {
         if(this.enabled) {
             this.enabled = false;

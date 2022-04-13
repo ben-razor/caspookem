@@ -18,21 +18,6 @@ import { TimeTrigger } from './caspooken/TimeTrigger';
 import { getObstacle, getSceneConfig } from '../../data/world/scenes';
 import { Obstacle } from './caspooken/Obstacle';
 
-function getServerURL(forceRemote=false) {
-  let url = 'https://localhost:8926';
-
-  if(!isLocal() || forceRemote) {
-    url =  'https://benrazor.net:8926';
-  }
-
-  return url;
-}
-
-const serverURL = getServerURL();
-
-const DEBUG_FORCE_BATTLE = false;
-const DEBUG_FORCE_POST_BATTLE = false;
-const DEBUG_NO_MINT = false;
 const DEBUG_FAST_BATTLE = false;
 
 const loader = new GLTFLoader();
@@ -60,7 +45,6 @@ document.addEventListener('keyup', e => {
 });
 
 const stateCheck = new StateCheck();
-let battleTimer;
 
 const postBattleScreens = {
   NONE: 0,
@@ -109,11 +93,9 @@ function Game3D(props) {
 
   const [imageDataURL, setImageDataURL] = useState('');
   const [prevScreen, setPrevScreen] = useState(screens.GARAGE);
-  const [battleText, setBattleText] = useState([]);
   const [orbitControls, setOrbitControls] = useState(false);
   const [orbitControlsEnabled, setOrbitControlsEnabled] = useState(false);
   const [garagePanel, setGaragePanel] = useState('equip');
-  const [postBattleScreen, setPostBattleScreen] = useState(postBattleScreens.NONE);
   const [showEquipControls, setShowEquipControls] = useState(false);
   const [showNFTList, setShowNFTList ] = useState(true);
   const [showNFTListHelp, setShowNFTListHelp ] = useState(false);
@@ -491,8 +473,8 @@ function Game3D(props) {
           ballBody.ballId = ballIndex++;
           ballMesh.ballId = ballBody.ballId;
 
-          ballMesh.castShadow = true
-          ballMesh.receiveShadow = true
+          ballMesh.castShadow = true;
+          ballMesh.receiveShadow = true;
 
           world.addBody(ballBody)
           scene.add(ballMesh)
@@ -537,12 +519,7 @@ function Game3D(props) {
 
           spiderTimer.addCallback({
             timeTriggered: (dt, t) => { 
-              let angle = Math.random() * Math.PI*2;
-              let spiderPos = new THREE.Vector3(10, 8, 0);
-              let rotator = new THREE.Euler(0, angle, 0);
-              spiderPos.applyEuler(rotator);
-              console.log(JSON.stringify(['spider time', dt, t, angle, spiderPos])); 
-              spider.enable(spiderPos); 
+              spider.spawn();
             }
           });
 
@@ -580,6 +557,7 @@ function Game3D(props) {
               for(let i = 0; i < spiders.length; i++) {
                 if(spiders[i].id === removeId) {
                   spiders[i].disable();
+                  spiders[i].spawn();
                   break;
                 }
               }
@@ -959,28 +937,9 @@ function Game3D(props) {
     </Fragment>
   }
 
-  useEffect(() => {
-    setBattleText([]);
-
-    if(screen === screens.BATTLE) {
-    }
-    else if(screen === screens.GARAGE) {
-    }
-  }, [screen]);
-
   function changeScreen(screenID) {
     setPrevScreen(screen);
     setScreen(screenID);
-  }
-
-  function startBattle() {
-    toast(getText('text_finding_opponent'));
-    execute('gameSimpleBattle');
-  }
-
-  function watchBattle() {
-    toast(getText('text_battle_started'));
-    changeScreen(screens.BATTLE)
   }
 
   function getScreenClass(screenId) {
