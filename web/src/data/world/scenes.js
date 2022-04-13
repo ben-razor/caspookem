@@ -22,7 +22,7 @@ const scenes = [
       { id: 'BlueCrateCenter003', classes: ['crate'], positionType: 'object', objId: 'BlueCrateCenter003', geometry: { type: "box", dims: [1, 1, 1] } },
     ],
     triggers: [
-      { id: 'door', positionType: 'object', objId: 'SceneRoomZeroDoor', geometry: { type: "sphere", radius: 0.5 } }
+      { id: 'Gem001', classes: ['gem', 'gem-pink-1'], positionType: 'object', objId: 'Gem001', geometry: { type: "sphere", radius: 0.5 } }
     ],
     bounds: { z: [-1.8, 0.8], x: [-3, 3] },
     startPos: { x: 0, y: 5, z: 5},

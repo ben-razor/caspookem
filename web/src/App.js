@@ -106,6 +106,10 @@ function App() {
     setPendingTx([]);
   }, [pendingTx]);
 
+  function getBucketURL(type, fileName, ext='png') {
+    return `${casBucketURL}${type}/${fileName}.${ext}`;
+  }
+
   function ipfsToBucketURL(ipfsURL) {
     let bucketURL = ipfsURL.replace('ipfs://', casBucketURL);
     return bucketURL;
@@ -411,7 +415,7 @@ function App() {
           <div className="br-help-line">{ getText('text_help_welcome') }</div>
           <div className="br-help-line">{ getText('text_help_near_karts') }</div>
           <div className="br-help-line">{ getText('text_help_garage') }</div>
-          <div className="br-help-line">{ getText('text_help_mint') }</div>
+          <div className="br-help-line">{ getText('text_help_only_caspookie') }</div>
           <div className="br-help-highlight">{ getText('text_help_kart_name') }</div>
           <div className="br-info-message br-info-message-start br-space-top br-full-width br-info-message-warning">
             <i className="fa fa-info br-info-icon"></i>
@@ -709,7 +713,7 @@ function App() {
           nftList={nftList} activeNFT={activeNFT} 
           ipfsToBucketURL={ipfsToBucketURL} requestMint={requestMint} 
           execute={execute} score={score} setScore={setScore} 
-          signedInInfo={signedInInfo} />
+          signedInInfo={signedInInfo} getBucketURL={getBucketURL} />
         </div>
       </div>
     </div>

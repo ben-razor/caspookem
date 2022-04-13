@@ -19,6 +19,7 @@ import { getObstacle, getSceneConfig } from '../../data/world/scenes';
 import { Obstacle } from './caspooken/Obstacle';
 import { Lifeform } from './caspooken/Lifeform';
 import { casperAttemptConnect, getHighScore } from '../helpers/casper';
+import { Trigger } from './caspooken/Trigger';
 
 const DEBUG_FAST_BATTLE = false;
 
@@ -50,6 +51,7 @@ let gameScore = 0;
 let gameHealth = 100;
 let gameJustDied = false;
 let gameJustStarted = false;
+let gameEquipment = [];
 
 function Game3D(props) {
   const showModal = props.showModal;
@@ -68,6 +70,7 @@ function Game3D(props) {
   const score = props.score;
   const setScore = props.setScore;
   const signedInInfo = props.signedInInfo;
+  const getBucketURL = props.getBucketURL;
 
   window.nftData = nftData;
 
@@ -90,6 +93,7 @@ function Game3D(props) {
   const [threeElem, setThreeElem ] = useState();
   const [health, setHealth] = useState(100);
   const [hit, setHit] = useState(false);
+  const [equipment, setEquipment] = useState([]);
 
   function characterChanged(nftData, prevNFTData) {
     if(!nftData || !prevNFTData) {
@@ -340,6 +344,13 @@ function Game3D(props) {
           obstacles.push(ob);
         }
 
+        let triggers = [];
+        for(let obConf of sceneConf.triggers) {
+          let tr = new Trigger(world, scene, obConf);
+          tr.enable();
+          triggers.push(tr);
+        }
+
         const groundShape = new CANNON.Plane()
         const groundBody = new CANNON.Body({ mass: 0, material: physicsMaterial })
         groundBody.objId = 'floor';
@@ -372,9 +383,16 @@ function Game3D(props) {
             if(gameHealth < 0) {
               gameHealth = 0;
               gameJustDied = true;
+              gameEquipment = [];
             }
             setHealth(gameHealth);
             setHit(true);
+          }
+          if(b2.classes?.includes('gem-pink-1')) {
+            console.log(JSON.stringify(['Collected Gem!!']));
+            gameEquipment.push({ id: b2.objId, type: 'gem-pink-1' });
+            setEquipment(gameEquipment);
+            removeIds.push(b2.objId);
           }
           if(!b2.classes?.includes('no-land')) {
             jumping = false;
@@ -548,6 +566,12 @@ function Game3D(props) {
                   break;
                 }
               }
+
+              for(let i = 0; i < triggers.length; i++) {
+                if(triggers[i].id === removeId) {
+                  triggers[i].disable();
+                }
+              }
             }
             removeIds = [];
           }
@@ -707,7 +731,7 @@ function Game3D(props) {
       new THREE.Vector3(5, 5, 5), new THREE.Vector3(-5, 5, 5), new THREE.Vector3(0, 5, -2)
     ])
 
-    const light = new THREE.AmbientLight( 0xf0f0f0 ); // soft white light
+    const light = new THREE.AmbientLight( 0xf0f0f0, 2); // soft white light
     scene.add( light );
 
     let i = 0;
@@ -966,8 +990,10 @@ function Game3D(props) {
     
     gameScore = 0;
     gameHealth = 100;
+    gameEquipment = [];
     setScore(gameScore);
     setHealth(gameHealth);
+    setEquipment(gameEquipment);
     changeScreen(screens.GAME);
     gameJustStarted = true;
   }
@@ -1000,6 +1026,17 @@ function Game3D(props) {
   }
 
   function getScreenGame() {
+
+    let equipUI = [];
+
+    let i = 0;
+    for(let equip of equipment) {
+      let url = getBucketURL('equipment', equip.type);
+      equipUI.push(<div className="br-hud-equip" key={equip.type + i++}>
+        <img className="br-hud-equip-image" alt={'Equipment: ' + equip.type} src={url} />
+      </div>)
+    }
+
     return <Fragment>
       <div className={ "br-screen br-screen-game " + getScreenClass(screens.GAME)}>
         <div className="br-game loading-fade-in">
@@ -1015,6 +1052,9 @@ function Game3D(props) {
               </div>
               <div className="br-hud-score">
                 Score: {score}
+              </div>
+              <div className="br-hud-equip-list">
+                {equipUI}
               </div>
               <div className="br-power-bar-panel">
                 <div className={"br-power-bar-outer" + (hit ? " br-anim-shake-short br-hurt" : '')}>

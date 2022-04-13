@@ -44,7 +44,7 @@ const text = {
     "text_help_welcome": `Virtuous ruler nCtl has protected the blockchain from harm for centuries`,
     "text_help_near_karts": `Now nCtl has been compromised by The CORS`,
     "text_help_garage": `The blockchain is being torn apart by sweet Irish melodies`,
-    "text_help_equip_pimp": `Only a lone ${text_consts.nft_name} can reach nCtl's mind and save the blockchain.`,
+    "text_help_only_caspookie": `Only a heroic ${text_consts.nft_name} can reach nCtl's mind and save the blockchain.`,
     "text_help_mint": `Mint it on the ${text_consts.blockchain_name} blockchain for ${text_consts.mint_price}`,
     "text_help_garage_title": `Garage`,
     "text_help_battle_title": `Battles`,

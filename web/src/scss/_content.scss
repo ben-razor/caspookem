@@ -54,7 +54,7 @@
     margin: 1em auto;
     border-radius: 2em;
     padding: 0.5em;
-    background-image: linear-gradient( 180deg, black, white 4em, hsl(0deg 0% 100% / 65%));
+    background-image: linear-gradient( 180deg, hsl(210deg, 50%, 65%), white 4em, hsl(0deg 0% 100% / 65%));
     box-shadow: 0px 2px 5px black;
 }
 
@@ -629,6 +629,22 @@
 .br-hud-score {
     color: white;
     font-weight: bold;
+}
+
+.br-hud-equip-list {
+    display: flex;
+    flex-direction: row;
+}
+
+.br-hud-equip {
+    width: 2em;
+    height: 2em;
+    border: 1px solid white;
+    border-radius: 25%;
+}
+
+.br-hud-equip-image {
+    width: 100%;
 }
 
 .br-level {
