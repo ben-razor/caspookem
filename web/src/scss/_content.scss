@@ -394,6 +394,14 @@
     border-radius: 1em;
 }
 
+.br-screen-game-start {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background-color: black;
+    color: white;
+}
+
 .br-screen-game-over {
     display: flex;
     flex-direction: column;
@@ -1046,7 +1054,7 @@
     -webkit-text-stroke: 1px hsl(200deg, 70%, 20%);
 }
 
-.br-game-over-controls {
+.br-game-controls {
     margin-top: 2em;
 }
 

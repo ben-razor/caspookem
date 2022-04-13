@@ -18,6 +18,7 @@ import { TimeTrigger } from './caspooken/TimeTrigger';
 import { getObstacle, getSceneConfig } from '../../data/world/scenes';
 import { Obstacle } from './caspooken/Obstacle';
 import { Lifeform } from './caspooken/Lifeform';
+import { casperAttemptConnect, getHighScore } from '../helpers/casper';
 
 const DEBUG_FAST_BATTLE = false;
 
@@ -48,7 +49,7 @@ const stateCheck = new StateCheck();
 let gameScore = 0;
 let gameHealth = 100;
 let gameJustDied = false;
-let gameJustStarted = true;
+let gameJustStarted = false;
 
 function Game3D(props) {
   const showModal = props.showModal;
@@ -558,6 +559,11 @@ function Game3D(props) {
           }
 
           if(gameJustDied) {
+            for(let i = 0; i < balls.length; i++) {
+              removeObj(world, scene, ballMeshes[i], balls[i]);
+              balls.splice(i, 1);
+              ballMeshes.splice(i, 1);
+            }
             for(let i = 0; i < spiders.length; i++) {
               spiders[i].disable();
             }
@@ -955,18 +961,15 @@ function Game3D(props) {
     return screenClass;
   }
 
-  function getGaragePanelTabs() {
-    let equipActiveClass = garagePanel === 'equip' ? ' br-pill-active ' : '';
-    let pimpActiveClass = garagePanel === 'pimp' ? ' br-pill-active ' : '';
-
-    return <div className="br-pills">
-      <div className={ "br-pill br-pill-left" + equipActiveClass } onClick={ e => setGaragePanel('equip') }>
-        Equipment
-      </div>
-      <div className={ "br-pill br-pill-right" + pimpActiveClass } onClick={ e => setGaragePanel('pimp') }>
-        Pimping
-      </div>
-    </div> 
+  function restart() {
+    console.log(JSON.stringify(['restarting']));
+    
+    gameScore = 0;
+    gameHealth = 100;
+    setScore(gameScore);
+    setHealth(gameHealth);
+    changeScreen(screens.GAME);
+    gameJustStarted = true;
   }
 
   function getMaxWeaponIndexForLevel(level) {
@@ -1032,7 +1035,6 @@ function Game3D(props) {
           </div>
           { showEquipControls ?
             <div className="br-strange-juice-overlay">
-              { getGaragePanelTabs() }
               { getControlUI(gameConfig, nftData) } 
             </div>
             :
@@ -1043,31 +1045,34 @@ function Game3D(props) {
     </Fragment> 
   }
 
-  function getScreenGamePrepare() {
-      return <div className={ "br-screen br-screen-game-prepare " + getScreenClass(screens.GAME_PREPARE)}>
+  function getScreenGameStart() {
+      return <div className={ "br-screen br-screen-game-start " + getScreenClass(screens.GAME_START)}>
         <div>
-          Start Game
+          Play Demo
+        </div>
+        <div className="br-game-controls">
+          { signedInInfo.success ?
+            <div>
+              <BrButton label="Play Caspookem" id="playCaspookem" className="br-button" onClick={ e => restart() } />
+            </div>
+            :
+            <div>
+              <BrButton label="Play Demo" id="playDemo" className="br-button" onClick={ e => restart() } />
+              <BrButton label="Connect Casper" id="connectCasperWallet" className="br-button" onClick={ e => casperAttemptConnect() } />
+            </div>
+
+          }
+
         </div>
       </div>
   }
   
-  function restart() {
-    console.log(JSON.stringify(['restarting']));
-    
-    gameScore = 0;
-    gameHealth = 100;
-    setScore(gameScore);
-    setHealth(gameHealth);
-    changeScreen(screens.GAME);
-    gameJustStarted = true;
-  }
-
   function getScreenGameOver() {
     return <div className={ "br-screen br-screen-game-over " + getScreenClass(screens.GAME_OVER)}>
       <div className="br-scary-text">
         You Deed
       </div>
-      <div className="br-game-over-controls">
+      <div className="br-game-controls">
         <BrButton label="Play Again" id="playMore" className="br-button" onClick={ e => restart() } />
       </div>
     </div>
@@ -1075,7 +1080,7 @@ function Game3D(props) {
 
   return <div className="br-screen-container">
     { getNFTListUI() }
-    { getScreenGamePrepare() }
+    { getScreenGameStart() }
     { getScreenGame() }
     { getScreenGameOver() }
   </div>

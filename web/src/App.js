@@ -42,7 +42,7 @@ const INTERVAL_CHECK_TX_COMPLETE = 4000;
 const TESTING_PENDING_TX = false;
 
 const screens= {
-  GAME_PREPARE: 1,
+  GAME_START: 1,
   GAME: 2,
   GAME_OVER: 3
 };
@@ -60,7 +60,7 @@ function App() {
   const [signedInInfo, setSignedInInfo] = useState({});
   const [nftList, setNFTList] = useState([]);
   const [processingActions, setProcessingActions] = useState({});
-  const [screen, setScreen] = useState(screens.GAME);
+  const [screen, setScreen] = useState(screens.GAME_START);
   const [selectedGame, setSelectedGame] = useState('game3D');
 
   const [highScore, setHighScore] = useState(0);
@@ -446,7 +446,7 @@ function App() {
     let ui;
 
     if(signedInInfo.success) {
-      let canSubmitScore = true; // score > highScore
+      let canSubmitScore = score > highScore
       ui = <div className="br-score-panel">
         <div className="br-score-bar">
           <div className="br-deed" id="deed-msg" style={ { display: 'none'}}>You Deed</div>
@@ -562,6 +562,20 @@ function App() {
     }
   }
 
+  function doConnection(isSignedIn) {
+    console.log(JSON.stringify(['dc']));
+    
+    if(!isSignedIn) {
+      casperAttemptConnect();
+    }
+    else {
+      window.casperlabsHelper.disconnectFromSite().then(() => {
+        setSignedInInfo({});
+        setIsSignedIn(false);
+      });
+    }
+  }
+
   function getPendingTransactionList(submittedTx) {
     let items = [];
 
@@ -669,7 +683,7 @@ function App() {
           <div className="br-header-controls">
             <button className="br-button br-icon-button"
                     onMouseDown={showModal}><i className="fa fa-info"></i></button>
-                    
+
           { MODAL_2_ENABLED ? 
               <Fragment>
                 <BrButton label={ getText("text_header_button_2") } id="showHighScoresButton" className="br-button" onClick={e => showModal(2)} />
@@ -680,7 +694,7 @@ function App() {
             <Fragment>
               <BrButton label={ isSignedIn ? "Sign out" : "Sign in"} id="signIn" 
                         className={"br-button " + (isSignedIn ? 'br-button-ok ' : 'br-button-not-ok') } 
-                        onClick={()=>{casperAttemptConnect()}} />
+                        onClick={ ()=>{ doConnection(isSignedIn) }} />
             </Fragment>
           </div>
         </div>

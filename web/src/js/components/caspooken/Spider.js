@@ -5,7 +5,7 @@ import { Vec3 } from 'cannon-es';
 
 export class Spider {
     constructor(id, classes=[], world, scene, physicsMaterial, options={ 
-        minSpeed: 0.4, maxSpeed: 1, speed: 0.4, spiderSenses: 0.5
+        minSpeed: 0.4, maxSpeed: 1.1, speed: 0.4, spiderSenses: 0.5
     }) {
         this.id = id;
         this.classes = ['spider'];
