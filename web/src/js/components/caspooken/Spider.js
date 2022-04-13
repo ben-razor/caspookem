@@ -94,15 +94,12 @@ export class Spider {
         this.vTo.multiplyScalar(this.speed * 10);
         this.vTo.y = this.size + 0.01;
 
-        console.log(JSON.stringify(['starget', this.vTo]));
-        
         this.body.velocity.x = this.vTo.x;
         this.body.velocity.y = this.vTo.y;
         this.body.velocity.z = this.vTo.z;
     }
 
     timeTriggered(timeout) {
-        console.log(JSON.stringify(['Timetriggered!', timeout]));
         if(this.targetObj) {
             this.setTarget(this.targetObj.position);
             

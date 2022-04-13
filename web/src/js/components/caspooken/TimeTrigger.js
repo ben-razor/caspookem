@@ -20,6 +20,11 @@ export class TimeTrigger {
     this.time = 0;
   }
 
+  reset() {
+    this.count = 0;
+    this.time = 0;
+  }
+
   update(dt) {
     this.time += dt;
 

@@ -17,6 +17,7 @@ import { Spider } from './caspooken/Spider';
 import { TimeTrigger } from './caspooken/TimeTrigger';
 import { getObstacle, getSceneConfig } from '../../data/world/scenes';
 import { Obstacle } from './caspooken/Obstacle';
+import { Lifeform } from './caspooken/Lifeform';
 
 const DEBUG_FAST_BATTLE = false;
 
@@ -46,6 +47,8 @@ const stateCheck = new StateCheck();
 
 let gameScore = 0;
 let gameHealth = 100;
+let gameJustDied = false;
+let gameJustStarted = true;
 
 function Game3D(props) {
   const showModal = props.showModal;
@@ -68,18 +71,14 @@ function Game3D(props) {
   window.nftData = nftData;
 
   const threeRef = React.createRef();
-  const threePhotoRef = React.createRef();
-  const photoComposerRef = React.createRef();
 
   const [scene, setScene] = useState();
   const [camera, setCamera] = useState();
   const [clock, setClock] = useState();
   const [sjScene, setSJScene] = useState();
-  const [photoSubScene, setPhotoSubScene] = useState();
   const [controlEntry, setControlEntry] = useState({ ...gameConfig.defaultEntry });
   const [styleInitialized, setStyleInitialized] = useState();
 
-  const [imageDataURL, setImageDataURL] = useState('');
   const [prevScreen, setPrevScreen] = useState(screens.GAME);
   const [orbitControls, setOrbitControls] = useState(false);
   const [orbitControlsEnabled, setOrbitControlsEnabled] = useState(false);
@@ -272,10 +271,12 @@ function Game3D(props) {
   }, [hit]);
 
   useEffect(() => {
-    if(health === 0 && stateCheck.changed('health', health, 100)) {
+    let changed = stateCheck.changed('health', health, 100);
+
+    if(health === 0 && changed) {
       changeScreen(screens.GAME_OVER);
     }
-  }, [health]);
+  }, [health, changeScreen, screens]);
 
   useEffect(() => {
     if(scene && camera && threeElem) {
@@ -314,7 +315,6 @@ function Game3D(props) {
         // We must add the contact materials to the world
         world.addContactMaterial(physics_physics)
 
-        let lifeformPositioner = gltf.scene.getObjectByName('EmptyLifeform');
         const clipWalk = THREE.AnimationClip.findByName( clips, 'Walk2' );
         const clipThrow = THREE.AnimationClip.findByName( clips, 'Throw' );
         const walkAction = mixer.clipAction( clipWalk );
@@ -328,18 +328,7 @@ function Game3D(props) {
           }
         }
 
-        //const lifeformShape = new CANNON.Box(new CANNON.Vec3(0.25, 1, 0.25))
-        const lifeformShape = new CANNON.Sphere(1)
-        const lifeformBody = new CANNON.Body({ mass: 5, fixedRotation: true, material: physicsMaterial })
-        lifeformBody.objId = 'lifeform';
-        lifeformBody.classes = [];
-        lifeformBody.addShape(lifeformShape)
-        let startPos = lifeformPositioner.position.clone();
-        startPos.set(0, 5, 0);
-        console.log(JSON.stringify(['lifeform pos: ', lifeformPositioner.position]));
-        
-        lifeformBody.position.copy(startPos);
-        world.addBody(lifeformBody)
+        let lifeform = new Lifeform(world, scene, physicsMaterial);
 
         let sceneConf = getSceneConfig('Scene0');
 
@@ -359,7 +348,7 @@ function Game3D(props) {
         groundBody.quaternion.setFromEuler(-Math.PI / 2, 0, 0)
         world.addBody(groundBody)
 
-        let controller = new BasicCharacterController(lifeformPositioner, {
+        let controller = new BasicCharacterController(lifeform.positioner, {
           forward: 'w',
           backward: 's',
           left: 'a',
@@ -374,18 +363,19 @@ function Game3D(props) {
         let totalTime = 0;
         let jumping = false;
 
-        lifeformBody.addEventListener('collide', a => {
+        lifeform.body.addEventListener('collide', a => {
           let b2 = a.body;
 
-          if(b2.classes.includes('spider')) {
+          if(b2.classes?.includes('spider')) {
             gameHealth = Math.floor(gameHealth - (5 + Math.random() * 5));
             if(gameHealth < 0) {
               gameHealth = 0;
+              gameJustDied = true;
             }
             setHealth(gameHealth);
             setHit(true);
           }
-          if(!b2.classes.includes('no-land')) {
+          if(!b2.classes?.includes('no-land')) {
             jumping = false;
           }
         })
@@ -393,14 +383,6 @@ function Game3D(props) {
         const shootVelocity = 20; 
         const ballShape = new CANNON.Sphere(0.28)
         const ballGeometry = new THREE.SphereBufferGeometry(ballShape.radius, 32, 32)
-        
-        function getShootDirection() {
-          const forward = new THREE.Vector3(0, 0, 1);
-          forward.applyQuaternion(lifeformPositioner.quaternion);
-          forward.normalize();
-          console.log(JSON.stringify(['vd', forward]));
-          return forward;
-        }
 
         const fireTexture = new THREE.TextureLoader().load(getAssetURL('fire-blue-dark.png', 'tex'));
 
@@ -431,7 +413,7 @@ function Game3D(props) {
             let cOther = a.body;
             let cBall = a.target;
 
-            if(cOther.classes.includes('spider')) {
+            if(cOther.classes?.includes('spider')) {
               console.log(JSON.stringify(['ro', cOther.objId]));
               removeIds.push(cOther.objId);
               gameScore = gameScore + 100;
@@ -476,7 +458,7 @@ function Game3D(props) {
           balls.push(ballBody)
           ballMeshes.push(ballMesh)
 
-          const shootDirection = getShootDirection()
+          const shootDirection = lifeform.getShootDirection()
           ballBody.velocity.set(
             shootDirection.x * shootVelocity,
             shootDirection.y * shootVelocity,
@@ -491,10 +473,10 @@ function Game3D(props) {
           offsetter.multiplyScalar(0.6);
           sider.multiplyScalar(0.8)
           offsetter.add(sider);
-          const x = lifeformBody.position.x + offsetter.x;
-          let y = lifeformBody.position.y + offsetter.y;
-          const z = lifeformBody.position.z + offsetter.z;
-          console.log(JSON.stringify(['lbp', lifeformBody.position]));
+          const x = lifeform.body.position.x + offsetter.x;
+          let y = lifeform.body.position.y + offsetter.y;
+          const z = lifeform.body.position.z + offsetter.z;
+          console.log(JSON.stringify(['lbp', lifeform.body.position]));
           
           y = y + 1.2;
           ballBody.position.set(x, y, z)
@@ -508,18 +490,27 @@ function Game3D(props) {
 
         for(let i = 1; i <= 5; i++) {
           let spider = new Spider('Emptyspider00' + i, ['spider'], world, scene);
-          spider.setTargetObj(lifeformPositioner);
-
-          let spiderTimer = new TimeTrigger(5, 1);
-
-          spiderTimer.addCallback({
-            timeTriggered: (dt, t) => { 
-              spider.spawn();
-            }
-          });
-
+          spider.setTargetObj(lifeform.positioner);
           spiders.push(spider);
+          let spiderTimer = new TimeTrigger(5, 1);
           spiderTimers.push(spiderTimer);
+        }
+
+        function startSpiders() {
+          for(let i = 0; i < spiders.length; i++) {
+            let spiderTimer = spiderTimers[i];
+            let spider = spiders[i];
+
+            if(!spiderTimer.callbacks.length) {
+              spiderTimer.addCallback({
+                timeTriggered: (dt, t) => { 
+                  spider.spawn();
+                }
+              });
+            }
+
+            spiderTimer.reset();
+          }
         }
 
         let removeObj = function(world, scene, mesh, body, spline) {
@@ -560,6 +551,21 @@ function Game3D(props) {
             removeIds = [];
           }
 
+          if(gameJustStarted) {
+            startSpiders();
+            lifeform.enable(sceneConf.startPos);
+            gameJustStarted = false;
+          }
+
+          if(gameJustDied) {
+            for(let i = 0; i < spiders.length; i++) {
+              spiders[i].disable();
+            }
+            lifeform.disable();
+            removeIds = [];
+            gameJustDied = false;
+          }
+
           if(toRemove.length) {
             for(let objId of toRemove) {
               if(!balls[objId]) continue;
@@ -579,25 +585,25 @@ function Game3D(props) {
                 ballMeshes[i].quaternion.copy(balls[i].quaternion)
               }
 
-              let height = lifeformBody.position.y - 1;
-              lifeformPositioner.position.copy(lifeformBody.position);
-              lifeformPositioner.position.y = height;
+              let height = lifeform.body.position.y - 1;
+              lifeform.positioner.position.copy(lifeform.body.position);
+              lifeform.positioner.position.y = height;
               let keys = controller._input._keys;
 
               if(keys.space) {
                 if(!jumping) {
-                  lifeformBody.velocity.y = 10;
+                  lifeform.body.velocity.y = 10;
                   if(keys.left) {
-                    lifeformBody.velocity.x = -6;
+                    lifeform.body.velocity.x = -6;
                   }
                   if(keys.right) {
-                    lifeformBody.velocity.x = 6;
+                    lifeform.body.velocity.x = 6;
                   }
                   if(keys.forward) {
-                    lifeformBody.velocity.z = -6;
+                    lifeform.body.velocity.z = -6;
                   }
                   if(keys.backward) {
-                    lifeformBody.velocity.z = 6;
+                    lifeform.body.velocity.z = 6;
                   }
                   jumping = true;
                 }
@@ -605,44 +611,44 @@ function Game3D(props) {
 
               if(keys.left) {
                 if(!jumping) {
-                  lifeformBody.velocity.x = -6;
-                  lifeformPositioner.rotation.set(0, -Math.PI/2, 0);
+                  lifeform.body.velocity.x = -6;
+                  lifeform.positioner.rotation.set(0, -Math.PI/2, 0);
                 }
               }
 
               if(keys.right) {
                 if(!jumping) {
-                  lifeformBody.velocity.x = 6;
-                  lifeformPositioner.rotation.set(0, Math.PI/2, 0);
+                  lifeform.body.velocity.x = 6;
+                  lifeform.positioner.rotation.set(0, Math.PI/2, 0);
                 }
               }
 
               if(keys.backward) {
                 if(!jumping) {
-                  lifeformBody.velocity.z = 6;
+                  lifeform.body.velocity.z = 6;
                   if(keys.left) {
-                    lifeformPositioner.rotation.set(0, -Math.PI/4, 0);
+                    lifeform.positioner.rotation.set(0, -Math.PI/4, 0);
                   }
                   else if(keys.right) {
-                    lifeformPositioner.rotation.set(0, Math.PI/4, 0);
+                    lifeform.positioner.rotation.set(0, Math.PI/4, 0);
                   }
                   else {
-                    lifeformPositioner.rotation.set(0, 0, 0);
+                    lifeform.positioner.rotation.set(0, 0, 0);
                   }
                 }
               }
 
               if(keys.forward) {
                 if(height < 0.1) {
-                  lifeformBody.velocity.z = -6;
+                  lifeform.body.velocity.z = -6;
                   if(keys.left) {
-                    lifeformPositioner.rotation.set(0, -3*Math.PI/4, 0);
+                    lifeform.positioner.rotation.set(0, -3*Math.PI/4, 0);
                   }
                   else if(keys.right) {
-                    lifeformPositioner.rotation.set(0, 3*Math.PI/4, 0);
+                    lifeform.positioner.rotation.set(0, 3*Math.PI/4, 0);
                   }
                   else {
-                    lifeformPositioner.rotation.set(0, Math.PI, 0);
+                    lifeform.positioner.rotation.set(0, Math.PI, 0);
                   }
                 }
               }
@@ -915,14 +921,7 @@ function Game3D(props) {
       </div>);
     }
 
-    let newKartActive = false;
-    if(!activeTokenId || activeTokenId === 'new_kart') {
-      newKartActive = true;
-    }
-
-    nftUI.push(<div className={"br-nft-list-item br-no-border"} 
-                    key="new_nft" onClick={e => requestMint() }>
-      
+    nftUI.push(<div className={"br-nft-list-item br-no-border"} key="new_nft">
       <BrButton label={ getText('text_mint_nft')} id="mintNFT" className="br-button" onClick={ e => requestMint() } />
     </div>);
 
@@ -1060,14 +1059,15 @@ function Game3D(props) {
     setScore(gameScore);
     setHealth(gameHealth);
     changeScreen(screens.GAME);
+    gameJustStarted = true;
   }
 
   function getScreenGameOver() {
     return <div className={ "br-screen br-screen-game-over " + getScreenClass(screens.GAME_OVER)}>
-      <div class="br-scary-text">
+      <div className="br-scary-text">
         You Deed
       </div>
-      <div class="br-game-over-controls">
+      <div className="br-game-over-controls">
         <BrButton label="Play Again" id="playMore" className="br-button" onClick={ e => restart() } />
       </div>
     </div>

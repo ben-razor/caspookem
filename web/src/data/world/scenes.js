@@ -14,7 +14,7 @@ const scenes = [
       { id: 'door', positionType: 'object', objId: 'SceneRoomZeroDoor', geometry: { type: "sphere", radius: 0.5 } }
     ],
     bounds: { z: [-1.8, 0.8], x: [-3, 3] },
-    startPos: { x: 0, y: 0, z: 0},
+    startPos: { x: 0, y: 5, z: 5},
     elems: {
       'SceneRoomZeroDoor': {
         condition: (strangeJuice) => {

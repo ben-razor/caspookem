@@ -571,8 +571,6 @@ function App() {
         {"type":"mintCaspookie","data":{"score":0,"deploy":"3edc478d1da1f3bdc8ca9ec82bc97151ed6b38196b826c551c69fec2ec62f9db"}}
       ];
     }
-    console.log(JSON.stringify(['pending ', submittedTx]));
-    
 
     if(submittedTx.length) {
       items.push(
@@ -669,13 +667,10 @@ function App() {
         </div>
         <div className="br-header-controls-panel">
           <div className="br-header-controls">
-            { screen === screens.GAME ?
-              <button className="br-button br-icon-button"
-                      onMouseDown={showModal}><i className="fa fa-info"></i></button>
-              :
-              ''
-            }
-            { MODAL_2_ENABLED ? 
+            <button className="br-button br-icon-button"
+                    onMouseDown={showModal}><i className="fa fa-info"></i></button>
+                    
+          { MODAL_2_ENABLED ? 
               <Fragment>
                 <BrButton label={ getText("text_header_button_2") } id="showHighScoresButton" className="br-button" onClick={e => showModal(2)} />
               </Fragment>
