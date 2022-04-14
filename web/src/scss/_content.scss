@@ -196,8 +196,7 @@
     margin: auto;
     width: 100%;
     min-height: 432px;
-    background-color: black;
-    border-radius: 1em;
+    position: relative;
 }
 
 .br-strange-juice-text-overlay {
@@ -390,8 +389,8 @@
 .br-screen {
     left: 0;
     top: 0;
-    width: 100%;
     min-height: 432px;
+    width: 800px;
     height: 432px;
     border-radius: 1em;
     display: flex;
