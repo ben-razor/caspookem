@@ -10,6 +10,7 @@ Live App: (Can't use Casper Signer without whitelisting so only 1 level demo mod
 
 Local App (Save high scores and use NFT to access extra levels with Casper Signer):  
 ```
+git@github.com:ben-razor/caspookem.git
 cd web
 npm install
 npm run start
