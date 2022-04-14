@@ -2,6 +2,8 @@
 
 A spooky game on [Casper Blockchain](https://casperlabs.io/).  
 
+<img src="https://github.com/ben-razor/caspookem/blob/main/artwork/render/game/screens/1-screenshot-demo-sm-1.png" width="440"/><img src="https://github.com/ben-razor/caspookem/blob/main/artwork/render/game/screens/2-screenshot-signed-in-sm-1.png" width="440"/>
+
 Built for the ReadyPlayerCasper hackathon tasks:
 
 [Build A Single Player Game On Casper](https://gitcoin.co/issue/casper-network/ready-player-casper-gitcoin/1/100028589)  
@@ -9,8 +11,6 @@ Built for the ReadyPlayerCasper hackathon tasks:
 [Build An NFT Holder-Exclusive Game On Casper](https://gitcoin.co/issue/casper-network/ready-player-casper-gitcoin/6/100028603)  
 
 The game is at a very early stage. Only a couple of rooms are implemented to demonstrate the concept.  
-
-More details on the game concept can be found in: 
 
 ## Storyline
 
@@ -22,12 +22,15 @@ Are your the chosen one?
 
 ## Caspookie NFTs
 
-Caspookem has a one room demo mode that anybody can play. To progress further in the game, the player must possess one or more Caspookies.
+Caspookem starts with a one room demo mode that anybody can play. To progress further in the game, the player must possess one or more Caspookies.  
 
-A very basic NFT collection has been created. In future more variations can be added to the NFTs.  
+A very basic NFT collection has been created. In future more variations can be added to the NFTs. The NFT changes the appearance of the character. In future different Caspookies will have different properties.  
 
 Here are some example NFTs:
 
+![15](https://github.com/ben-razor/caspookem/blob/main/artwork/render/nft/v1/img/15.png)
+![71](https://github.com/ben-razor/caspookem/blob/main/artwork/render/nft/v1/img/71.png)
+![72](https://github.com/ben-razor/caspookem/blob/main/artwork/render/nft/v1/img/72.png)
 
 
 ## Technology
