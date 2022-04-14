@@ -15,13 +15,9 @@ More details on the game concept can be found in:
 ## Storyline
 
 Virtuous ruler nCtl has protected the blockchain from harm for centuries.  
-
 Now nCtl has been compromised by The CORS.  
-
 The blockchain is being torn apart by sweet Irish melodies.  
-
 Only a heroic **Caspookie** can reach nCtl's mind and save the blockchain.  
-
 Are your the chosen one?  
 
 ## Caspookie NFTs
