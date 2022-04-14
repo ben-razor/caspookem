@@ -490,6 +490,22 @@ function Game3D(props) {
             gameScore += 1000;
             setScore(gameScore);
           }
+          if(b2.classes?.includes('gem-blue-1')) {
+            console.log(JSON.stringify(['Collected Gem!!']));
+            gameEquipment.push({ id: b2.objId, type: 'gem-blue-1' });
+            setEquipment(gameEquipment);
+            removeIds.push(b2.objId);
+            gameScore += 2000;
+            setScore(gameScore);
+          }
+          if(b2.classes?.includes('gem-orange-1')) {
+            console.log(JSON.stringify(['Collected Gem!!']));
+            gameEquipment.push({ id: b2.objId, type: 'gem-orange-1' });
+            setEquipment(gameEquipment);
+            removeIds.push(b2.objId);
+            gameScore += 5000;
+            setScore(gameScore);
+          }
           if(b2.classes?.includes('door')) {
             console.log(JSON.stringify(['it be door time', gameDoorTriggered]));
             setDoorTriggered(++gameDoorTriggered);
@@ -716,6 +732,14 @@ function Game3D(props) {
               removeObj(world, scene, ballMeshes[i], balls[i]);
               balls.splice(i, 1);
               ballMeshes.splice(i, 1);
+            }
+            for(let i = 0; i < obstacles.length; i++) {
+              let ob = obstacles[i];
+              ob.disable();
+            }
+            for(let i = 0; i < triggers.length; i++) {
+              let tr = triggers[i];
+              tr.disable();
             }
             for(let i = 0; i < spiders.length; i++) {
               spiders[i].disable();

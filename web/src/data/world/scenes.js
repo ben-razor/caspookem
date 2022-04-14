@@ -42,7 +42,8 @@ const scenes = [
       { id: 'BlueCrateCenter001', pos: {x: -12, y: 1, z: 0}},
       { id: 'BlueCrateCenter002', pos: {x: -12, y: 1, z: -2}},
       { id: 'BlueCrateCenter003', pos: {x: -12, y: 1, z: -4}},
-      { id: 'GemCenter001', pos: {x: -12, y: 3, z: -4}},
+      { id: 'GemCenter001', pos: {x: 8, y: 5, z: 0}},
+      { id: 'GemCenter002', pos: {x: -12, y: 3, z: -4}},
     ],
     obstacles: [ 
       { id: 'computer', classes: [], positionType: 'object', objId: 'WorldL1Computer', geometry: { type: "box", dims: [.2, 2, .2] } },
@@ -62,6 +63,7 @@ const scenes = [
     ],
     triggers: [
       { id: 'GemCenter001', classes: ['no-land', 'gem', 'gem-pink-1'], positionType: 'object', objId: 'GemCenter001', geometry: { type: "sphere", radius: 0.5 } },
+      { id: 'GemCenter002', classes: ['no-land', 'gem', 'gem-blue-1'], positionType: 'object', objId: 'GemCenter002', geometry: { type: "sphere", radius: 0.5 } },
       { id: 'Door001', classes: ['no-land', 'door'], positionType: 'position', position: [-.5, 2.5, -16], geometry: { type: "box", dims: [3, 2.5, 2] } }
     ],
     door: 'Door_Double',
