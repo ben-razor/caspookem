@@ -37,14 +37,13 @@ Are your the chosen one?
 
 Caspookem starts with a one room demo mode that anybody can play. To progress further in the game, the player must possess one or more Caspookies.  
 
-A very basic NFT collection has been created. In future more variations can be added to the NFTs. The NFT changes the appearance of the character. In future different Caspookies will have different properties.  
+A very basic NFT collection has been created. In future more variations can be added to the NFTs. The NFT changes the appearance of the character. In future different Caspookies can have different powers in the game.  
 
 Here are some example NFTs:
 
 ![15](https://github.com/ben-razor/caspookem/blob/main/artwork/render/nft/v1/img/15.png)
 ![71](https://github.com/ben-razor/caspookem/blob/main/artwork/render/nft/v1/img/71.png)
 ![72](https://github.com/ben-razor/caspookem/blob/main/artwork/render/nft/v1/img/72.png)
-
 
 ## Technology
 
