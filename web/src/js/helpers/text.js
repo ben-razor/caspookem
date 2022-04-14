@@ -78,6 +78,8 @@ const text = {
     'text_door_is_pleased': 'Door is pleased. You may pass.',
 
     'text_equip_pink_crystal': 'pink crystal',
+    'text_equip_blue_crystal': 'blue crystal',
+    'text_equip_orange_crystal': 'orange crystal',
     'text_lifeform_spiders': 'spiders',
 
     "success_save_kart": `${text_consts.nft_name} saved!!`,

@@ -176,16 +176,41 @@ function Game3D(props) {
     return hidden;
   }
 
+  function hasRequiredItems(requiredItems, gameEquipment) {
+    let hasEquip = true;
+    for(let item of requiredItems) {
+      let hasItem = gameEquipment.find(x => x.type === item);
+      if(!hasItem) {
+        hasEquip = false;
+      }
+    }
+
+    return hasEquip;
+  }
+
   const getDoorText = useCallback(() => {
     let doorText = '';
 
-    let hasEquip = gameEquipment.find(x => x.type === 'gem-pink-1');
+    let sceneConf = getSceneConfig('Scene' + level);
+    let hasEquip = hasRequiredItems(sceneConf.requiredItems, gameEquipment, level);
 
     if(!hasEquip) {
       doorText = getText('text_door_possession', { 'object': getText('text_equip_pink_crystal')});
+
+      if(sceneConf.requiredItems.length === 2) {
+        doorText = getText('text_door_possession', { 
+          'object': getText('text_equip_pink_crystal') + ' and ' + getText('text_equip_blue_crystal')
+        });
+      }
+      else if(sceneConf.requiredItems.length === 3) {
+        doorText = getText('text_door_possession', { 
+          'object': getText('text_equip_pink_crystal') + ', ' + getText('text_equip_blue_crystal') + ' and ' +
+                    getText('text_equip_orange_crystal')
+        });
+      }
     }
-    else if(gameSpiders < 3) {
-      doorText = getText('text_door_mashup', { 'number': 3, 'lifeforms': getText('text_lifeform_spiders')});
+    else if(gameSpiders < sceneConf.requiredSpiders) {
+      doorText = getText('text_door_mashup', { 'number': sceneConf.requiredSpiders, 'lifeforms': getText('text_lifeform_spiders')});
     }
     else if(!nftList.length) {
       doorText = getText('text_door_mint_caspookies');
@@ -195,7 +220,7 @@ function Game3D(props) {
     }
 
     return 'Door: ' + doorText;
-  }, [nftList]);
+  }, [nftList, level]);
 
   const styleScene = useCallback((scene, controlEntry) => {
     scene.traverse(o => {
@@ -335,7 +360,7 @@ function Game3D(props) {
   }, [levelEnded, changeScreen, screens]);
   
   useEffect(() => {
-      console.log(JSON.stringify(['door triggered']));
+    console.log(JSON.stringify(['door triggered']));
     if(doorTriggered) {
       let doorText = getDoorText();
       console.log(JSON.stringify(['door triggered 2', doorText]));
@@ -509,10 +534,19 @@ function Game3D(props) {
           if(b2.classes?.includes('door')) {
             console.log(JSON.stringify(['it be door time', gameDoorTriggered]));
             setDoorTriggered(++gameDoorTriggered);
-            door.open();
-            gameLevelJustEnded = true;
-            gameLevel += 1;
-            setLevelEnded(gameLevelJustEnded);
+
+            let sceneConf = getSceneConfig('Scene' + gameLevel);
+            let hasEquip = hasRequiredItems(sceneConf.requiredItems, gameEquipment, gameLevel);
+            let hasMashedSpiders = gameSpiders >= sceneConf.requiredSpiders;
+
+            console.log(JSON.stringify(['DOOR', hasEquip, hasMashedSpiders, gameSpiders, sceneConf.requiredSpiders]));
+            
+            if(hasEquip && hasMashedSpiders) {
+              door.open();
+              gameLevelJustEnded = true;
+              gameLevel += 1;
+              setLevelEnded(gameLevelJustEnded);
+            }
           }
           if(!b2.classes?.includes('no-land')) {
             jumping = false;
