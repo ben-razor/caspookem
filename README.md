@@ -2,7 +2,7 @@
 
 A spooky game on [Casper Blockchain](https://casperlabs.io/).  
 
-<img src="https://github.com/ben-razor/caspookem/blob/main/artwork/render/game/screens/1-screenshot-demo-sm-1.png" width="440"/><img src="https://github.com/ben-razor/caspookem/blob/main/artwork/render/game/screens/2-screenshot-signed-in-sm-1.png" width="440"/>
+<img src="https://github.com/ben-razor/caspookem/blob/main/artwork/render/game/screens/1-screenshot-demo-1.png" width="440"/><img src="https://github.com/ben-razor/caspookem/blob/main/artwork/render/game/screens/2-screenshot-signed-in-1.png" width="440"/>
 
 Video demo: 
 
