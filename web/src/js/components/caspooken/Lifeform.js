@@ -32,7 +32,8 @@ export class Lifeform {
   disable() {
     if(this.enabled) {
       this.positioner.visible = false;
-      this.world.remove(this.body);
+      this.world.removeBody(this.body);
+      this.enabled = false;
     }
   }
 
@@ -46,6 +47,7 @@ export class Lifeform {
       this.world.addBody(this.body);
       this.body.position.copy(startPos);
       this.positioner.rotation.set(0, 0, 0);
+      this.enabled = true;
     }
   }
 }

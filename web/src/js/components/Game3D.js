@@ -20,6 +20,7 @@ import { Obstacle } from './caspooken/Obstacle';
 import { Lifeform } from './caspooken/Lifeform';
 import { casperAttemptConnect, getHighScore } from '../helpers/casper';
 import { Trigger } from './caspooken/Trigger';
+import { Door } from './caspooken/Door';
 
 const DEBUG_FAST_BATTLE = false;
 
@@ -51,6 +52,9 @@ let gameScore = 0;
 let gameHealth = 100;
 let gameJustDied = false;
 let gameJustStarted = false;
+let gameLevelJustEnded = false;
+let gameLevelJustStarted = false;
+let gameLevel = 0;
 let gameSpiders = 0;
 let gameDoorTriggered = 0;
 let gameEquipment = [];
@@ -98,6 +102,8 @@ function Game3D(props) {
   const [equipment, setEquipment] = useState([]);
   const [doorTriggered, setDoorTriggered ] = useState(0);
   const [gameText, setGameText] = useState('');
+  const [levelEnded, setLevelEnded] = useState();
+  const [level, setLevel] = useState(gameLevel);
 
   function characterChanged(nftData, prevNFTData) {
     if(!nftData || !prevNFTData) {
@@ -308,6 +314,16 @@ function Game3D(props) {
     }
   }, [health, changeScreen, screens]);
 
+
+  useEffect(() => {
+    let changed = stateCheck.changed('levelEnded', levelEnded, 100);
+
+    if(levelEnded && changed) {
+      setLevel(gameLevel);
+      changeScreen(screens.GAME_LEVEL);
+    }
+  }, [levelEnded, changeScreen, screens]);
+  
   useEffect(() => {
       console.log(JSON.stringify(['door triggered']));
     if(doorTriggered) {
@@ -412,6 +428,8 @@ function Game3D(props) {
         let totalTime = 0;
         let jumping = false;
 
+        let door = new Door(sceneConf.door, world, scene);
+
         lifeform.body.addEventListener('collide', a => {
           let b2 = a.body;
 
@@ -436,6 +454,10 @@ function Game3D(props) {
           if(b2.classes?.includes('door')) {
             console.log(JSON.stringify(['it be door time', gameDoorTriggered]));
             setDoorTriggered(++gameDoorTriggered);
+            door.open();
+            gameLevelJustEnded = true;
+            gameLevel += 1;
+            setLevelEnded(gameLevelJustEnded);
           }
           if(!b2.classes?.includes('no-land')) {
             jumping = false;
@@ -576,6 +598,12 @@ function Game3D(props) {
           }
         }
 
+        function removeSpiders() {
+          for(let i = 0; i < spiders.length; i++) {
+            spiders[i].disable();
+          }
+        }
+
         function enableTriggers() {
           for(let i = 0; i < triggers.length; i++) {
             let trigger = triggers[i];
@@ -627,6 +655,8 @@ function Game3D(props) {
             removeIds = [];
           }
 
+          door.update(dt, totalTime);
+
           if(gameJustStarted) {
             startSpiders();
             enableTriggers();
@@ -646,6 +676,27 @@ function Game3D(props) {
             lifeform.disable();
             removeIds = [];
             gameJustDied = false;
+          }
+
+          if(gameLevelJustEnded) {
+            for(let i = 0; i < balls.length; i++) {
+              removeObj(world, scene, ballMeshes[i], balls[i]);
+              balls.splice(i, 1);
+              ballMeshes.splice(i, 1);
+            }
+            removeSpiders();
+            lifeform.disable(); 
+            removeIds = [];
+            gameLevelJustEnded = false;
+          }
+
+          if(gameLevelJustStarted) {
+            console.log(JSON.stringify(['GLJS']));
+            door.close();
+            startSpiders();
+            enableTriggers();
+            lifeform.enable(sceneConf.startPos);
+            gameLevelJustStarted = false;
           }
 
           if(toRemove.length) {
@@ -1052,6 +1103,17 @@ function Game3D(props) {
     gameJustStarted = true;
   }
 
+  function startLevel() {
+    console.log(JSON.stringify(['start level']));
+    gameHealth = 100;
+    gameSpiders = 0;
+    gameEquipment = [];
+    setEquipment(gameEquipment);
+    setGameText('');
+    changeScreen(screens.GAME);
+    gameLevelJustStarted = true;
+  }
+
   function getMaxWeaponIndexForLevel(level) {
     if(!level) {
       level = 0;
@@ -1101,7 +1163,7 @@ function Game3D(props) {
               <div className='br-level'>
                 {getText('text_level')}
                 <div className="br-level-number">
-                  {nftData?.level || 0}
+                  {level}
                 </div>
               </div>
               <div className="br-hud-score">
@@ -1181,11 +1243,26 @@ function Game3D(props) {
     </div>
   }
 
+  function getScreenLevel() {
+    return <div className={ "br-screen br-screen-game-over " + getScreenClass(screens.GAME_LEVEL)}>
+      <div className="br-scary-text">
+        Great!!
+      </div>
+      <div className="br-scary-text br-scary-text-med">
+        Level {level} 
+      </div>
+      <div className="br-game-controls">
+        <BrButton label="StartLevel" id="startLevel" className="br-button" onClick={ e => startLevel() } />
+      </div>
+    </div>
+  }
+
   return <div className="br-screen-container">
     { getNFTListUI() }
     { getScreenGameStart() }
     { getScreenGame() }
     { getScreenGameOver() }
+    { getScreenLevel() }
   </div>
 }
 

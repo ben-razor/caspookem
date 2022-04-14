@@ -38,7 +38,8 @@ const TESTING_PENDING_TX = false;
 const screens= {
   GAME_START: 1,
   GAME: 2,
-  GAME_OVER: 3
+  GAME_OVER: 3,
+  GAME_LEVEL: 4
 };
 
 const helpModes = {

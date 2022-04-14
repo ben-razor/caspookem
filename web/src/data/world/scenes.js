@@ -25,15 +25,9 @@ const scenes = [
       { id: 'Gem001', classes: ['no-land', 'gem', 'gem-pink-1'], positionType: 'object', objId: 'Gem001', geometry: { type: "sphere", radius: 0.5 } },
       { id: 'Door001', classes: ['no-land', 'door'], positionType: 'position', position: [-.5, 2.5, -16], geometry: { type: "box", dims: [3, 2.5, 2] } }
     ],
+    door: 'Door_Double',
     bounds: { z: [-1.8, 0.8], x: [-3, 3] },
     startPos: { x: 0, y: 5, z: 5},
-    elems: {
-      'SceneRoomZeroDoor': {
-        condition: (strangeJuice) => {
-          return strangeJuice.evolution > 2;
-        }
-      }
-    },
     controls: [
       { 
         id: 'drink_strange_juice', 
