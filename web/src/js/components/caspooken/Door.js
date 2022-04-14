@@ -46,6 +46,8 @@ export class Door {
   close() {
     this.doorLeft.position.copy(this.doorLeftPos);
     this.doorRight.position.copy(this.doorRightPos);
+    this.dist = 0;
+    this.opening = false;
   }
 
   disable() {

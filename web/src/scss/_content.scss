@@ -195,7 +195,9 @@
 .br-screen-container {
     margin: auto;
     width: 100%;
-    min-height: 532px;
+    min-height: 432px;
+    background-color: black;
+    border-radius: 1em;
 }
 
 .br-strange-juice-text-overlay {
@@ -392,9 +394,6 @@
     min-height: 432px;
     height: 432px;
     border-radius: 1em;
-}
-
-.br-screen-game-start {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -402,11 +401,14 @@
     color: white;
 }
 
+.br-screen-game-start {
+}
+
 .br-screen-game-over {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    background-color: black;
+}
+
+.br-screen-game-level {
+
 }
 
 .br-screen-battle {

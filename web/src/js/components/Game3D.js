@@ -1079,10 +1079,20 @@ function Game3D(props) {
     let screenClass = 'br-screen-hidden';
 
     if(screenId === screen) {
-      screenClass = 'br-screen-current loading-fade-in-fast';
+      if(screenId === screens.GAME_LEVEL) {
+        screenClass = 'br-screen-current loading-fade-in ';
+      }
+      else {
+        screenClass = 'br-screen-current loading-fade-in-fast ';
+      }
     }
     else if(screenId === prevScreen) {
-      screenClass = 'br-screen-prev loading-fade-out-instant';
+      if(screenId === screens.GAME) {
+        screenClass = 'br-screen-prev loading-fade-out-fast ';
+      }
+      else {
+        screenClass = 'br-screen-prev loading-fade-out-instant ';
+      }
     }
 
     return screenClass;
@@ -1108,10 +1118,12 @@ function Game3D(props) {
     gameHealth = 100;
     gameSpiders = 0;
     gameEquipment = [];
+    setHealth(gameHealth);
     setEquipment(gameEquipment);
     setGameText('');
     changeScreen(screens.GAME);
     gameLevelJustStarted = true;
+    setLevelEnded(false);
   }
 
   function getMaxWeaponIndexForLevel(level) {
@@ -1244,7 +1256,7 @@ function Game3D(props) {
   }
 
   function getScreenLevel() {
-    return <div className={ "br-screen br-screen-game-over " + getScreenClass(screens.GAME_LEVEL)}>
+    return <div className={ "br-screen br-screen-game-level " + getScreenClass(screens.GAME_LEVEL)}>
       <div className="br-scary-text">
         Great!!
       </div>
