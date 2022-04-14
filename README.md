@@ -4,15 +4,27 @@ A spooky game on [Casper Blockchain](https://casperlabs.io/).
 
 <img src="https://github.com/ben-razor/caspookem/blob/main/artwork/render/game/screens/1-screenshot-demo-sm-1.png" width="440"/><img src="https://github.com/ben-razor/caspookem/blob/main/artwork/render/game/screens/2-screenshot-signed-in-sm-1.png" width="440"/>
 
+Video demo: 
+
+Live App: (Can't use Casper Signer without whitelisting so only 1 level demo mode): [https://caspookem.web.app/](https://caspookem.web.app/)
+
+Local App (Save high scores and use NFT ownership access with Casper Signer):  
+```
+cd web
+npm install
+npm run start
+```
+
 Built for the ReadyPlayerCasper hackathon tasks:
 
 [Build A Single Player Game On Casper](https://gitcoin.co/issue/casper-network/ready-player-casper-gitcoin/1/100028589)  
 
 [Build An NFT Holder-Exclusive Game On Casper](https://gitcoin.co/issue/casper-network/ready-player-casper-gitcoin/6/100028603)  
 
-The game is at a very early stage. Only a couple of rooms are implemented to demonstrate the concept.  
 
 ## Storyline
+
+The game is at a very early stage. Only a couple of rooms are implemented to demonstrate the concept.  
 
 Virtuous ruler nCtl has protected the blockchain from harm for centuries.  
 Now nCtl has been compromised by The CORS.  
