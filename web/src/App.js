@@ -421,23 +421,21 @@ function App() {
           </div>
         </div>
         :
-        <div className="br-help-panel">
-          <div className="br-help-line">{ getText('text_help_battle') }</div>
-          <div className="br-help-line">{ getText('text_help_level_up') }</div>
-          <div className="br-help-highlight">{ getText('text_help_upgrade') }</div>
-          <div className="br-info-message br-info-message-start br-space-top br-full-width">
-            <i className="fa fa-info br-info-icon"></i>
-            {getText('text_help_no_equip_benefit')}
-            <br />
-            {getText('text_help_look_cool')}
-          </div>
-        </div>
+        getControlsUI()
       }
     </Fragment>            
 
     return ui;
   }
 
+  function getControlsUI() {
+    return <div className="br-keymap-panel">
+      <div className="br-keymap-line">W,A,S,D - Forward, Back, Left, Right</div>
+      <div className="br-keymap-line">J - Jump</div>
+      <div className="br-keymap-line">N - Fire</div>
+    </div>
+  }
+  
   function doHeaderAction() {
     console.log(JSON.stringify(['doing header action']));
   }
@@ -709,7 +707,8 @@ function App() {
           nftList={nftList} activeNFT={activeNFT} 
           ipfsToBucketURL={ipfsToBucketURL} requestMint={requestMint} 
           execute={execute} score={score} setScore={setScore} 
-          signedInInfo={signedInInfo} getBucketURL={getBucketURL} />
+          signedInInfo={signedInInfo} getBucketURL={getBucketURL} 
+          getControlsUI={getControlsUI} />
         </div>
       </div>
     </div>

@@ -1112,3 +1112,11 @@
 .br-no-border {
     border-width: 0;
 }
+
+.br-keymap-panel {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-top: 1em;
+}

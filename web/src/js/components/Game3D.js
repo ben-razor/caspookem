@@ -78,6 +78,7 @@ function Game3D(props) {
   const setScore = props.setScore;
   const signedInInfo = props.signedInInfo;
   const getBucketURL = props.getBucketURL;
+  const getControlsUI = props.getControlsUI;
 
   window.nftData = nftData;
 
@@ -1381,6 +1382,7 @@ function Game3D(props) {
             </div>
           }
         </div>
+        { getControlsUI() }
       </div>
   }
   
@@ -1399,6 +1401,9 @@ function Game3D(props) {
     return <div className={ "br-screen br-screen-game-level " + getScreenClass(screens.GAME_LEVEL)}>
       <div className="br-scary-text">
         Great!!
+      </div>
+      <div className="br-scary-text br-scary-text-med">
+        Score {score}
       </div>
       <div className="br-scary-text br-scary-text-med">
         Level {level-1} Complete
