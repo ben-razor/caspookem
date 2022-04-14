@@ -4,7 +4,7 @@ A spooky game on [Casper Blockchain](https://casperlabs.io/).
 
 <img src="https://github.com/ben-razor/caspookem/blob/main/artwork/render/game/screens/1-screenshot-demo-1.png" width="500"/>
 
-Video demo: [View on YouTube](https://youtu.be/5f1jSMXxoNY)
+**Video demo:** [View on YouTube](https://youtu.be/5f1jSMXxoNY)
 
 Live App: (Can't use Casper Signer without whitelisting so only 1 level demo mode): [https://caspookem.web.app/](https://caspookem.web.app/)
 
