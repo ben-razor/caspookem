@@ -1076,6 +1076,14 @@
     background-image: linear-gradient( 180deg, white, hsla(0deg, 0%, 100%, 0.5));
 }
 
+.br-intro-subtitle {
+    margin-bottom: 2em;
+}
+
+.br-intro-text {
+    margin-bottom: .5em;
+}
+
 .br-scary-text {
     font-family: BrScary, sans-serif;
     font-size: 4em;
@@ -1085,6 +1093,11 @@
     background-clip: text;
     -webkit-text-fill-color: transparent;
     -webkit-text-stroke: 1px hsl(200deg, 70%, 20%);
+}
+
+.br-scary-title {
+    font-size: 3em;
+    margin-bottom: .2em;
 }
 
 .br-scary-text-med {

@@ -58,6 +58,7 @@ let gameLevel = 0;
 let gameSpiders = 0;
 let gameDoorTriggered = 0;
 let gameEquipment = [];
+let gameNumNFTs = 0;
 
 function Game3D(props) {
   const showModal = props.showModal;
@@ -342,6 +343,10 @@ function Game3D(props) {
   }, [hit]);
 
   useEffect(() => {
+    gameNumNFTs = nftList.length;
+  }, [nftList]);
+
+  useEffect(() => {
     let changed = stateCheck.changed('health', health, 100);
 
     if(health === 0 && changed) {
@@ -541,7 +546,7 @@ function Game3D(props) {
 
             console.log(JSON.stringify(['DOOR', hasEquip, hasMashedSpiders, gameSpiders, sceneConf.requiredSpiders]));
             
-            if(hasEquip && hasMashedSpiders) {
+            if(hasEquip && hasMashedSpiders && gameNumNFTs) {
               door.open();
               gameLevelJustEnded = true;
               gameLevel += 1;
@@ -1346,8 +1351,23 @@ function Game3D(props) {
 
   function getScreenGameStart() {
       return <div className={ "br-screen br-screen-game-start " + getScreenClass(screens.GAME_START)}>
+        <div className="br-scary-text br-scary-title">
+          Caspookem
+        </div>
+        <div className='br-intro-subtitle'>
+          A spooky game on Casper Blockchain
+        </div>
+        <div className="br-intro-text">
+          Play a demo level 
+        </div>
+        <div className="br-intro-text">
+          OR
+        </div>
+        <div className="br-intro-text">
+          Connect Casper Signer and mint a Caspookie to play for real
+        </div>
         <div>
-          Play Demo
+
         </div>
         <div className="br-game-controls">
           { signedInInfo.success ?
