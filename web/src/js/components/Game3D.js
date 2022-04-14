@@ -15,7 +15,7 @@ import { BasicCharacterController } from './3d/CharacterController';
 import { ParticleSystem } from './3d/Particle';
 import { Spider } from './caspooken/Spider';
 import { TimeTrigger } from './caspooken/TimeTrigger';
-import { getObstacle, getSceneConfig } from '../../data/world/scenes';
+import { getNumScenes, getObstacle, getSceneConfig } from '../../data/world/scenes';
 import { Obstacle } from './caspooken/Obstacle';
 import { Lifeform } from './caspooken/Lifeform';
 import { casperAttemptConnect, getHighScore } from '../helpers/casper';
@@ -545,6 +545,9 @@ function Game3D(props) {
               door.open();
               gameLevelJustEnded = true;
               gameLevel += 1;
+              if(gameLevel >= getNumScenes()) {
+                gameLevel = 0;
+              }
               setLevelEnded(gameLevelJustEnded);
             }
           }
@@ -780,6 +783,8 @@ function Game3D(props) {
             }
             lifeform.disable();
             removeIds = [];
+            obstacles = [];
+            triggers = [];
             gameJustDied = false;
           }
 
@@ -1223,6 +1228,7 @@ function Game3D(props) {
     gameEquipment = [];
     setScore(gameScore);
     setHealth(gameHealth);
+    setLevel(gameLevel);
     setEquipment(gameEquipment);
     setGameText('');
     changeScreen(screens.GAME);

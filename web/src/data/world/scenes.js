@@ -135,6 +135,10 @@ export function getSceneConfig(sceneName) {
   }
 }
 
+export function getNumScenes() {
+  return scenes.length;
+}
+
 export function getObstacle(sceneName, objId) {
   let sceneConf = getSceneConfig(sceneName);
   let obstacle = null;
