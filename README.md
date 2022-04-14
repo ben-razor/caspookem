@@ -8,7 +8,7 @@ Video demo:
 
 Live App: (Can't use Casper Signer without whitelisting so only 1 level demo mode): [https://caspookem.web.app/](https://caspookem.web.app/)
 
-Local App (Save high scores and use NFT ownership access with Casper Signer):  
+Local App (Save high scores and use NFT to access extra levels with Casper Signer):  
 ```
 cd web
 npm install
