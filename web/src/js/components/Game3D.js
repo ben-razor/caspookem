@@ -431,6 +431,15 @@ function Game3D(props) {
             triggers.push(tr);
           }
 
+          for(let i = 0; i < spiders.length; i++) {
+            if(i < sceneConf.numSpiders) {
+              spiders[i].paused = false;
+            }
+            else {
+              spiders[i].paused = true;
+            }
+          }
+
           return sceneConf;
         }
 
@@ -606,6 +615,16 @@ function Game3D(props) {
         for(let i = 1; i <= 5; i++) {
           let spider = new Spider('Emptyspider00' + i, ['spider'], world, scene);
           spider.setTargetObj(lifeform.positioner);
+          spiders.push(spider);
+          spider.paused = true;
+          let spiderTimer = new TimeTrigger(5, 1);
+          spiderTimers.push(spiderTimer);
+        }
+
+        for(let i = 1; i <= 5; i++) {
+          let spider = new Spider('Emptytechnospider00' + i, ['spider'], world, scene);
+          spider.setTargetObj(lifeform.positioner);
+          spider.paused = true;
           spiders.push(spider);
           let spiderTimer = new TimeTrigger(5, 1);
           spiderTimers.push(spiderTimer);

@@ -20,6 +20,7 @@ export class Spider {
         this.debug = false;
         this.size = 0.7;
         this.enabled = false;
+        this.paused = false;
         this.speed = options.speed;
         this.minSpeed = options.minSpeed;
         this.maxSpeed = options.maxSpeed;
@@ -57,12 +58,14 @@ export class Spider {
     }
 
     spawn() {
-        let angle = Math.random() * Math.PI*2;
-        let spiderPos = new THREE.Vector3(10, 8, 0);
-        let rotator = new THREE.Euler(0, angle, 0);
-        this.speed = this.minSpeed;
-        spiderPos.applyEuler(rotator);
-        this.enable(spiderPos); 
+        if(!this.paused) {
+            let angle = Math.random() * Math.PI*2;
+            let spiderPos = new THREE.Vector3(10, 8, 0);
+            let rotator = new THREE.Euler(0, angle, 0);
+            this.speed = this.minSpeed;
+            spiderPos.applyEuler(rotator);
+            this.enable(spiderPos); 
+        }
     }
 
     disable() {

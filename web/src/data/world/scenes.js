@@ -29,6 +29,7 @@ const scenes = [
     door: 'Door_Double',
     bounds: { z: [-1.8, 0.8], x: [-3, 3] },
     startPos: { x: 0, y: 5, z: 5},
+    numSpiders: 5
   },
   {
     sceneName: "Scene1",
@@ -66,6 +67,7 @@ const scenes = [
     door: 'Door_Double',
     bounds: { z: [-1.8, 0.8], x: [-3, 3] },
     startPos: { x: 0, y: 5, z: 15},
+    numSpiders: 8
   }
 ]
 
