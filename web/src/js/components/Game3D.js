@@ -166,6 +166,16 @@ function Game3D(props) {
     return hidden;
   }
 
+  function sceneObjectStartHidden(name, hiddenNameStarts) {
+    let hidden = false;
+    for(let start of hiddenNameStarts) {
+      if(name.startsWith(start)) {
+        hidden = true;
+      }
+    }
+    return hidden;
+  }
+
   const getDoorText = useCallback(() => {
     let doorText = '';
 
@@ -388,7 +398,21 @@ function Game3D(props) {
 
         let lifeform = new Lifeform(world, scene, physicsMaterial);
 
-        let sceneConf = getSceneConfig('Scene0');
+        let sceneConf = getSceneConfig('Scene' + level);
+
+        scene.traverse(o => {
+          if(sceneObjectStartHidden(o.name, sceneConf.startHidden)) {
+            o.visible = false;
+          }
+        });
+
+        for(let obConf of sceneConf.objects) {
+          let obj = scene.getObjectByName(obConf.id);
+          console.log(JSON.stringify(['O', obj.visible]));
+          
+          obj.position.copy(obConf.pos);
+          obj.visible = true;
+        }
 
         let obstacles = [];
         for(let obConf of sceneConf.obstacles) {
@@ -1261,10 +1285,10 @@ function Game3D(props) {
         Great!!
       </div>
       <div className="br-scary-text br-scary-text-med">
-        Level {level} 
+        Level {level-1} Complete
       </div>
       <div className="br-game-controls">
-        <BrButton label="StartLevel" id="startLevel" className="br-button" onClick={ e => startLevel() } />
+        <BrButton label={'Start Level ' + level} id="startLevel" className="br-button" onClick={ e => startLevel() } />
       </div>
     </div>
   }
