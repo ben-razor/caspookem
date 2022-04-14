@@ -155,6 +155,7 @@ function App() {
 
       let _timerId = setInterval(async () => {
         let res = await checkSignedIn();
+        console.log(JSON.stringify(['post si', res]));
 
         if(res.success) {
           let _activePublicKey = res.data.activePublicKey;
