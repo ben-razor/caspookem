@@ -398,34 +398,40 @@ function Game3D(props) {
 
         let lifeform = new Lifeform(world, scene, physicsMaterial);
 
-        let sceneConf = getSceneConfig('Scene' + level);
-
-        scene.traverse(o => {
-          if(sceneObjectStartHidden(o.name, sceneConf.startHidden)) {
-            o.visible = false;
-          }
-        });
-
-        for(let obConf of sceneConf.objects) {
-          let obj = scene.getObjectByName(obConf.id);
-          console.log(JSON.stringify(['O', obj.visible]));
-          
-          obj.position.copy(obConf.pos);
-          obj.visible = true;
-        }
-
         let obstacles = [];
-        for(let obConf of sceneConf.obstacles) {
-          let ob = new Obstacle(world, scene, obConf, physicsMaterial);
-          ob.enable();
-          obstacles.push(ob);
-        }
-
         let triggers = [];
-        for(let obConf of sceneConf.triggers) {
-          let tr = new Trigger(world, scene, obConf);
-          tr.enable();
-          triggers.push(tr);
+
+        function initLevel(nextLevel) {
+          let sceneConf = getSceneConfig('Scene' + nextLevel);
+
+          lifeform.enable(sceneConf.startPos);
+
+          scene.traverse(o => {
+            if(sceneObjectStartHidden(o.name, sceneConf.startHidden)) {
+              o.visible = false;
+            }
+          });
+
+          for(let obConf of sceneConf.objects) {
+            let obj = scene.getObjectByName(obConf.id);
+            console.log(JSON.stringify(['O', obj.visible]));
+            obj.position.copy(obConf.pos);
+            obj.visible = true;
+          }
+
+          for(let obConf of sceneConf.obstacles) {
+            let ob = new Obstacle(world, scene, obConf, physicsMaterial);
+            ob.enable();
+            obstacles.push(ob);
+          }
+
+          for(let obConf of sceneConf.triggers) {
+            let tr = new Trigger(world, scene, obConf);
+            tr.enable();
+            triggers.push(tr);
+          }
+
+          return sceneConf;
         }
 
         const groundShape = new CANNON.Plane()
@@ -452,7 +458,7 @@ function Game3D(props) {
         let totalTime = 0;
         let jumping = false;
 
-        let door = new Door(sceneConf.door, world, scene);
+        let door = new Door('Door_Double', world, scene);
 
         lifeform.body.addEventListener('collide', a => {
           let b2 = a.body;
@@ -682,10 +688,8 @@ function Game3D(props) {
           door.update(dt, totalTime);
 
           if(gameJustStarted) {
-            startSpiders();
-            enableTriggers();
-            lifeform.enable(sceneConf.startPos);
             gameJustStarted = false;
+            gameLevelJustStarted = true;
           }
 
           if(gameJustDied) {
@@ -708,6 +712,16 @@ function Game3D(props) {
               balls.splice(i, 1);
               ballMeshes.splice(i, 1);
             }
+            for(let i = 0; i < obstacles.length; i++) {
+              let ob = obstacles[i];
+              ob.disable();
+            }
+            for(let i = 0; i < triggers.length; i++) {
+              let tr = triggers[i];
+              tr.disable();
+            }
+            obstacles = [];
+            triggers = [];
             removeSpiders();
             lifeform.disable(); 
             removeIds = [];
@@ -715,11 +729,11 @@ function Game3D(props) {
           }
 
           if(gameLevelJustStarted) {
-            console.log(JSON.stringify(['GLJS']));
+            console.log(JSON.stringify(['GLJS', gameLevel]));
+            initLevel(gameLevel)
             door.close();
             startSpiders();
             enableTriggers();
-            lifeform.enable(sceneConf.startPos);
             gameLevelJustStarted = false;
           }
 
@@ -1128,6 +1142,7 @@ function Game3D(props) {
     gameScore = 0;
     gameHealth = 100;
     gameSpiders = 0;
+    gameLevel = 0;
     gameEquipment = [];
     setScore(gameScore);
     setHealth(gameHealth);
@@ -1261,9 +1276,7 @@ function Game3D(props) {
               <BrButton label="Play Demo" id="playDemo" className="br-button" onClick={ e => restart() } />
               <BrButton label="Connect Casper" id="connectCasperWallet" className="br-button" onClick={ e => casperAttemptConnect() } />
             </div>
-
           }
-
         </div>
       </div>
   }
