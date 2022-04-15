@@ -5,7 +5,7 @@ import './scss/styles.scss';
 import { toast as toasty } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import BrButton from './js/components/lib/BrButton';
-import { localLog, StateCheck } from './js/helpers/helpers';
+import { isLocal, localLog, StateCheck } from './js/helpers/helpers';
 import getText, { ellipsis } from './js/helpers/text';
 import { hexColorToInt } from './js/helpers/3d';
 import bigInt from 'big-integer';
@@ -466,7 +466,21 @@ function App() {
 
     }
     else {
-      if(signedInInfo.reason === 'error_casper_no_signer') {
+      if(!isLocal()) {
+        let link = <a href="https://github.com/ben-razor/caspookem" target="_blank" rel="noreferrer">
+          { 'Github Repo' }
+        </a>
+
+        ui = <div className="br-info-message">
+          <i className="fa fa-info br-info-icon"></i>
+          <div>
+            { 'Casper Signer is unavailable on https://caspookem.web.app/'}
+            <br />
+            <div>Check out the {link} to mint Caspookies and save high scores</div>
+          </div>
+        </div>
+      }
+      else if(signedInInfo.reason === 'error_casper_no_signer') {
         let link = <a href="https://chrome.google.com/webstore/detail/casper-signer/djhndpllfiibmcdbnmaaahkhchcoijce" target="_blank" rel="noreferrer">
           { getText('text_wallet_name')}
         </a>

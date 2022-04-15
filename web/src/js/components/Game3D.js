@@ -60,6 +60,8 @@ let gameDoorTriggered = 0;
 let gameEquipment = [];
 let gameNumNFTs = 0;
 
+let casperDisabled = true; // !isLocal();
+
 function Game3D(props) {
   const showModal = props.showModal;
   const nftList = props.nftList;
@@ -215,7 +217,12 @@ function Game3D(props) {
       doorText = getText('text_door_mashup', { 'number': sceneConf.requiredSpiders, 'lifeforms': getText('text_lifeform_spiders')});
     }
     else if(!nftList.length) {
-      doorText = getText('text_door_mint_caspookies');
+      if(casperDisabled) { 
+        doorText = "Usually I'd demand an NFT but I like the cut of your jib";
+      }
+      else {
+        doorText = getText('text_door_mint_caspookies');
+      }
     }
     else {
       doorText = getText('text_door_is_pleased');
@@ -366,16 +373,17 @@ function Game3D(props) {
   }, [levelEnded, changeScreen, screens]);
   
   useEffect(() => {
-    console.log(JSON.stringify(['door triggered']));
-    if(doorTriggered) {
-      let doorText = getDoorText();
-      console.log(JSON.stringify(['door triggered 2', doorText]));
+    let changed = stateCheck.changed('doorTriggered', doorTriggered, 100);
+
+    if(changed && doorTriggered) {
+      let doorText = getDoorText(level);
+      console.log(JSON.stringify(['door triggered 2', doorText, doorTriggered, level, gameLevelJustEnded]));
       setGameText('');
       setTimeout(() => {
         setGameText(doorText);
       }, 10)
     }
-  }, [doorTriggered, getDoorText]);
+  }, [doorTriggered, getDoorText, level]);
 
   useEffect(() => {
     if(scene && camera && threeElem) {
@@ -538,16 +546,21 @@ function Game3D(props) {
             setScore(gameScore);
           }
           if(b2.classes?.includes('door')) {
-            console.log(JSON.stringify(['it be door time', gameDoorTriggered]));
             setDoorTriggered(++gameDoorTriggered);
 
             let sceneConf = getSceneConfig('Scene' + gameLevel);
             let hasEquip = hasRequiredItems(sceneConf.requiredItems, gameEquipment, gameLevel);
             let hasMashedSpiders = gameSpiders >= sceneConf.requiredSpiders;
 
-            console.log(JSON.stringify(['DOOR', hasEquip, hasMashedSpiders, gameSpiders, sceneConf.requiredSpiders]));
+            console.log(JSON.stringify(['DOOR', gameLevelJustEnded, hasEquip, hasMashedSpiders, gameSpiders, sceneConf.requiredSpiders]));
+
+            let passesNFTGating = gameNumNFTs;
+
+            if(casperDisabled) {
+              passesNFTGating = true;
+            }
             
-            if(hasEquip && hasMashedSpiders && gameNumNFTs) {
+            if(hasEquip && hasMashedSpiders && passesNFTGating) {
               door.open();
               gameLevelJustEnded = true;
               gameLevel += 1;
@@ -1351,39 +1364,40 @@ function Game3D(props) {
   }
 
   function getScreenGameStart() {
-      return <div className={ "br-screen br-screen-game-start " + getScreenClass(screens.GAME_START)}>
-        <div className="br-scary-text br-scary-title">
-          Caspookem
-        </div>
-        <div className='br-intro-subtitle'>
-          A spooky game on Casper Blockchain
-        </div>
-        <div className="br-intro-text">
-          Play a demo level 
-        </div>
-        <div className="br-intro-text">
-          OR
-        </div>
-        <div className="br-intro-text">
-          Connect Casper Signer and mint a Caspookie to play for real
-        </div>
-        <div>
-
-        </div>
-        <div className="br-game-controls">
-          { signedInInfo.success ?
-            <div>
-              <BrButton label="Play Caspookem" id="playCaspookem" className="br-button" onClick={ e => restart() } />
-            </div>
-            :
-            <div>
-              <BrButton label="Play Demo" id="playDemo" className="br-button" onClick={ e => restart() } />
-              <BrButton label="Connect Casper" id="connectCasperWallet" className="br-button" onClick={ e => casperAttemptConnect() } />
-            </div>
-          }
-        </div>
-        { getControlsUI() }
+    let connectCasperText = 'Connect Casper';
+    if(casperDisabled) {
+      connectCasperText = 'Casper Unavailable';
+    }
+    return <div className={ "br-screen br-screen-game-start " + getScreenClass(screens.GAME_START)}>
+      <div className="br-scary-text br-scary-title">
+        Caspookem
       </div>
+      <div className='br-intro-subtitle'>
+        A spooky game on Casper Blockchain
+      </div>
+      <div className="br-intro-text">
+        Play a demo level 
+      </div>
+      <div className="br-intro-text">
+        OR
+      </div>
+      <div className="br-intro-text">
+        Connect Casper Signer and mint a Caspookie to play for real
+      </div>
+      <div className="br-game-controls">
+        { signedInInfo.success ?
+          <div>
+            <BrButton label="Play Caspookem" id="playCaspookem" className="br-button" onClick={ e => restart() } />
+          </div>
+          :
+          <div>
+            <BrButton label="Play Demo" id="playDemo" className="br-button" onClick={ e => restart() } />
+            <BrButton label={ connectCasperText } id="connectCasperWallet" className="br-button" onClick={ e => casperAttemptConnect() } />
+          </div>
+        }
+      </div>
+      { getControlsUI() }
+    </div>
   }
   
   function getScreenGameOver() {
