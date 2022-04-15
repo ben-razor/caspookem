@@ -22,7 +22,6 @@ Built for the ReadyPlayerCasper hackathon tasks:
 
 [Build An NFT Holder-Exclusive Game On Casper](https://gitcoin.co/issue/casper-network/ready-player-casper-gitcoin/6/100028603)  
 
-
 ## Storyline
 
 Virtuous ruler nCtl has protected the blockchain from harm for centuries.  
