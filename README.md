@@ -47,7 +47,7 @@ Here are some example NFTs:
 
 The game is at a very early stage. Only a few rooms are implemented to demonstrate the concept.  
 
-The story line can be integrated into the game based on the outline in the [design document]().  
+The story line can be integrated into the game based on the outline in the [design outline](https://github.com/ben-razor/caspookem/blob/main/nctl-vs-cors.md).  
 
 More rooms can be added to create a multiplayer battle mode.  
 
