@@ -8,7 +8,7 @@ A spooky game on [Casper Blockchain](https://casperlabs.io/).
 
 Live App: (**No Casper Signer without whitelisting so live version is No-Casper demo mode**): [https://caspookem.web.app/](https://caspookem.web.app/)
 
-Local App (**Token gating with Caspookie NFTs, Saving high scores with Casper Signer**):  
+Local App (**Token gating with Caspookie NFTs and aving high scores using Casper Signer**):  
 ```
 git@github.com:ben-razor/caspookem.git
 cd web
