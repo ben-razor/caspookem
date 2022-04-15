@@ -448,12 +448,33 @@ function App() {
     return ui;
   }
 
-  function getControlsUI() {
-    return <div className="br-keymap-panel">
-      <div className="br-keymap-line">W,A,S,D - Forward, Back, Left, Right</div>
-      <div className="br-keymap-line">J - Jump</div>
-      <div className="br-keymap-line">N - Fire</div>
-    </div>
+  function getControlsUI(type='horizontal') {
+    let controlsUI;
+
+    if(type === 'horizontal') {
+      controlsUI = <div className="br-keymap-panel">
+        <div className="br-keymap-line">W,A,S,D - Forward, Back, Left, Right</div>
+        <div className="br-keymap-line">J - Jump</div>
+        <div className="br-keymap-line">N - Fire</div>
+      </div>
+    }
+    else if(type === 'one-line') {
+      controlsUI = <div className="br-keymap-one-line">
+        <div className="br-keymap-vert-line">W - Fwd, S - Back, A - Left, D - Right, J - Jump, N - Fire</div>
+      </div>
+    }
+    else {
+      controlsUI = <div className="br-keymap-vert">
+        <div className="br-keymap-vert-line">W - Fwd</div>
+        <div className="br-keymap-vert-line">S - Back</div>
+        <div className="br-keymap-vert-line">A - Left</div>
+        <div className="br-keymap-vert-line">D - Right</div>
+        <div className="br-keymap-vert-line">J - Jump</div>
+        <div className="br-keymap-vert-line">N - Fire</div>
+      </div>
+    }
+
+    return controlsUI;
   }
   
   function doHeaderAction() {
@@ -744,6 +765,7 @@ function App() {
           signedInInfo={signedInInfo} getBucketURL={getBucketURL} 
           getControlsUI={getControlsUI} />
         </div>
+        { screen === screens.GAME ?  getControlsUI('one-line'): '' }
       </div>
     </div>
   );

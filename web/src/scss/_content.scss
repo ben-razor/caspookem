@@ -1109,6 +1109,10 @@
     margin-top: 2em;
 }
 
+.br-controls-side {
+    position: absolute;
+}
+
 .br-no-border {
     border-width: 0;
 }
@@ -1119,4 +1123,8 @@
     justify-content: center;
     align-items: center;
     margin-top: 1em;
+}
+
+.br-keymap-one-line {
+    margin-top: 0.5em;
 }
