@@ -108,6 +108,7 @@ function Game3D(props) {
   const [gameText, setGameText] = useState('');
   const [levelEnded, setLevelEnded] = useState();
   const [level, setLevel] = useState(gameLevel);
+  const [loadingWorld, setLoadingWorld] = useState(true);
 
   function characterChanged(nftData, prevNFTData) {
     if(!nftData || !prevNFTData) {
@@ -159,6 +160,12 @@ function Game3D(props) {
       setControlEntry(_controlEntry);
     }
   }, [activeNFT]);
+
+  useEffect(() => {
+    setTimeout(() => {
+      setLoadingWorld(false);
+    }, 6000);
+  }, []);
 
   function startHidden(name) {
     let hidden = false;
@@ -1391,18 +1398,27 @@ function Game3D(props) {
       <div className="br-intro-text">
         Connect Casper Signer and mint a Caspookie to play for real
       </div>
-      <div className="br-game-controls">
-        { signedInInfo.success ?
+      {
+        loadingWorld ?
           <div>
-            <BrButton label="Play Caspookem" id="playCaspookem" className="br-button" onClick={ e => restart() } />
+            <div className=""><i className="fas fa-spinner fa-spin fa-2x"></i></div>
+            <div>Loading World...</div>
           </div>
-          :
-          <div>
-            <BrButton label="Play Demo" id="playDemo" className="br-button" onClick={ e => restart() } />
-            <BrButton label={ connectCasperText } id="connectCasperWallet" className="br-button" onClick={ e => casperAttemptConnect() } />
-          </div>
-        }
-      </div>
+        :
+          <div className="br-game-controls">
+              { signedInInfo.success ?
+                <div>
+                  <BrButton label="Play Caspookem" id="playCaspookem" className="br-button" onClick={ e => restart() } />
+                </div>
+                :
+                <div>
+                  <BrButton label="Play Demo" id="playDemo" className="br-button" onClick={ e => restart() } />
+                  <BrButton label={ connectCasperText } id="connectCasperWallet" className="br-button" onClick={ e => casperAttemptConnect() } />
+                </div>
+              }
+            </div>
+      }
+      
       { getControlsUI() }
     </div>
   }
