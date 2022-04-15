@@ -260,23 +260,28 @@ function App() {
 
       if(res.success) {
         if(type === 'mintCaspookie') {
-          let txRes = await mintCaspookie(res.data.activePublicKey);
-
-          if(txRes.success) {
-            console.log(JSON.stringify(['deploy', txRes.data.deploy]));
-            
-            data.deploy = txRes.data.deploy;
-            let _submittedTx = [...submittedTx, { type, data }]
-            setSubmittedTx(_submittedTx);
+          if(nftList.length >= 4) {
+            toast('Maximum 4 Caspookies per account', 'warning');
           }
           else {
-            if(txRes?.data?.error?.code === -32008) {
-              doubleToast(getText('error_mint_nft'), getText('text_ensure_enough_token'));
+            let txRes = await mintCaspookie(res.data.activePublicKey);
+
+            if(txRes.success) {
+              console.log(JSON.stringify(['deploy', txRes.data.deploy]));
+              
+              data.deploy = txRes.data.deploy;
+              let _submittedTx = [...submittedTx, { type, data }]
+              setSubmittedTx(_submittedTx);
             }
             else {
-              toast(getText('error_mint_nft'));
+              if(txRes?.data?.error?.code === -32008) {
+                doubleToast(getText('error_mint_nft'), getText('text_ensure_enough_token'));
+              }
+              else {
+                toast(getText('error_mint_nft'));
+              }
+              console.log(JSON.stringify(['error minting caspookie', txRes]));
             }
-            console.log(JSON.stringify(['error minting caspookie', txRes]));
           }
         }
         if(type === 'addHighScore') {
