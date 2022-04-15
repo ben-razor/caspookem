@@ -25,8 +25,6 @@ Built for the ReadyPlayerCasper hackathon tasks:
 
 ## Storyline
 
-The game is at a very early stage. Only a few rooms are implemented to demonstrate the concept.  
-
 Virtuous ruler nCtl has protected the blockchain from harm for centuries.  
 Now nCtl has been compromised by The CORS.  
 The blockchain is being torn apart by sweet Irish melodies.  
@@ -44,6 +42,14 @@ Here are some example NFTs:
 ![15](https://github.com/ben-razor/caspookem/blob/main/artwork/render/nft/v1/img/15.png)
 ![71](https://github.com/ben-razor/caspookem/blob/main/artwork/render/nft/v1/img/71.png)
 ![72](https://github.com/ben-razor/caspookem/blob/main/artwork/render/nft/v1/img/72.png)
+
+## Future Work
+
+The game is at a very early stage. Only a few rooms are implemented to demonstrate the concept.  
+
+The story line can be integrated into the game based on the outline in the [design document]().  
+
+More rooms can be added to create a multiplayer battle mode.  
 
 ## Technology
 
