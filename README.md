@@ -2,13 +2,13 @@
 
 A spooky game on [Casper Blockchain](https://casperlabs.io/).  
 
-<img src="https://github.com/ben-razor/caspookem/blob/main/artwork/render/game/screens/1-screenshot-demo-1.png" width="440"/><img src="https://github.com/ben-razor/caspookem/blob/main/artwork/render/game/screens/2-screenshot-signed-in-1.png" width="440"/>
+<img src="https://github.com/ben-razor/caspookem/blob/main/artwork/render/game/screens/1-screenshot-demo-1.png" width="500"/>
 
-Video demo: 
+**Video demo:** [View on YouTube](https://youtu.be/5f1jSMXxoNY)
 
 Live App: (Can't use Casper Signer without whitelisting so only 1 level demo mode): [https://caspookem.web.app/](https://caspookem.web.app/)
 
-Local App (Save high scores and use NFT to access extra levels with Casper Signer):  
+Local App (Token gating with Caspookie NFTs, Saving high scores with Casper Signer):  
 ```
 git@github.com:ben-razor/caspookem.git
 cd web
@@ -25,7 +25,7 @@ Built for the ReadyPlayerCasper hackathon tasks:
 
 ## Storyline
 
-The game is at a very early stage. Only a couple of rooms are implemented to demonstrate the concept.  
+The game is at a very early stage. Only a few rooms are implemented to demonstrate the concept.  
 
 Virtuous ruler nCtl has protected the blockchain from harm for centuries.  
 Now nCtl has been compromised by The CORS.  
@@ -47,4 +47,4 @@ Here are some example NFTs:
 
 ## Technology
 
-Caspookem is built on Casper Blockchain.  High scores can be saved on chain, and 
+Caspookem is built on Casper Blockchain.  Caspookie NFTs can be minted and high scores can be saved on chain. This is only available on localhost as live deployment requires Casper Wallet whitelisting.
