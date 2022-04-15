@@ -5,10 +5,10 @@ import { Vec3 } from 'cannon-es';
 
 export class Spider {
     constructor(id, classes=[], world, scene, physicsMaterial, options={ 
-        minSpeed: 0.4, maxSpeed: 1.1, speed: 0.4, spiderSenses: 0.5
+        minSpeed: 0.4, maxSpeed: 1.1, speed: 0.4, spiderSenses: 0.5, mass: 1, size: 0.7, class: 'standard'
     }) {
         this.id = id;
-        this.classes = ['spider'];
+        this.classes = ['spider', options.class];
         this.positioner = scene.getObjectByName(id);
         if(!this.positioner) {
             console.log(JSON.stringify(['Cant find object with id: ', this.id]));
@@ -18,12 +18,13 @@ export class Spider {
         this.scene = scene;
         this.physicsMaterial = physicsMaterial;
         this.debug = false;
-        this.size = 0.7;
+        this.size = options.size;
         this.enabled = false;
         this.paused = false;
         this.speed = options.speed;
         this.minSpeed = options.minSpeed;
         this.maxSpeed = options.maxSpeed;
+        this.mass = options.mass;
         this.vTo = new THREE.Vector3(0,0,0);
 
         this.timeTrigger = new TimeTrigger(options.spiderSenses);
@@ -46,7 +47,7 @@ export class Spider {
             }
 
             const shape = new CANNON.Sphere(this.size);
-            this.body = new CANNON.Body({ mass: 1, material: this.physicsMaterial, position: startPos })
+            this.body = new CANNON.Body({ mass: this.mass, material: this.physicsMaterial, position: startPos })
             this.positioner.position.copy(startPos);
             this.body.objId = this.id;
             this.body.classes = this.classes;

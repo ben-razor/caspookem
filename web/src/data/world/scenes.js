@@ -1,7 +1,8 @@
 const scenes = [
+  
   {
-    sceneName: "Scene0",
-    startHidden: ['CrateStandard', 'BlueCrateCenter', 'GemCenter'],
+    sceneName: "Scene1",
+    startHidden: ['CrateStandard', 'BlueCrateCenter', 'GemCenter', 'RedCrateCenter'],
     objects: [
       { id: 'CrateStandard001', pos: {x: 8, y: 1, z: 0}},
       { id: 'CrateStandard002', pos: {x: 8, y: 1, z: 2}},
@@ -35,7 +36,7 @@ const scenes = [
   },
   {
     sceneName: "Scene1",
-    startHidden: ['CrateStandard', 'BlueCrateCenter', 'GemCenter'],
+    startHidden: ['CrateStandard', 'BlueCrateCenter', 'GemCenter', 'RedCrateCenter'],
     objects: [
       { id: 'CrateStandard001', pos: {x: 8, y: 1, z: 0}},
       { id: 'CrateStandard002', pos: {x: 8, y: 1, z: 2}},
@@ -77,7 +78,7 @@ const scenes = [
   },
   {
     sceneName: "Scene2",
-    startHidden: ['CrateStandard', 'BlueCrateCenter', 'GemCenter'],
+    startHidden: ['CrateStandard', 'BlueCrateCenter', 'GemCenter', 'RedCrateCenter'],
     objects: [
       { id: 'CrateStandard001', pos: {x: 8, y: 1, z: 0}},
       { id: 'CrateStandard002', pos: {x: 8, y: 1, z: 2}},
@@ -124,6 +125,64 @@ const scenes = [
     numSpiders: 8,
     requiredSpiders: 10,
     requiredItems: ['gem-pink-1', 'gem-blue-1', 'gem-orange-1']
+  },
+  {
+    sceneName: "Scene3",
+    startHidden: ['CrateStandard', 'BlueCrateCenter', 'GemCenter', 'RedCrateCenter'],
+    objects: [
+      { id: 'CrateStandard001', pos: {x: 8, y: 1, z: 0}},
+      { id: 'CrateStandard002', pos: {x: 8, y: 1, z: 2}},
+      { id: 'CrateStandard003', pos: {x: 8, y: 3, z: 0}},
+      { id: 'CrateStandard004', pos: {x: 10, y: 1, z: 0}},
+      { id: 'CrateStandard005', pos: {x: 15, y: 1, z: -13}},
+      { id: 'CrateStandard004', pos: {x: 15, y: 1, z: -15}},
+      { id: 'CrateStandard007', pos: {x: 15, y: 3, z: -15}},
+      { id: 'BlueCrateCenter001', pos: {x: -12, y: 1, z: 0}},
+      { id: 'BlueCrateCenter002', pos: {x: -12, y: 1, z: -2}},
+      { id: 'BlueCrateCenter003', pos: {x: -12, y: 1, z: -4}},
+      { id: 'RedCrateCenter001', pos: {x: -15, y: 3, z: 8}},
+      { id: 'RedCrateCenter002', pos: {x: -15, y: 1, z: 8}},
+      { id: 'RedCrateCenter003', pos: {x: -13, y: 1, z: 8}},
+      { id: 'GemCenter001', pos: {x: 8, y: 5, z: 0}},
+      { id: 'GemCenter002', pos: {x: -12, y: 3, z: -4}},
+      { id: 'GemCenter003', pos: {x: 15, y: 5, z: -15}},
+      { id: 'GemCenter004', pos: {x: -15, y: 5, z: 8}},
+    ],
+    obstacles: [ 
+      { id: 'computer', classes: [], positionType: 'object', objId: 'WorldL1Computer', geometry: { type: "box", dims: [.2, 2, .2] } },
+      { id: 'WorldL1ColumnL', classes: ['no-land'], positionType: 'object', objId: 'WorldL1ColumnL', geometry: { type: "box", dims: [.2, 2.25, .2] } },
+      { id: 'WorldL1ColumnR', classes: ['no-land'], positionType: 'object', objId: 'WorldL1ColumnR', geometry: { type: "box", dims: [.2, 2.25, .2] } },
+      { id: 'BackWall', classes: ['no-land'], positionType: 'position', position: [0, 0, -16], geometry: { type: "plane", orientation: [0, 0, 0] } },
+      { id: 'FrontWall', classes: ['no-land'], positionType: 'position', position: [0, 0, 16], geometry: { type: "plane", orientation: [0, Math.PI, 0] } },
+      { id: 'SideWallR', classes: ['no-land'], positionType: 'position', position: [16, 0, 0], geometry: { type: "plane", orientation: [0, -Math.PI / 2, 0] } },
+      { id: 'SideWallL', classes: ['no-land'], positionType: 'position', position: [-16, 0, 0], geometry: { type: "plane", orientation: [0, Math.PI / 2, 0] } },
+      { id: 'CrateStandard001', classes: ['crate'], positionType: 'object', objId: 'CrateStandard001', geometry: { type: "box", dims: [1, 1, 1] } },
+      { id: 'CrateStandard002', classes: ['crate'], positionType: 'object', objId: 'CrateStandard002', geometry: { type: "box", dims: [1, 1, 1] } },
+      { id: 'CrateStandard003', classes: ['crate'], positionType: 'object', objId: 'CrateStandard003', geometry: { type: "box", dims: [1, 1, 1] } },
+      { id: 'CrateStandard004', classes: ['crate'], positionType: 'object', objId: 'CrateStandard004', geometry: { type: "box", dims: [1, 1, 1] } },
+      { id: 'CrateStandard005', classes: ['crate'], positionType: 'object', objId: 'CrateStandard005', geometry: { type: "box", dims: [1, 1, 1] } },
+      { id: 'CrateStandard006', classes: ['crate'], positionType: 'object', objId: 'CrateStandard006', geometry: { type: "box", dims: [1, 1, 1] } },
+      { id: 'CrateStandard007', classes: ['crate'], positionType: 'object', objId: 'CrateStandard007', geometry: { type: "box", dims: [1, 1, 1] } },
+      { id: 'BlueCrateCenter001', classes: ['crate'], positionType: 'object', objId: 'BlueCrateCenter001', geometry: { type: "box", dims: [1, 1, 1] } },
+      { id: 'BlueCrateCenter002', classes: ['crate'], positionType: 'object', objId: 'BlueCrateCenter002', geometry: { type: "box", dims: [1, 1, 1] } },
+      { id: 'BlueCrateCenter003', classes: ['crate'], positionType: 'object', objId: 'BlueCrateCenter003', geometry: { type: "box", dims: [1, 1, 1] } },
+      { id: 'RedCrateCenter001', classes: ['crate'], positionType: 'object', objId: 'RedCrateCenter001', geometry: { type: "box", dims: [1, 1, 1] } },
+      { id: 'RedCrateCenter002', classes: ['crate'], positionType: 'object', objId: 'RedCrateCenter002', geometry: { type: "box", dims: [1, 1, 1] } },
+      { id: 'RedCrateCenter003', classes: ['crate'], positionType: 'object', objId: 'RedCrateCenter003', geometry: { type: "box", dims: [1, 1, 1] } },
+    ],
+    triggers: [
+      { id: 'GemCenter001', classes: ['no-land', 'gem', 'gem-pink-1'], positionType: 'object', objId: 'GemCenter001', geometry: { type: "sphere", radius: 0.5 } },
+      { id: 'GemCenter002', classes: ['no-land', 'gem', 'gem-blue-1'], positionType: 'object', objId: 'GemCenter002', geometry: { type: "sphere", radius: 0.5 } },
+      { id: 'GemCenter003', classes: ['no-land', 'gem', 'gem-orange-1'], positionType: 'object', objId: 'GemCenter003', geometry: { type: "sphere", radius: 0.5 } },
+      { id: 'GemCenter004', classes: ['no-land', 'gem', 'gem-red-1'], positionType: 'object', objId: 'GemCenter004', geometry: { type: "sphere", radius: 0.5 } },
+      { id: 'Door001', classes: ['no-land', 'door'], positionType: 'position', position: [-.5, 2.5, -16], geometry: { type: "box", dims: [3, 2.5, 2] } }
+    ],
+    door: 'Door_Double',
+    bounds: { z: [-1.8, 0.8], x: [-3, 3] },
+    startPos: { x: 0, y: 5, z: 0},
+    numSpiders: 15,
+    requiredSpiders: 13,
+    requiredItems: ['gem-pink-1', 'gem-blue-1', 'gem-orange-1', 'gem-red-1']
   }
 ]
 

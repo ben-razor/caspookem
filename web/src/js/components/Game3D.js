@@ -2,7 +2,7 @@ import React, {useEffect, useState, useCallback, Fragment} from 'react';
 import * as THREE from 'three';
 import * as CANNON from 'cannon-es';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
-import lifeform from '../../data/models/ghost-7.gltf';
+import lifeform from '../../data/models/ghost-8.gltf';
 import imageFrame from '../../images/frame-dark-1.png';
 import BrButton from './lib/BrButton';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
@@ -218,6 +218,9 @@ function Game3D(props) {
           'object': getText('text_equip_pink_crystal') + ', ' + getText('text_equip_blue_crystal') + ' and ' +
                     getText('text_equip_orange_crystal')
         });
+      }
+      else if(sceneConf.requiredItems.length === 4) {
+        doorText = 'Crystals... you know the drill.'
       }
     }
     else if(gameSpiders < sceneConf.requiredSpiders) {
@@ -511,8 +514,6 @@ function Game3D(props) {
           faster: 'shift'
         });
 
-        let cannonPhysics = true;
-
         let totalTime = 0;
         let jumping = false;
 
@@ -522,7 +523,15 @@ function Game3D(props) {
           let b2 = a.body;
 
           if(b2.classes?.includes('spider')) {
-            gameHealth = Math.floor(gameHealth - (5 + Math.random() * 5));
+            let baseDamage = 5;
+            if(b2.classes?.includes('alien')) {
+              baseDamage = 2;
+            }
+            else if(b2.classes?.includes('techno')) {
+              baseDamage = 8;
+            }
+
+            gameHealth = Math.floor(gameHealth - (baseDamage + Math.random() * 5));
             if(gameHealth < 0) {
               gameHealth = 0;
               gameJustDied = true;
@@ -553,6 +562,14 @@ function Game3D(props) {
             setEquipment(gameEquipment);
             removeIds.push(b2.objId);
             gameScore += 5000;
+            setScore(gameScore);
+          }
+          if(b2.classes?.includes('gem-red-1')) {
+            console.log(JSON.stringify(['Collected Gem!!']));
+            gameEquipment.push({ id: b2.objId, type: 'gem-red-1' });
+            setEquipment(gameEquipment);
+            removeIds.push(b2.objId);
+            gameScore += 10000;
             setScore(gameScore);
           }
           if(b2.classes?.includes('door')) {
@@ -698,7 +715,9 @@ function Game3D(props) {
         let spiderTimers = [];
 
         for(let i = 1; i <= 5; i++) {
-          let spider = new Spider('Emptyspider00' + i, ['spider'], world, scene);
+          let spider = new Spider('Emptyspider00' + i, ['spider'], world, scene, physicsMaterial, { 
+            minSpeed: 0.4, maxSpeed: 1.1, speed: 0.4, spiderSenses: 0.6, mass: 2, size: 0.7, class: 'standard'
+          });
           spider.setTargetObj(lifeform.positioner);
           spiders.push(spider);
           spider.paused = true;
@@ -707,7 +726,20 @@ function Game3D(props) {
         }
 
         for(let i = 1; i <= 5; i++) {
-          let spider = new Spider('Emptytechnospider00' + i, ['spider'], world, scene);
+          let spider = new Spider('Emptytechnospider00' + i, ['spider'], world, scene, physicsMaterial, {
+            minSpeed: 0.2, maxSpeed: 0.9, speed: 0.2, spiderSenses: 1.2, mass: 3, size: 0.9, class: 'techno'
+          });
+          spider.setTargetObj(lifeform.positioner);
+          spider.paused = true;
+          spiders.push(spider);
+          let spiderTimer = new TimeTrigger(5, 1);
+          spiderTimers.push(spiderTimer);
+        }
+
+        for(let i = 1; i <= 5; i++) {
+          let spider = new Spider('Emptyalienspider00' + i, ['spider'], world, scene, physicsMaterial, {
+            minSpeed: 0.7, maxSpeed: 1.2, speed: 0.7, spiderSenses: 0.3, mass: 0.1, size: 0.5, class: 'alien'
+          });
           spider.setTargetObj(lifeform.positioner);
           spider.paused = true;
           spiders.push(spider);
