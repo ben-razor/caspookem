@@ -11,7 +11,7 @@ Live App: (**No Casper Signer without whitelisting so live version is No-Casper 
 Local App (**Token gating with Caspookie NFTs and saving high scores using Casper Signer**):  
 ```
 git clone git@github.com:ben-razor/caspookem.git
-cd web
+cd caspookem/web
 npm install
 npm run start
 ```
