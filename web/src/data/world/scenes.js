@@ -70,7 +70,7 @@ const scenes = [
     ],
     door: 'Door_Double',
     bounds: { z: [-1.8, 0.8], x: [-3, 3] },
-    startPos: { x: 0, y: 5, z: 15},
+    startPos: { x: 0, y: 5, z: 0},
     numSpiders: 8,
     requiredSpiders: 5, 
     requiredItems: ['gem-pink-1', 'gem-blue-1']
@@ -120,7 +120,7 @@ const scenes = [
     ],
     door: 'Door_Double',
     bounds: { z: [-1.8, 0.8], x: [-3, 3] },
-    startPos: { x: 0, y: 5, z: 15},
+    startPos: { x: 0, y: 5, z: 0},
     numSpiders: 8,
     requiredSpiders: 10,
     requiredItems: ['gem-pink-1', 'gem-blue-1', 'gem-orange-1']

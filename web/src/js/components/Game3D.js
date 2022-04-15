@@ -440,7 +440,10 @@ function Game3D(props) {
         let obstacles = [];
         let triggers = [];
 
+        console.log(JSON.stringify(['px1']));
+        
         function initLevel(nextLevel) {
+        console.log(JSON.stringify(['px2']));
           let sceneConf = getSceneConfig('Scene' + nextLevel);
 
           lifeform.enable(sceneConf.startPos);
@@ -784,6 +787,7 @@ function Game3D(props) {
           if(gameJustStarted) {
             gameJustStarted = false;
             gameLevelJustStarted = true;
+            console.log(JSON.stringify(['px gjs']));
           }
 
           if(gameJustDied) {
@@ -852,7 +856,7 @@ function Game3D(props) {
           }
 
           if(cannonPhysics) {
-            if(totalTime > 5) {
+            if(totalTime > 2) {
               world.step(Math.min(dt, 0.1));
 
               for (let i = 0; i < balls.length; i++) {

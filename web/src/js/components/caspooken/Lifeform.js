@@ -44,6 +44,7 @@ export class Lifeform {
       }
 
       this.positioner.visible = true;
+      this.body.velocity.set(0, 0, 0);
       this.world.addBody(this.body);
       this.body.position.copy(startPos);
       this.positioner.rotation.set(0, 0, 0);
