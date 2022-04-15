@@ -34,11 +34,6 @@ The music sounds a bit like The Chain by Fleetwood Mac.
 
 ## Script Outline
 
-'''
-Comp: "You can't leave the room till you've fixed these bugs"
-Cas:  That sounds scarily familiar
-'''
-
 ```
 Cas:  What's the crack with this place?
 Cas:  Maybe the computer will say
@@ -92,6 +87,11 @@ Mark: Disappear into a "blockchain". We're the one's that are supposed to put yo
 nCtl: Fruck you Mark Tuna. It's on.
 Cas:  Boom!! I knew you'd return N-Kettle
 Cas:  Let's smoke this motha like it aint no thing
+```
+
+```
+Comp: "You can't leave the room till you've fixed these bugs"
+Cas:  That sounds scarily familiar
 ```
 
 ## Caspookie Names
