@@ -47,4 +47,8 @@ Here are some example NFTs:
 
 ## Technology
 
-Caspookem is built on Casper Blockchain.  Caspookie NFTs can be minted and high scores can be saved on chain. This is only available on localhost as live deployment requires Casper Wallet whitelisting.
+Caspookem is built on Casper Blockchain.  Caspookie NFTs can be minted and high scores can be saved on chain.  
+
+This is currently only available on localhost as live deployment requires Casper Wallet whitelisting.  
+
+
