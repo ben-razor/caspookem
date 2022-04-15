@@ -8,10 +8,10 @@ A spooky game on [Casper Blockchain](https://casperlabs.io/).
 
 Live App: (**No Casper Signer without whitelisting so live version is No-Casper demo mode**): [https://caspookem.web.app/](https://caspookem.web.app/)
 
-Local App (**Token gating with Caspookie NFTs, Saving high scores with Casper Signer**):  
+Local App (**Token gating with Caspookie NFTs and saving high scores using Casper Signer**):  
 ```
-git@github.com:ben-razor/caspookem.git
-cd web
+git clone git@github.com:ben-razor/caspookem.git
+cd caspookem/web
 npm install
 npm run start
 ```
@@ -21,7 +21,6 @@ Built for the ReadyPlayerCasper hackathon tasks:
 [Build A Single Player Game On Casper](https://gitcoin.co/issue/casper-network/ready-player-casper-gitcoin/1/100028589)  
 
 [Build An NFT Holder-Exclusive Game On Casper](https://gitcoin.co/issue/casper-network/ready-player-casper-gitcoin/6/100028603)  
-
 
 ## Storyline
 
