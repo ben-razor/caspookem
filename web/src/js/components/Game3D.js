@@ -759,12 +759,19 @@ function Game3D(props) {
           }
         }
 
+        const timeStep = 1 / 60;
+        let lastCallTime = performance.now() / 1000
+
         var animateLifeform = function () {
           requestAnimationFrame( animateLifeform );
-
-          let dt = clock.getDelta();
-          totalTime += dt;
           
+          const time = performance.now() / 1000;
+          const dt = time - lastCallTime;
+          totalTime += dt;
+          lastCallTime = time;
+
+          world.step(timeStep, dt);
+
           for(let i = 0; i < spiders.length; i++) {
             spiders[i].update(dt, totalTime);
             spiderTimers[i].update(dt);
@@ -862,80 +869,77 @@ function Game3D(props) {
             toRemove = [];
           }
 
-          if(cannonPhysics) {
-            if(totalTime > 2) {
-              world.step(Math.min(dt, 0.1));
+          if(totalTime > 2) {
 
-              for (let i = 0; i < balls.length; i++) {
-                ballMeshes[i].position.copy(balls[i].position)
-                ballMeshes[i].quaternion.copy(balls[i].quaternion)
-              }
+            for (let i = 0; i < balls.length; i++) {
+              ballMeshes[i].position.copy(balls[i].position)
+              ballMeshes[i].quaternion.copy(balls[i].quaternion)
+            }
 
-              let height = lifeform.body.position.y - 1;
-              lifeform.positioner.position.copy(lifeform.body.position);
-              lifeform.positioner.position.y = height;
-              let keys = controller._input._keys;
+            let height = lifeform.body.position.y - 1;
+            lifeform.positioner.position.copy(lifeform.body.position);
+            lifeform.positioner.position.y = height;
+            let keys = controller._input._keys;
 
-              if(keys.space) {
-                if(!jumping) {
-                  lifeform.body.velocity.y = 10;
-                  if(keys.left) {
-                    lifeform.body.velocity.x = -6;
-                  }
-                  if(keys.right) {
-                    lifeform.body.velocity.x = 6;
-                  }
-                  if(keys.forward) {
-                    lifeform.body.velocity.z = -6;
-                  }
-                  if(keys.backward) {
-                    lifeform.body.velocity.z = 6;
-                  }
-                  jumping = true;
-                }
-              }
-
-              if(keys.left) {
-                if(!jumping) {
+            if(keys.space) {
+              if(!jumping) {
+                lifeform.body.velocity.y = 10;
+                if(keys.left) {
                   lifeform.body.velocity.x = -6;
-                  lifeform.positioner.rotation.set(0, -Math.PI/2, 0);
                 }
-              }
-
-              if(keys.right) {
-                if(!jumping) {
+                if(keys.right) {
                   lifeform.body.velocity.x = 6;
-                  lifeform.positioner.rotation.set(0, Math.PI/2, 0);
                 }
-              }
-
-              if(keys.backward) {
-                if(!jumping) {
-                  lifeform.body.velocity.z = 6;
-                  if(keys.left) {
-                    lifeform.positioner.rotation.set(0, -Math.PI/4, 0);
-                  }
-                  else if(keys.right) {
-                    lifeform.positioner.rotation.set(0, Math.PI/4, 0);
-                  }
-                  else {
-                    lifeform.positioner.rotation.set(0, 0, 0);
-                  }
-                }
-              }
-
-              if(keys.forward) {
-                if(!jumping) {
+                if(keys.forward) {
                   lifeform.body.velocity.z = -6;
-                  if(keys.left) {
-                    lifeform.positioner.rotation.set(0, -3*Math.PI/4, 0);
-                  }
-                  else if(keys.right) {
-                    lifeform.positioner.rotation.set(0, 3*Math.PI/4, 0);
-                  }
-                  else {
-                    lifeform.positioner.rotation.set(0, Math.PI, 0);
-                  }
+                }
+                if(keys.backward) {
+                  lifeform.body.velocity.z = 6;
+                }
+                jumping = true;
+              }
+            }
+
+            if(keys.left) {
+              if(!jumping) {
+                lifeform.body.velocity.x = -6;
+                lifeform.positioner.rotation.set(0, -Math.PI/2, 0);
+              }
+            }
+
+            if(keys.right) {
+              if(!jumping) {
+                lifeform.body.velocity.x = 6;
+                lifeform.positioner.rotation.set(0, Math.PI/2, 0);
+              }
+            }
+
+            if(keys.backward) {
+              if(!jumping) {
+                lifeform.body.velocity.z = 6;
+                if(keys.left) {
+                  lifeform.positioner.rotation.set(0, -Math.PI/4, 0);
+                }
+                else if(keys.right) {
+                  lifeform.positioner.rotation.set(0, Math.PI/4, 0);
+                }
+                else {
+                  lifeform.positioner.rotation.set(0, 0, 0);
+                }
+              }
+            }
+
+            if(keys.forward) {
+              if(!jumping) {
+                lifeform.body.velocity.z = -6;
+                if(keys.left) {
+                  lifeform.positioner.rotation.set(0, -3*Math.PI/4, 0);
+                }
+                else if(keys.right) {
+                  lifeform.positioner.rotation.set(0, 3*Math.PI/4, 0);
+                }
+                else {
+                  lifeform.positioner.rotation.set(0, Math.PI, 0);
                 }
               }
             }
