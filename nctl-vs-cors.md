@@ -34,8 +34,10 @@ The music sounds a bit like The Chain by Fleetwood Mac.
 
 ## Script Outline
 
+'''
 Comp: "You can't leave the room till you've fixed these bugs"
 Cas:  That sounds scarily familiar
+'''
 
 ```
 Cas:  What's the crack with this place?
