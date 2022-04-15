@@ -528,7 +528,7 @@ function Game3D(props) {
               baseDamage = 2;
             }
             else if(b2.classes?.includes('techno')) {
-              baseDamage = 8;
+              baseDamage = 10;
             }
 
             gameHealth = Math.floor(gameHealth - (baseDamage + Math.random() * 5));
@@ -716,7 +716,7 @@ function Game3D(props) {
 
         for(let i = 1; i <= 5; i++) {
           let spider = new Spider('Emptyspider00' + i, ['spider'], world, scene, physicsMaterial, { 
-            minSpeed: 0.4, maxSpeed: 1.1, speed: 0.4, spiderSenses: 0.6, mass: 2, size: 0.7, class: 'standard'
+            minSpeed: 0.5, maxSpeed: 1.1, speed: 0.5, spiderSenses: 0.6, mass: 2, size: 0.7, class: 'standard'
           });
           spider.setTargetObj(lifeform.positioner);
           spiders.push(spider);
@@ -727,7 +727,7 @@ function Game3D(props) {
 
         for(let i = 1; i <= 5; i++) {
           let spider = new Spider('Emptytechnospider00' + i, ['spider'], world, scene, physicsMaterial, {
-            minSpeed: 0.2, maxSpeed: 0.9, speed: 0.2, spiderSenses: 1.2, mass: 3, size: 0.9, class: 'techno'
+            minSpeed: 0.3, maxSpeed: 0.9, speed: 0.3, spiderSenses: 1.2, mass: 3, size: 0.9, class: 'techno'
           });
           spider.setTargetObj(lifeform.positioner);
           spider.paused = true;

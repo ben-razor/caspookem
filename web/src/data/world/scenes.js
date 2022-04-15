@@ -1,7 +1,7 @@
 const scenes = [
   
   {
-    sceneName: "Scene1",
+    sceneName: "Scene0",
     startHidden: ['CrateStandard', 'BlueCrateCenter', 'GemCenter', 'RedCrateCenter'],
     objects: [
       { id: 'CrateStandard001', pos: {x: 8, y: 1, z: 0}},
@@ -122,7 +122,7 @@ const scenes = [
     door: 'Door_Double',
     bounds: { z: [-1.8, 0.8], x: [-3, 3] },
     startPos: { x: 0, y: 5, z: 0},
-    numSpiders: 8,
+    numSpiders: 11,
     requiredSpiders: 10,
     requiredItems: ['gem-pink-1', 'gem-blue-1', 'gem-orange-1']
   },
