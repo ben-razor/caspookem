@@ -10,7 +10,7 @@ export class Spider {
         this.id = id;
         this.classes = ['spider'];
         this.positioner = scene.getObjectByName(id);
-        if(!this.postioner) {
+        if(!this.positioner) {
             console.log(JSON.stringify(['Cant find object with id: ', this.id]));
         }
 

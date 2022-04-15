@@ -584,7 +584,9 @@ function Game3D(props) {
 
         let balls = [];
         let ballMeshes = [];
-        let material = new THREE.MeshToonMaterial({ color: '#0022aa', alphaMap: fireTexture, alphaBlend: THREE.AdditiveBlending, opacity: 1 })
+        let material = new THREE.MeshStandardMaterial({ 
+          color: '#2288dd', alphaMap: fireTexture, alphaBlend: THREE.AdditiveBlending, opacity: 1
+        })
         let ballIndex = 0;
         let toRemove = [];
         let removeIds = [];

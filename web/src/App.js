@@ -141,7 +141,6 @@ function App() {
 
   useEffect(() => {
     let changed = stateCheck.changed('activePublicKey1', activePublicKey, '');
-    console.log(JSON.stringify(['apk changed', activePublicKey]));
     
     if(changed && activePublicKey) {
       requestHighScore();
@@ -157,7 +156,6 @@ function App() {
 
       let _timerId = setInterval(async () => {
         let res = await checkSignedIn();
-        console.log(JSON.stringify(['post si', res]));
 
         if(res.success) {
           let _activePublicKey = res.data.activePublicKey;

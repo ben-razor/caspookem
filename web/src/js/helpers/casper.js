@@ -332,8 +332,6 @@ export async function checkSignedIn() {
   let res = createErrorInfo('error_casper_no_signer');
   let activePublicKey;
 
-  console.log(JSON.stringify(['clh', window.casperlabsHelper, window['casperlabsHelper']]));
-  
   if(window.casperlabsHelper) {
      try {
       activePublicKey = await window.casperlabsHelper.getActivePublicKey();
