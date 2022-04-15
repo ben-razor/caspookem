@@ -6,7 +6,7 @@ A spooky game on [Casper Blockchain](https://casperlabs.io/).
 
 **Video demo:** [View on YouTube](https://youtu.be/5f1jSMXxoNY)
 
-Live App: (Can't use Casper Signer without whitelisting so only 1 level demo mode): [https://caspookem.web.app/](https://caspookem.web.app/)
+Live App: (No Casper Signer without whitelisting so is No-Casper demo mode): [https://caspookem.web.app/](https://caspookem.web.app/)
 
 Local App (Token gating with Caspookie NFTs, Saving high scores with Casper Signer):  
 ```
