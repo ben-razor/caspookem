@@ -55,6 +55,7 @@ More rooms can be added to create a multiplayer battle mode.
 
 Caspookem is built on Casper Blockchain.  Caspookie NFTs can be minted and high scores can be saved on chain.  
 
-This is currently only available on localhost as live deployment requires Casper Wallet whitelisting.  
+This feature is currently only available on localhost as live deployment requires Casper Wallet whitelisting.  
 
+Connection to blockchain nodes required a proxy server to be deployed to work around CORS restrictions. There was no indication of which network nodes are reliable so it points at a randomly chosen node. This is extremely error prone. It would be beneficial if Casper could provide some reliable nodes with CORS disabled to use for testnet development.  
 
