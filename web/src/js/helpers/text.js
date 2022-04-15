@@ -3,6 +3,7 @@ const text_consts = {
   "nft_name": "Caspookie",
   "nft_short_name": "Caspookie",
   "blockchain_name": "Casper",
+  "token": "CSPR",
   "mint_price": "0.1 CSPR"
 }
 
@@ -67,6 +68,8 @@ const text = {
     "text_unknown_transaction": `Unknown transaction`,
     "text_adding_high_score": `Adding high score`,
     "text_minting": `Minting ${text_consts.nft_name}`,
+    "text_minted": `${text_consts.nft_name} minted`,
+    "text_ensure_enough_token": `Ensure you have enough ${text_consts.token}`,
 
     'text_sign_in_to_save': 'Sign in to save and view progress',
     'text_wallet_name': 'Casper Signer',
@@ -89,7 +92,7 @@ const text = {
     "error_save_kart": `Error saving ${text_consts.nft_name}`,
     "error_no_active_kart": `No ${text_consts.nft_name} is active`,
     "error_check_console": "Check console for details",
-    "error_mint_kart": `Error minting ${text_consts.nft_name}`,
+    "error_mint_nft": `Error minting ${text_consts.nft_name}`,
     "error_upgrade_kart": `Error upgrading ${text_consts.nft_name}`,
     "error_starting_battle": `Error starting battle`,
     "error_no_opponent_selected": `Error no opponent selected`,

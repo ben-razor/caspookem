@@ -60,7 +60,7 @@ let gameDoorTriggered = 0;
 let gameEquipment = [];
 let gameNumNFTs = 0;
 
-let casperDisabled = true; // !isLocal();
+let casperDisabled = !isLocal();
 
 function Game3D(props) {
   const showModal = props.showModal;
@@ -546,6 +546,7 @@ function Game3D(props) {
             setScore(gameScore);
           }
           if(b2.classes?.includes('door')) {
+            console.log(JSON.stringify(['it be door time', gameDoorTriggered]));
             setDoorTriggered(++gameDoorTriggered);
 
             let sceneConf = getSceneConfig('Scene' + gameLevel);

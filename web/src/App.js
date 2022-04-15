@@ -114,39 +114,40 @@ function App() {
     return parseInt(ipfsURL.split('/').slice(-1)[0].replace('.json', ''));
   }
 
+  const requestCaspookies = useCallback(async() => {
+    let caspookieNFTs = await getCaspookiesForAccount(activePublicKey);
+
+    console.log(JSON.stringify([caspookieNFTs]));
+    let _nftList = [];
+
+    for(let cas of caspookieNFTs) {
+      let meta = cas.metaMap;
+
+      let bucketURL = ipfsToBucketURL(meta.token_uri);
+      console.log(JSON.stringify(['fetching metadata from', bucketURL]));
+
+      let r = await fetch(bucketURL);
+      let j = await r.json();
+
+      let tokenId = ipfsToTokenId(meta.token_uri);
+      j.token_id = tokenId;
+      console.log(JSON.stringify(['Caspookie metadata:', j]));
+      _nftList.push(j);
+      setActiveNFT(j);
+    }
+
+    setNFTList(_nftList);
+  }, [activePublicKey]);
+
   useEffect(() => {
+    let changed = stateCheck.changed('activePublicKey1', activePublicKey, '');
     console.log(JSON.stringify(['apk changed', activePublicKey]));
     
-    if(activePublicKey) {
+    if(changed && activePublicKey) {
       requestHighScore();
-      (async () => {
-        let caspookieNFTs = await getCaspookiesForAccount(activePublicKey);
-
-        console.log(JSON.stringify([caspookieNFTs]));
-        let _nftList = [];
-
-        for(let cas of caspookieNFTs) {
-          let meta = cas.metaMap;
-
-          let bucketURL = ipfsToBucketURL(meta.token_uri);
-          console.log(JSON.stringify(['fetching metadata from', bucketURL]));
-
-          let r = await fetch(bucketURL);
-          let j = await r.json();
-
-          let tokenId = ipfsToTokenId(meta.token_uri);
-          j.token_id = tokenId;
-          console.log(JSON.stringify(['Caspookie metadata:', j]));
-          _nftList.push(j);
-          setActiveNFT(j);
-        }
-
-        setNFTList(_nftList);
-
-
-      })();
+      requestCaspookies();
     }
-  }, [activePublicKey]);
+  }, [requestCaspookies, requestHighScore, activePublicKey]);
 
   useEffect(() => {
     if(stateCheck.changed('doPendingTx', pendingTx) || stateCheck.changed('apk1', activePublicKey)) {
@@ -197,6 +198,8 @@ function App() {
               console.log(JSON.stringify([res]));
 
               if(res.success) {
+                console.log(JSON.stringify(['tx complete', res]));
+                
                 if(txInfo.type === 'addHighScore') {
                   toast(getText('text_high_score_saved'));
                   console.log(JSON.stringify(['Updating high score', txInfo]));
@@ -204,6 +207,10 @@ function App() {
                   if(txInfo.data.score > highScore) {
                     setHighScore(txInfo.data.score);
                   }
+                }
+                else if(txInfo.type === 'mintCaspookie') {
+                  toast(getText('text_minted'));
+                  requestCaspookies();
                 }
                 else {
                   toast(getText('text_tx_complete', txInfo));
@@ -264,6 +271,15 @@ function App() {
             let _submittedTx = [...submittedTx, { type, data }]
             setSubmittedTx(_submittedTx);
           }
+          else {
+            if(txRes?.data?.error?.code === -32008) {
+              doubleToast(getText('error_mint_nft'), getText('text_ensure_enough_token'));
+            }
+            else {
+              toast(getText('error_mint_nft'));
+            }
+            console.log(JSON.stringify(['error minting caspookie', txRes]));
+          }
         }
         if(type === 'addHighScore') {
           let txRes = await addHighScore(data.score, res.data.activePublicKey, NETWORK_NAME, PAYMENT_ADD_HIGH_SCORE);
@@ -273,6 +289,10 @@ function App() {
             data.deploy = txRes.data.deploy;
             let _submittedTx = [...submittedTx, { type, data }]
             setSubmittedTx(_submittedTx);
+          }
+          else {
+            toast('Error adding high score');
+            console.log(JSON.stringify(['error adding high score', txRes]));
           }
         }
         else if(type === 'getHighScore') {
@@ -617,7 +637,7 @@ function App() {
         }
 
         items.push(<div className="br-pending-list-item" key={"pending-list-" + i++}>
-          <div className="br-pending-list-spinner"><i class="fas fa-spinner fa-spin"></i></div>
+          <div className="br-pending-list-spinner"><i className="fas fa-spinner fa-spin"></i></div>
           { ellipsis(text) }
         </div>);
       }
