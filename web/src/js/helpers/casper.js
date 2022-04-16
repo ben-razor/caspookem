@@ -21,7 +21,7 @@ const CONTRACT_NFT_PRA = 'hash-09766a2ccc20f5a4a24442bf5ef83a58f7a145593e78c8443
 const CONTRACT_CASPOOKIES001 = 'hash-b0fecb42a40e963f40b53a7081d0865624b5a052ab91f4d97271a23303af66f4';
 
 //Create Casper client and service to interact with Casper node.
-const apiUrl = "https://benrazor.net:7777/rpc/";
+const apiUrl = "https://benrazor.net:7778/rpc";
 const casperService = new CasperServiceByJsonRPC(apiUrl);
 const casperClient = new CasperClient(apiUrl);
 const contractClient = new Contract(casperClient);
