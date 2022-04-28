@@ -58,3 +58,4 @@ This feature is currently only available on localhost as live deployment require
 
 Connection to blockchain nodes required a proxy server to be deployed to work around CORS restrictions. There was no indication of which network nodes are reliable so it points at a randomly chosen node. This is extremely error prone. It would be beneficial if Casper could provide some reliable nodes with CORS disabled to use for testnet development.  
 
+Casper Verification: Ben Razor
